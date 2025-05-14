@@ -191,6 +191,88 @@
     text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
   }
   
+  /* Animations pour l'arrière-plan dynamique */
+  @keyframes backgroundPulse {
+    0% {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    50% {
+      background-color: rgba(20, 20, 40, 0.4);
+    }
+    100% {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .bg-dynamic-1 {
+    animation: backgroundPulse 4s infinite ease-in-out;
+  }
+  
+  .bg-dynamic-2 {
+    animation: backgroundPulse 3s infinite ease-in-out;
+    background-color: rgba(30, 10, 60, 0.25);
+  }
+  
+  .bg-dynamic-3 {
+    animation: backgroundPulse 2s infinite ease-in-out;
+    background-color: rgba(60, 20, 80, 0.3);
+  }
+  
+  /* Animation pour les particules d'arrière-plan */
+  @keyframes floatParticle {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+    100% {
+      transform: translateY(0) rotate(360deg);
+    }
+  }
+  
+  .bg-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .bg-particle-1 {
+    animation: floatParticle 8s infinite ease-in-out;
+    background-color: #7447FF;
+  }
+  
+  .bg-particle-2 {
+    animation: floatParticle 12s infinite ease-in-out;
+    background-color: #44AAFF;
+  }
+  
+  .bg-particle-3 {
+    animation: floatParticle 10s infinite ease-in-out;
+    background-color: #FF4477;
+  }
+  
+  /* Animation pour les boss */
+  @keyframes shake {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+      transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+      transform: translateX(5px);
+    }
+  }
+  
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  
   @keyframes pulse {
     0%, 100% {
       transform: scale(1);

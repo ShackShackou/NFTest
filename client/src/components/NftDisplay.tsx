@@ -50,6 +50,27 @@ interface CharacterState {
   isCrouching: boolean;
   isJumping: boolean;
   direction: 'left' | 'right';
+  evolution: 'normal' | 'evolved' | 'ultimate';
+}
+
+// Type pour les quêtes journalières
+interface DailyQuest {
+  id: string;
+  title: string;
+  description: string;
+  requirement: number;
+  currentProgress: number;
+  reward: number;
+  completed: boolean;
+  type: 'clicks' | 'combos' | 'boss' | 'level';
+}
+
+// Type pour le tableau des meilleurs scores
+interface HighScore {
+  name: string;
+  score: number;
+  level: number;
+  date: Date;
 }
 
 interface NftDisplayProps {
@@ -118,8 +139,53 @@ export function NftDisplay({ className }: NftDisplayProps) {
     isAttacking: false,
     isCrouching: false,
     isJumping: false,
-    direction: 'right'
+    direction: 'right',
+    evolution: 'normal'
   });
+  
+  // Quêtes journalières
+  const [dailyQuests, setDailyQuests] = useState<DailyQuest[]>([
+    {
+      id: 'quest1',
+      title: 'Clicker fou',
+      description: 'Cliquez 100 fois sur le NFT',
+      requirement: 100,
+      currentProgress: 0,
+      reward: 50,
+      completed: false,
+      type: 'clicks'
+    },
+    {
+      id: 'quest2',
+      title: 'Combo master',
+      description: 'Atteignez un combo de 15',
+      requirement: 15,
+      currentProgress: 0,
+      reward: 100,
+      completed: false,
+      type: 'combos'
+    },
+    {
+      id: 'quest3',
+      title: 'Boss slayer',
+      description: 'Battez 1 boss',
+      requirement: 1,
+      currentProgress: 0,
+      reward: 200,
+      completed: false,
+      type: 'boss'
+    }
+  ]);
+  
+  // Tableau des meilleurs scores
+  const [highScores, setHighScores] = useState<HighScore[]>([
+    { name: "NFT Master", score: 1000, level: 5, date: new Date(2025, 3, 15) },
+    { name: "Pixel Pro", score: 750, level: 4, date: new Date(2025, 3, 10) },
+    { name: "Clicker King", score: 500, level: 3, date: new Date(2025, 3, 5) }
+  ]);
+  
+  // Particules d'arrière-plan
+  const [backgroundParticles, setBackgroundParticles] = useState<Array<{id: number, x: number, y: number, type: number}>>([]);
   
   // État pour les accessoires et objets dans la boutique
   const [shopItems, setShopItems] = useState<ShopItem[]>([
@@ -347,6 +413,109 @@ export function NftDisplay({ className }: NftDisplayProps) {
     
     return () => clearInterval(animationInterval);
   }, [gameEffects, particleEffects, shockwaves]);
+  
+  // Mise en place des particules d'arrière-plan
+  useEffect(() => {
+    // Créer les particules initiales
+    const particles = [];
+    const particleCount = 15;
+    
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        id: i,
+        x: Math.random() * 100, // Position aléatoire en pourcentage
+        y: Math.random() * 100,
+        type: Math.floor(Math.random() * 3) + 1 // 3 types de particules
+      });
+    }
+    
+    setBackgroundParticles(particles);
+  }, []);
+  
+  // Vérifier et mettre à jour les quêtes journalières
+  useEffect(() => {
+    const updatedQuests = dailyQuests.map(quest => {
+      let newProgress = quest.currentProgress;
+      
+      // Mettre à jour la progression selon le type de quête
+      if (quest.type === 'clicks' && !quest.completed) {
+        newProgress = Math.min(quest.requirement, gameStats.totalClicks);
+      } else if (quest.type === 'combos' && !quest.completed) {
+        newProgress = Math.min(quest.requirement, gameStats.maxCombo);
+      } else if (quest.type === 'boss' && !quest.completed && boss.level > 1) {
+        newProgress = Math.min(quest.requirement, boss.level - 1);
+      } else if (quest.type === 'level' && !quest.completed) {
+        newProgress = Math.min(quest.requirement, gameStats.level);
+      }
+      
+      // Vérifier si la quête est complétée
+      const justCompleted = !quest.completed && newProgress >= quest.requirement;
+      
+      if (justCompleted) {
+        // Récompenser le joueur
+        setClickCount(prev => prev + quest.reward);
+        
+        // Afficher un toast pour annoncer la complétion de la quête
+        toast({
+          title: `🎯 Quête complétée: ${quest.title}`,
+          description: `Vous avez gagné ${quest.reward} points!`,
+          duration: 5000,
+        });
+      }
+      
+      return {
+        ...quest,
+        currentProgress: newProgress,
+        completed: quest.completed || justCompleted
+      };
+    });
+    
+    setDailyQuests(updatedQuests);
+  }, [gameStats.totalClicks, gameStats.maxCombo, boss.level, gameStats.level, toast]);
+  
+  // Évolution du personnage basée sur le niveau
+  useEffect(() => {
+    if (gameStats.level >= 10 && characterState.evolution !== 'ultimate') {
+      // Évolution ultime
+      setCharacterState(prev => ({ ...prev, evolution: 'ultimate' }));
+      
+      toast({
+        title: "✨ ÉVOLUTION ULTIME!",
+        description: "Votre NFT a atteint sa forme finale!",
+        duration: 5000,
+      });
+      
+    } else if (gameStats.level >= 5 && characterState.evolution === 'normal') {
+      // Première évolution
+      setCharacterState(prev => ({ ...prev, evolution: 'evolved' }));
+      
+      toast({
+        title: "🌟 ÉVOLUTION!",
+        description: "Votre NFT a évolué et devient plus puissant!",
+        duration: 5000,
+      });
+    }
+  }, [gameStats.level, characterState.evolution, toast]);
+  
+  // Mettre à jour les meilleurs scores
+  useEffect(() => {
+    if (clickCount > 0 && gameStats.level > 1) {
+      // Vérifier si le score actuel est un meilleur score
+      const lowestScore = highScores.length > 0 ? Math.min(...highScores.map(hs => hs.score)) : 0;
+      
+      if (clickCount > lowestScore || highScores.length < 5) {
+        // Ajouter le nouveau score et trier
+        const newHighScores = [
+          ...highScores,
+          { name: "Vous", score: clickCount, level: gameStats.level, date: new Date() }
+        ]
+        .sort((a, b) => b.score - a.score) // Trier par score décroissant
+        .slice(0, 5); // Garder seulement les 5 premiers
+        
+        setHighScores(newHighScores);
+      }
+    }
+  }, [clickCount, gameStats.level, highScores]);
   
   // Une fois que l'image est chargée, on met isLoading à false
   useEffect(() => {
@@ -810,12 +979,24 @@ export function NftDisplay({ className }: NftDisplayProps) {
           ref={containerRef}
           className={cn(
             "relative z-10 p-4 custom-cursor",
-            isFrozen && "frozen-frame"
+            isFrozen && "frozen-frame",
+            gameStats.level >= 10 ? 'bg-dynamic-3' : gameStats.level >= 5 ? 'bg-dynamic-2' : 'bg-dynamic-1'
           )}
           onMouseEnter={handleImageHover}
           onMouseLeave={handleImageLeave}
           onClick={handleImageClick}
         >
+          {/* Particules d'arrière-plan */}
+          {backgroundParticles.map(particle => (
+            <div
+              key={particle.id}
+              className={`bg-particle bg-particle-${particle.type}`}
+              style={{
+                left: `${particle.x}%`,
+                top: `${particle.y}%`,
+              }}
+            />
+          ))}
           {isLoading ? (
             <div className="flex items-center justify-center h-[400px]">
               <Spinner size="lg" />
