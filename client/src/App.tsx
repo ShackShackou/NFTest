@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NftMarketplace from "@/pages/NftMarketplace";
 import NftMintPage from "@/pages/NftMintPage";
+import NftManager from "@/pages/NftManager";
 import NotFound from "@/pages/not-found";
 import { WalletProvider } from "@/components/WalletProvider";
 import { WagmiConfig } from "wagmi";
@@ -16,6 +17,7 @@ function Router() {
       <Route path="/" component={NftMarketplace} />
       <Route path="/collections/pixel" component={NftMarketplace} />
       <Route path="/mint" component={NftMintPage} />
+      <Route path="/manager" component={NftManager} />
       <Route component={NotFound} />
     </Switch>
   );

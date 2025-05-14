@@ -39,6 +39,9 @@ export function Navbar() {
                 <Link href="/mint">
                   <span className="px-3 py-2 rounded-md text-sm font-medium text-accent hover:text-accent/80 cursor-pointer">Mint NFT</span>
                 </Link>
+                <Link href="/manager">
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-accent hover:text-accent/80 cursor-pointer">Manager</span>
+                </Link>
                 <Link href="#">
                   <span className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
                 </Link>
@@ -98,6 +101,9 @@ export function Navbar() {
             </Link>
             <Link href="/mint">
               <span className="block px-3 py-2 rounded-md text-base font-medium text-accent hover:text-accent/80 cursor-pointer">Mint NFT</span>
+            </Link>
+            <Link href="/manager">
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-accent hover:text-accent/80 cursor-pointer">Manager</span>
             </Link>
             <Link href="#">
               <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
