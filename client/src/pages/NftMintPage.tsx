@@ -2,14 +2,29 @@ import React from 'react';
 import NftMinter from '@/components/NftMinter';
 import { Toaster } from '@/components/ui/toaster';
 import { Link } from 'wouter';
+import { Helmet } from 'react-helmet';
+import { Navbar } from '@/components/Navbar';
 
 export default function NftMintPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">NFT Minter - DARTHBATER Collection</h1>
-        <Link href="/collections/pixel" className="text-blue-500 hover:underline">
-          Retour à la galerie
+    <div className="bg-neutral-dark min-h-screen">
+      <Helmet>
+        <title>Mint DARTHBATER NFT | PIXELNFT Marketplace</title>
+        <meta name="description" content="Mintez votre propre NFT interactif de la collection DARTHBATER. Utilisez le réseau Sepolia pour obtenir un NFT de test avec mini-jeu intégré et éléments ARG." />
+        <meta property="og:title" content="Mint DARTHBATER NFT | PIXELNFT Marketplace" />
+        <meta property="og:description" content="Obtenez votre propre NFT de jeu interactif avec éléments ARG cachés." />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      
+      <Navbar />
+    
+      <div className="container mx-auto py-24 px-4">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-pixel text-primary">NFT<span className="text-accent">Minter</span> <span className="text-white text-xl ml-2">- DARTHBATER Collection</span></h1>
+        <Link href="/">
+          <span className="bg-neutral-darker text-primary hover:text-accent px-4 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer flex items-center">
+            &larr; Retour à la galerie
+          </span>
         </Link>
       </div>
       
@@ -80,6 +95,7 @@ export default function NftMintPage() {
       </div>
       
       <Toaster />
+    </div>
     </div>
   );
 }
