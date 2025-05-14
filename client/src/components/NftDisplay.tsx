@@ -62,7 +62,16 @@ interface DailyQuest {
   currentProgress: number;
   reward: number;
   completed: boolean;
+  claimed: boolean;
   type: 'clicks' | 'combos' | 'boss' | 'level';
+}
+
+// Type pour les particules d'arrière-plan
+interface BackgroundParticle {
+  id: number;
+  x: number;
+  y: number;
+  type: number;
 }
 
 // Type pour le tableau des meilleurs scores
@@ -153,6 +162,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
       currentProgress: 0,
       reward: 50,
       completed: false,
+      claimed: false,
       type: 'clicks'
     },
     {
@@ -163,6 +173,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
       currentProgress: 0,
       reward: 100,
       completed: false,
+      claimed: false,
       type: 'combos'
     },
     {
@@ -173,6 +184,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
       currentProgress: 0,
       reward: 200,
       completed: false,
+      claimed: false,
       type: 'boss'
     }
   ]);
@@ -185,7 +197,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
   ]);
   
   // Particules d'arrière-plan
-  const [backgroundParticles, setBackgroundParticles] = useState<Array<{id: number, x: number, y: number, type: number}>>([]);
+  const [backgroundParticles, setBackgroundParticles] = useState<BackgroundParticle[]>([]);
   
   // État pour les accessoires et objets dans la boutique
   const [shopItems, setShopItems] = useState<ShopItem[]>([
@@ -314,6 +326,68 @@ export function NftDisplay({ className }: NftDisplayProps) {
   // Crée une onde de choc
   const createShockwave = (x: number, y: number) => {
     return createEffect(x, y, 0, 'shockwave');
+  };
+  
+  // Fonction pour afficher les quêtes journalières
+  const showQuests = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Éviter que le clic se propage au NFT
+    
+    toast({
+      title: "🎯 Quêtes Journalières",
+      description: (
+        <div className="text-sm space-y-2 mt-2">
+          {dailyQuests.map((quest) => (
+            <div key={quest.id} className="space-y-1">
+              <div className="flex justify-between">
+                <span className="font-bold">{quest.title}</span>
+                <span>{quest.completed ? "✅" : `${quest.currentProgress}/${quest.requirement}`}</span>
+              </div>
+              <div className="text-xs">{quest.description} - Récompense: {quest.reward} pts</div>
+              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-green-500" 
+                  style={{ width: `${(quest.currentProgress / quest.requirement) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Bouton pour réclamer les récompenses */}
+          {dailyQuests.some(quest => quest.completed && !quest.claimed) && (
+            <button
+              className="mt-2 w-full py-1 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-sm"
+              onClick={() => {
+                // Calculer les points à ajouter
+                const pointsToAdd = dailyQuests
+                  .filter(quest => quest.completed && !quest.claimed)
+                  .reduce((total, quest) => total + quest.reward, 0);
+                
+                // Mettre à jour les quêtes comme réclamées
+                const updatedQuests = dailyQuests.map(quest => 
+                  quest.completed && !quest.claimed 
+                    ? { ...quest, claimed: true } 
+                    : quest
+                );
+                setDailyQuests(updatedQuests);
+                
+                // Ajouter les points au score
+                setClickCount(prev => prev + pointsToAdd);
+                
+                // Notification
+                toast({
+                  title: "🎁 Récompenses réclamées!",
+                  description: `Vous avez reçu ${pointsToAdd} points pour vos quêtes accomplies.`,
+                  duration: 3000,
+                });
+              }}
+            >
+              Réclamer les récompenses
+            </button>
+          )}
+        </div>
+      ),
+      duration: 7000,
+    });
   };
   
   // Initialisation des effets sonores
@@ -516,6 +590,82 @@ export function NftDisplay({ className }: NftDisplayProps) {
       }
     }
   }, [clickCount, gameStats.level, highScores]);
+  
+  // Fonction pour afficher le tableau des meilleurs scores
+  const showHighScores = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Éviter que le clic se propage au NFT
+    
+    toast({
+      title: "🏆 Meilleurs Scores",
+      description: (
+        <div className="text-sm space-y-1">
+          {highScores.map((score, index) => (
+            <div key={index} className="flex justify-between">
+              <span className="font-bold">{index + 1}. {score.name}</span>
+              <span>{score.score} pts (Niv. {score.level})</span>
+            </div>
+          ))}
+        </div>
+      ),
+      duration: 5000,
+    });
+  };
+  
+  // Fonction pour réinitialiser les statistiques
+  const resetStats = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    toast({
+      title: "⚠️ Réinitialiser les statistiques?",
+      description: (
+        <div className="text-sm space-y-2">
+          <p>Cela réinitialisera votre score, niveau et progression. Les achats seront conservés.</p>
+          <div className="flex space-x-2 mt-2">
+            <button 
+              className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              onClick={() => {
+                // Réinitialiser les stats
+                setClickCount(0);
+                setCurrentCombo(0);
+                setComboMultiplier(1);
+                setGameStats({
+                  totalClicks: 0,
+                  maxCombo: 0,
+                  maxSpeed: 1,
+                  bestScore: 0,
+                  unlockedAchievements: [],
+                  level: 1,
+                  xp: 0,
+                  xpNeeded: 100,
+                  specialAbilities: []
+                });
+                setCharacterState(prev => ({ ...prev, evolution: 'normal' }));
+                setBoss(prev => ({ ...prev, level: 1, defeated: false }));
+                
+                // Notification
+                toast({
+                  title: "Statistiques réinitialisées",
+                  description: "Votre progression a été réinitialisée. Bonne chance!",
+                  duration: 3000,
+                });
+              }}
+            >
+              Confirmer
+            </button>
+            <button 
+              className="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+              onClick={() => {
+                toast.dismiss();
+              }}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      ),
+      duration: 10000,
+    });
+  };
   
   // Une fois que l'image est chargée, on met isLoading à false
   useEffect(() => {
@@ -1100,12 +1250,14 @@ export function NftDisplay({ className }: NftDisplayProps) {
                 Score: {clickCount} | Combo: x{comboMultiplier}
               </div>
               
-              {/* Succès débloqués */}
-              {gameStats.unlockedAchievements.length > 0 && (
-                <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-gold px-3 py-1 rounded-full text-xs">
-                  🏆 Succès: {gameStats.unlockedAchievements.length}
-                </div>
-              )}
+              {/* Succès débloqués - Cliquable pour voir les meilleurs scores */}
+              <button
+                onClick={showHighScores}
+                className="absolute top-4 left-4 bg-black bg-opacity-70 hover:bg-opacity-80 text-gold px-3 py-1 rounded-full text-xs flex items-center z-30"
+              >
+                <span className="mr-1">🏆</span>
+                <span>Scores</span>
+              </button>
               
               {/* Affichage du niveau et de l'XP */}
               <div className="absolute top-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-xs flex flex-col items-end">
@@ -1137,20 +1289,39 @@ export function NftDisplay({ className }: NftDisplayProps) {
                 </div>
               )}
               
-              {/* Bouton pour désactiver/activer le son */}
-              <button 
-                className="absolute top-16 right-4 bg-black bg-opacity-70 text-white p-2 rounded-full text-xs z-30"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSoundEnabled(!soundEnabled);
-                  toast({
-                    title: soundEnabled ? "Sons désactivés" : "Sons activés",
-                    duration: 2000,
-                  });
-                }}
-              >
-                {soundEnabled ? "🔊" : "🔇"}
-              </button>
+              {/* Contrôles supplémentaires */}
+              <div className="absolute top-16 right-4 z-30 flex flex-col space-y-2">
+                {/* Bouton pour désactiver/activer le son */}
+                <button 
+                  className="bg-black bg-opacity-70 hover:bg-opacity-80 text-white p-2 rounded-full text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSoundEnabled(!soundEnabled);
+                    toast({
+                      title: soundEnabled ? "Sons désactivés" : "Sons activés",
+                      duration: 2000,
+                    });
+                  }}
+                >
+                  {soundEnabled ? "🔊" : "🔇"}
+                </button>
+                
+                {/* Bouton pour afficher les quêtes */}
+                <button 
+                  className="bg-black bg-opacity-70 hover:bg-opacity-80 text-white p-2 rounded-full text-xs"
+                  onClick={showQuests}
+                >
+                  🎯
+                </button>
+                
+                {/* Bouton pour réinitialiser les stats */}
+                <button 
+                  className="bg-black bg-opacity-70 hover:bg-opacity-80 text-white p-2 rounded-full text-xs"
+                  onClick={resetStats}
+                >
+                  🔄
+                </button>
+              </div>
               
               {/* Capacités spéciales débloquées */}
               {gameStats.specialAbilities.length > 0 && (
