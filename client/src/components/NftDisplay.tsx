@@ -5,6 +5,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useGifController } from '@/hooks/useGifController';
 import { PlayIcon, PauseIcon, RotateCcwIcon } from 'lucide-react';
 import darthBaterGif from '@assets/13_DARTHBATER.gif';
+import { cn } from '@/lib/utils';
 
 interface NftDisplayProps {
   className?: string;
@@ -16,13 +17,15 @@ export function NftDisplay({ className }: NftDisplayProps) {
     totalFrames,
     isPlaying,
     isLoading,
+    isFrozen,
     play,
     pause,
     restart,
     goToFrame,
-    goToLastFrame,
+    jumpToFrame19
   } = useGifController(darthBaterGif);
 
+  const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Render the GIF image
@@ -44,14 +47,38 @@ export function NftDisplay({ className }: NftDisplayProps) {
         className="relative bg-neutral-dark rounded-xl overflow-hidden hover-glow transition-all duration-300 h-[450px] sm:h-[550px] flex items-center justify-center"
       >
         {/* Background effect */}
-        <div className="absolute inset-0 bg-primary/30 z-0"></div>
+        <div className={cn(
+          "absolute inset-0 bg-primary/30 z-0",
+          isFrozen && "bg-accent/40"
+        )}></div>
         
         {/* NFT Display */}
         <div 
-          className="relative z-10 p-4 cursor-pointer"
-          onMouseEnter={() => pause()}
-          onMouseLeave={() => play()}
-          onClick={() => goToLastFrame()}
+          className={cn(
+            "relative z-10 p-4 custom-cursor",
+            isFrozen && "frozen-frame"
+          )}
+          onMouseEnter={() => {
+            setIsHovering(true);
+            pause();
+          }}
+          onMouseLeave={() => {
+            setIsHovering(false);
+            if (!isFrozen) play();
+          }}
+          onClick={() => {
+            // Check if we're around frame 15 (or can simulate this condition)
+            const currentFrame = currentFrameIndex;
+            if (currentFrame >= 10 && currentFrame <= 17) {
+              jumpToFrame19();
+            } else {
+              if (isHovering) {
+                play();
+              } else {
+                pause();
+              }
+            }
+          }}
         >
           {isLoading ? (
             <div className="flex items-center justify-center h-[400px]">
@@ -61,7 +88,10 @@ export function NftDisplay({ className }: NftDisplayProps) {
             <img 
               src={darthBaterGif}
               alt="Interactive NFT - DARTHBATER" 
-              className="pixelated max-h-[400px] max-w-full mx-auto"
+              className={cn(
+                "pixelated max-h-[400px] max-w-full mx-auto",
+                isFrozen && "animate-none"
+              )}
             />
           )}
         </div>
@@ -70,7 +100,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-neutral-dark/90 to-transparent text-center py-4 px-6 opacity-0 hover:opacity-100 transition-opacity duration-300">
           <p className="text-xs md:text-sm font-medium">
             <span className="mr-2">🖱️</span> 
-            Hover to pause, click to advance
+            Hover pour arrêter, cliquez sur le personnage pour interagir
           </p>
         </div>
       </div>
@@ -82,7 +112,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
             variant="ghost"
             size="icon"
             onClick={play}
-            disabled={isPlaying}
+            disabled={isPlaying || isFrozen}
             className="text-xl text-neutral-light hover:text-primary transition-colors"
           >
             <PlayIcon className="h-5 w-5" />
@@ -91,7 +121,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
             variant="ghost"
             size="icon"
             onClick={pause}
-            disabled={!isPlaying}
+            disabled={!isPlaying || isFrozen}
             className="text-xl text-neutral-light hover:text-primary transition-colors"
           >
             <PauseIcon className="h-5 w-5" />
@@ -100,6 +130,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
             variant="ghost"
             size="icon"
             onClick={restart}
+            disabled={isFrozen}
             className="text-xl text-neutral-light hover:text-primary transition-colors"
           >
             <RotateCcwIcon className="h-5 w-5" />
@@ -116,6 +147,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
             onValueChange={(value) => {
               goToFrame(value[0]);
             }}
+            disabled={isFrozen}
           />
         </div>
       </div>

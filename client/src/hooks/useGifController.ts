@@ -12,7 +12,9 @@ export const useGifController = (gifUrl: string) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
   const frameInterval = useRef<number | null>(null);
+  const freezeTimeoutRef = useRef<number | null>(null);
   const gifCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Load and parse the GIF
@@ -51,12 +53,15 @@ export const useGifController = (gifUrl: string) => {
       if (frameInterval.current) {
         clearInterval(frameInterval.current);
       }
+      if (freezeTimeoutRef.current) {
+        clearTimeout(freezeTimeoutRef.current);
+      }
     };
   }, [gifUrl]);
 
   // Animation control
   useEffect(() => {
-    if (frames.length === 0 || !isPlaying) return;
+    if (frames.length === 0 || !isPlaying || isFrozen) return;
     
     const playAnimation = () => {
       frameInterval.current = window.setInterval(() => {
@@ -72,11 +77,12 @@ export const useGifController = (gifUrl: string) => {
         frameInterval.current = null;
       }
     };
-  }, [frames, isPlaying, currentFrameIndex, totalFrames]);
+  }, [frames, isPlaying, currentFrameIndex, totalFrames, isFrozen]);
 
   // Player controls
   const play = useCallback(() => {
     setIsPlaying(true);
+    setIsFrozen(false);
   }, []);
 
   const pause = useCallback(() => {
@@ -86,6 +92,7 @@ export const useGifController = (gifUrl: string) => {
   const restart = useCallback(() => {
     setCurrentFrameIndex(0);
     setIsPlaying(true);
+    setIsFrozen(false);
   }, []);
 
   const goToFrame = useCallback((frameIndex: number) => {
@@ -99,17 +106,36 @@ export const useGifController = (gifUrl: string) => {
     setIsPlaying(false);
   }, [totalFrames]);
 
+  // Specialized interaction for DARTHBATER NFT
+  const jumpToFrame19 = useCallback(() => {
+    // Jump from frame 15 to 19
+    setIsFrozen(true);
+    setCurrentFrameIndex(19);
+
+    // Unfreeze after 800ms and resume playing
+    if (freezeTimeoutRef.current) {
+      clearTimeout(freezeTimeoutRef.current);
+    }
+    
+    freezeTimeoutRef.current = window.setTimeout(() => {
+      setIsFrozen(false);
+      setIsPlaying(true);
+    }, 800);
+  }, []);
+
   return {
     currentFrameIndex,
     totalFrames,
     isPlaying,
     isLoading,
     hasError,
+    isFrozen,
     gifCanvasRef,
     play,
     pause,
     restart,
     goToFrame,
     goToLastFrame,
+    jumpToFrame19
   };
 };

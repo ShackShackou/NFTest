@@ -85,7 +85,7 @@ export function NftDetails({ nftId }: NftDetailsProps) {
         </div>
         <p className="text-neutral-light/80 text-sm">
           {nft?.description || 
-            "This interactive NFT features a pixel art character with special powers. The NFT responds to user interaction - hover to pause the animation, click to advance to the final frame. Part of the \"Pixel Warriors\" collection with unique on-chain properties."}
+            "Cet NFT interactif présente un personnage en pixel art avec des pouvoirs spéciaux. Le NFT répond à l'interaction de l'utilisateur - survolez pour mettre en pause l'animation, cliquez sur le personnage pour déclencher une animation spéciale (de la frame 15 à 19). Un objet de collection unique avec des propriétés rares."}
         </p>
       </Card>
       
