@@ -118,7 +118,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
     specialAbilities: []
   });
   
-  // Système de boss
+  // Système de boss avec plusieurs types de boss
   const [boss, setBoss] = useState<Boss>({
     active: false,
     health: 100,
@@ -130,6 +130,15 @@ export function NftDisplay({ className }: NftDisplayProps) {
     defeated: false,
     animation: 'idle'
   });
+  
+  // Catalogue de boss pour le système de progression
+  const bossCatalog = [
+    { name: "DARK PIXEL LORD", sprite: "👾", healthBase: 100, attackPower: 1, rewardXP: 50, rewardPoints: 200 },
+    { name: "CODE BREAKER", sprite: "🤖", healthBase: 200, attackPower: 2, rewardXP: 100, rewardPoints: 400 },
+    { name: "GLITCH DRAGON", sprite: "🐉", healthBase: 350, attackPower: 3, rewardXP: 200, rewardPoints: 800 },
+    { name: "CRYPTO PHOENIX", sprite: "🦅", healthBase: 500, attackPower: 4, rewardXP: 350, rewardPoints: 1500 },
+    { name: "VOID EATER", sprite: "👹", healthBase: 800, attackPower: 5, rewardXP: 500, rewardPoints: 3000 }
+  ];
   
   // Système d'effets sonores
   const [sounds, setSounds] = useState({
@@ -195,6 +204,21 @@ export function NftDisplay({ className }: NftDisplayProps) {
     { name: "Pixel Pro", score: 750, level: 4, date: new Date(2025, 3, 10) },
     { name: "Clicker King", score: 500, level: 3, date: new Date(2025, 3, 5) }
   ]);
+  
+  // Système de progression narrative et événements aléatoires
+  const [storyEvents, setStoryEvents] = useState<{
+    currentChapter: number;
+    totalChapters: number;
+    lastEvent: string;
+    eventHistory: string[];
+    unlockedLore: string[];
+  }>({
+    currentChapter: 1,
+    totalChapters: 5,
+    lastEvent: "Début de l'aventure",
+    eventHistory: ["Vous avez trouvé un NFT mystérieux..."],
+    unlockedLore: ["Prologue: Le NFT mystérieux"]
+  });
   
   // Particules d'arrière-plan
   const [backgroundParticles, setBackgroundParticles] = useState<BackgroundParticle[]>([]);
@@ -610,6 +634,8 @@ export function NftDisplay({ className }: NftDisplayProps) {
       duration: 5000,
     });
   };
+  
+  // Cette fonction n'est plus utilisée, nous utilisons une fonction inline dans le bouton directement
   
   // Fonction pour réinitialiser les statistiques
   const resetStats = (e: React.MouseEvent) => {
@@ -1327,6 +1353,45 @@ export function NftDisplay({ className }: NftDisplayProps) {
                   onClick={showQuests}
                 >
                   🎯
+                </button>
+                
+                {/* Bouton pour afficher l'histoire */}
+                <button 
+                  className="bg-black bg-opacity-70 hover:bg-opacity-80 text-white p-2 rounded-full text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toast({
+                      title: `📜 Histoire - Chapitre ${storyEvents.currentChapter}/${storyEvents.totalChapters}`,
+                      description: (
+                        <div className="text-sm space-y-2">
+                          <p className="font-bold border-b pb-1 mb-1">Fragments débloqués:</p>
+                          <ul className="list-disc pl-4 space-y-1">
+                            {storyEvents.unlockedLore.length > 0 ? (
+                              storyEvents.unlockedLore.map((lore, index) => (
+                                <li key={index}>{lore}</li>
+                              ))
+                            ) : (
+                              <li className="text-muted-foreground">Aucun fragment débloqué pour l'instant</li>
+                            )}
+                          </ul>
+                          
+                          <p className="font-bold border-b pb-1 mt-3 mb-1">Événements récents:</p>
+                          <ul className="space-y-1">
+                            {storyEvents.eventHistory.slice(-3).map((event, index) => (
+                              <li key={index} className="text-xs">{event}</li>
+                            ))}
+                          </ul>
+                          
+                          <p className="mt-2 text-xs text-muted-foreground italic">
+                            Continuez à interagir avec le NFT pour débloquer de nouveaux chapitres...
+                          </p>
+                        </div>
+                      ),
+                      duration: 8000,
+                    });
+                  }}
+                >
+                  📜
                 </button>
                 
                 {/* Bouton pour réinitialiser les stats */}
