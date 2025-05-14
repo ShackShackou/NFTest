@@ -41,28 +41,31 @@ export function NftDisplay({ className }: NftDisplayProps) {
     }
   };
 
-  // Fonction pour simuler le saut de frames et freeze lors du clic
+  // Fonction pour simuler le saut de frames spécifiques (barre horizontale → verticale)
   const handleImageClick = () => {
-    // Pour simuler le saut de frame 15 à 19, on freeze temporairement
+    // Quand l'utilisateur clique, on simule un saut de la frame où la barre rouge
+    // est horizontale à celle où elle est verticale
     setIsFrozen(true);
     
     if (imgRef.current) {
-      // Ajouter la classe qui indique un état spécial de "clic"
-      imgRef.current.classList.add('gif-clicked');
+      // On applique une classe qui fait apparaître la barre verticale
+      imgRef.current.classList.add('vertical-saber');
+      imgRef.current.classList.remove('horizontal-saber');
       
       // Nettoyer le timeout existant si nécessaire
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
       }
       
-      // Reprendre l'animation après un court délai
+      // Reprendre l'animation après un délai
       timeoutRef.current = window.setTimeout(() => {
         setIsFrozen(false);
         setIsPaused(false);
         
         if (imgRef.current) {
           imgRef.current.style.animationPlayState = 'running';
-          imgRef.current.classList.remove('gif-clicked');
+          imgRef.current.classList.remove('vertical-saber');
+          imgRef.current.classList.add('horizontal-saber');
         }
       }, 800);
     }
@@ -72,13 +75,10 @@ export function NftDisplay({ className }: NftDisplayProps) {
     <div className={`flex flex-col space-y-6 ${className}`}>
       {/* NFT Display Container - Simple avec aucun contrôle UI */}
       <div 
-        className="relative bg-neutral-dark rounded-xl overflow-hidden hover-glow transition-all duration-300 h-[450px] sm:h-[550px] flex items-center justify-center"
+        className="relative overflow-hidden transition-all duration-300 h-[450px] sm:h-[550px] flex items-center justify-center"
       >
-        {/* Background effect */}
-        <div className={cn(
-          "absolute inset-0 bg-primary/30 z-0",
-          isFrozen && "bg-accent/40"
-        )}></div>
+        {/* Background teal - correspond à l'arrière-plan de votre GIF */}
+        <div className="absolute inset-0 bg-[#1ab3b3] z-0"></div>
         
         {/* NFT Display */}
         <div 
@@ -95,12 +95,10 @@ export function NftDisplay({ className }: NftDisplayProps) {
               <Spinner size="lg" />
             </div>
           ) : (
-            <img 
+            <div 
               ref={imgRef}
-              src={darthBaterGif}
-              alt="Interactive NFT - DARTHBATER" 
               className={cn(
-                "pixelated max-h-[400px] max-w-full mx-auto",
+                "horizontal-saber", // Par défaut, affiche l'image avec barre horizontale
                 isPaused && "paused-gif",
                 isFrozen && "frozen-gif"
               )}
