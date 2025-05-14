@@ -1201,11 +1201,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
           // Ajouter les points de récompense
           setPoints(prev => prev + quest.reward);
           
-          toast({
-            title: "Récompense réclamée!",
-            description: `Vous avez reçu ${quest.reward} points!`,
-            variant: "success"
-          });
+          showToast(
+            "Récompense réclamée!",
+            `Vous avez reçu ${quest.reward} points!`,
+            "success"
+          );
           
           return { ...quest, claimed: true };
         }
@@ -1235,11 +1235,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
       )
     );
     
-    toast({
-      title: "Achat réussi!",
-      description: `Vous avez acheté ${item.name}!`,
-      variant: "success"
-    });
+    showToast(
+      "Achat réussi!",
+      `Vous avez acheté ${item.name}!`,
+      "success"
+    );
   };
 
   // Application d'un item
@@ -1263,11 +1263,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
       })
     );
     
-    toast({
-      title: "Item appliqué",
-      description: `Vous avez équipé ${item.name}!`,
-      variant: "default"
-    });
+    showToast(
+      "Item appliqué",
+      `Vous avez équipé ${item.name}!`,
+      "default"
+    );
   };
 
   // Génération d'une couleur aléatoire
