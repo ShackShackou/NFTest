@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { ethers, BrowserProvider, JsonRpcSigner } from 'ethers';
 import Web3Modal from 'web3modal';
 
 // Type pour stocker les informations du portefeuille connecté
 export interface WalletInfo {
   address: string;
   chainId: number;
-  provider: ethers.providers.Web3Provider | null;
-  signer: ethers.Signer | null;
+  provider: BrowserProvider | null;
+  signer: JsonRpcSigner | null;
   network: string;
   isConnected: boolean;
 }
@@ -58,7 +58,7 @@ const useWallet = () => {
       const instance = await web3Modal.connect();
       
       // Créer un provider ethers à partir de l'instance
-      const provider = new ethers.providers.Web3Provider(instance);
+      const provider = new BrowserProvider(instance);
       
       // Obtenir les comptes
       const accounts = await provider.listAccounts();
@@ -71,12 +71,12 @@ const useWallet = () => {
       const network = await provider.getNetwork();
       
       // Obtenir le signer
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       
       // Stocker les informations du portefeuille
       setWalletInfo({
-        address: accounts[0],
-        chainId: network.chainId,
+        address: accounts[0].address,
+        chainId: Number(network.chainId),
         provider,
         signer,
         network: network.name,
@@ -84,11 +84,17 @@ const useWallet = () => {
       });
       
       // Événements pour détecter les changements
-      instance.on("accountsChanged", (accounts: string[]) => {
+      instance.on("accountsChanged", async (accounts: string[]) => {
         if (accounts.length > 0) {
+          // En ethers v6, on doit récupérer le signer à nouveau
+          const updatedProvider = new BrowserProvider(instance);
+          const updatedSigner = await updatedProvider.getSigner();
+          
           setWalletInfo(prev => ({
             ...prev,
-            address: accounts[0]
+            address: accounts[0],
+            provider: updatedProvider,
+            signer: updatedSigner
           }));
         } else {
           // Déconnecté
@@ -98,14 +104,15 @@ const useWallet = () => {
       
       instance.on("chainChanged", async () => {
         // Actualiser le provider
-        const newProvider = new ethers.providers.Web3Provider(instance);
+        const newProvider = new BrowserProvider(instance);
         const newNetwork = await newProvider.getNetwork();
+        const newSigner = await newProvider.getSigner();
         
         setWalletInfo(prev => ({
           ...prev,
           provider: newProvider,
-          signer: newProvider.getSigner(),
-          chainId: newNetwork.chainId,
+          signer: newSigner,
+          chainId: Number(newNetwork.chainId),
           network: newNetwork.name
         }));
       });
@@ -217,13 +224,17 @@ const useWallet = () => {
   // Vérifier automatiquement si un fournisseur est déjà connecté
   useEffect(() => {
     const checkConnection = async () => {
-      const web3Modal = new Web3Modal({
-        cacheProvider: true,
-        providerOptions
-      });
-      
-      if (web3Modal.cachedProvider) {
-        connectWallet();
+      try {
+        const web3Modal = new Web3Modal({
+          cacheProvider: true,
+          providerOptions
+        });
+        
+        if (web3Modal.cachedProvider) {
+          await connectWallet();
+        }
+      } catch (error) {
+        console.error("Error checking connection:", error);
       }
     };
     
