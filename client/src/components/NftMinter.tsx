@@ -4,17 +4,23 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { formatEthPrice, shortenAddress } from '@/lib/utils';
-
-// Contract d'exemple sur Sepolia Testnet - à remplacer par votre contrat réel
-const TEST_NFT_CONTRACT = "0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656";
+import { useWallet } from '@/components/WalletProvider';
+import { ethers } from 'ethers';
+import { contractABI, contractAddress as defaultContractAddress } from '@/lib/contractConfig';
 
 export default function NftMinter() {
   const { toast } = useToast();
-  // États simulés pour la démo 
-  const [wallet, setWallet] = useState({ isConnected: false, address: '', network: 'sepolia' });
-  const [loading, setLoading] = useState(false);
+  const { 
+    address, 
+    isConnected, 
+    isLoading, 
+    chainId,
+    isSepoliaNetwork,
+    connectWallet, 
+    disconnectWallet 
+  } = useWallet();
   const [error, setError] = useState<string | null>(null);
-  const [isOnTestnet, setIsOnTestnet] = useState(true);
+  const [isMinting, setIsMinting] = useState(false);
   
   const [mintStatus, setMintStatus] = useState<{
     success?: boolean;
@@ -24,126 +30,141 @@ export default function NftMinter() {
   } | null>(null);
   
   // État pour stocker l'adresse du contrat
-  const [contractAddress, setContractAddress] = useState<string>(TEST_NFT_CONTRACT);
-  
-  const handleConnectWallet = async () => {
-    setLoading(true);
-    
-    try {
-      if (wallet.isConnected) {
-        // Simuler une déconnexion
-        setWallet({ isConnected: false, address: '', network: 'sepolia' });
-        toast({
-          title: "Déconnecté",
-          description: "Portefeuille déconnecté avec succès",
-        });
-      } else {
-        // Simuler une connexion
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setWallet({ 
-          isConnected: true, 
-          address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e', 
-          network: 'sepolia' 
-        });
-        toast({
-          title: "Connecté",
-          description: "Portefeuille connecté avec succès",
-        });
-      }
-    } catch (err: any) {
-      setError(err.message || "Erreur lors de la connexion");
-      toast({
-        title: "Erreur",
-        description: "Impossible de se connecter au portefeuille",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [contractAddress, setContractAddress] = useState<string>(defaultContractAddress);
   
   const handleSwitchToTestnet = async () => {
-    setLoading(true);
-    
     try {
-      // Simuler le changement de réseau
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setIsOnTestnet(true);
+      if (!window.ethereum) {
+        throw new Error('MetaMask n\'est pas installé');
+      }
+      
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }], // chainId en hexadécimal pour Sepolia (11155111)
+      });
+      
       toast({
-        title: "Réseau changé",
-        description: "Vous êtes maintenant sur le réseau de test Sepolia",
+        title: 'Réseau changé',
+        description: 'Vous êtes maintenant sur le réseau de test Sepolia',
       });
     } catch (err: any) {
-      setError(err.message || "Erreur lors du changement de réseau");
+      setError(err.message || 'Erreur lors du changement de réseau');
+      
+      // Si le réseau n'est pas configuré, proposer de l'ajouter
+      if (err.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0xaa36a7',
+                chainName: 'Sepolia Test Network',
+                nativeCurrency: {
+                  name: 'ETH',
+                  symbol: 'ETH',
+                  decimals: 18,
+                },
+                rpcUrls: ['https://sepolia.infura.io/v3/'],
+                blockExplorerUrls: ['https://sepolia.etherscan.io'],
+              },
+            ],
+          });
+        } catch (addError: any) {
+          setError(addError.message || 'Impossible d\'ajouter le réseau Sepolia');
+        }
+      }
+      
       toast({
-        title: "Erreur",
-        description: "Impossible de changer de réseau",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de changer de réseau',
+        variant: 'destructive',
       });
-    } finally {
-      setLoading(false);
     }
   };
   
   const handleMintNft = async () => {
-    if (!wallet.isConnected) {
+    if (!isConnected) {
       toast({
-        title: "Erreur",
-        description: "Veuillez d'abord connecter votre portefeuille",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Veuillez d\'abord connecter votre portefeuille',
+        variant: 'destructive',
       });
       return;
     }
     
-    if (!isOnTestnet) {
+    if (!isSepoliaNetwork) {
       toast({
-        title: "Mauvais réseau",
-        description: "Veuillez passer sur le réseau Sepolia testnet pour minter",
-        variant: "destructive"
+        title: 'Mauvais réseau',
+        description: 'Veuillez passer sur le réseau Sepolia testnet pour minter',
+        variant: 'destructive',
       });
       return;
     }
     
-    setLoading(true);
+    setIsMinting(true);
     setMintStatus(null);
+    setError(null);
     
     try {
-      // Simuler une transaction de mint
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!window.ethereum) {
+        throw new Error('MetaMask n\'est pas installé');
+      }
       
-      // Simuler une réponse positive
-      const mockResult = {
-        success: true,
-        transactionHash: "0x7d5a0c6ab48d84a043e6a4ba7f96f2ad978adf26278ad712c6b6df2cf9fb068f",
-        tokenId: "42"
-      };
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const nftContract = new ethers.Contract(contractAddress, contractABI, signer);
+      
+      // Mint le NFT
+      const transaction = await nftContract.mintNFT(address);
+      
+      // Attendre que la transaction soit minée
+      toast({
+        title: 'Transaction envoyée',
+        description: 'Attendez que la transaction soit confirmée...',
+      });
+      
+      const receipt = await transaction.wait();
+      
+      // Chercher l'événement NFTMinted dans les logs
+      const mintEvent = receipt.logs
+        .map((log: any) => {
+          try {
+            return nftContract.interface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .filter((event: any) => event && event.name === 'NFTMinted')[0];
+      
+      // Extraire le tokenId de l'événement
+      const tokenId = mintEvent ? mintEvent.args.tokenId.toString() : 'Inconnu';
       
       toast({
-        title: "NFT minté avec succès !",
-        description: `Token ID: ${mockResult.tokenId}`,
+        title: 'NFT minté avec succès !',
+        description: `Token ID: ${tokenId}`,
       });
       
       setMintStatus({
         success: true,
-        transactionHash: mockResult.transactionHash,
-        tokenId: mockResult.tokenId
+        transactionHash: receipt.hash,
+        tokenId: tokenId,
       });
     } catch (err: any) {
-      const errorMsg = err.message || "Une erreur s'est produite";
+      const errorMsg = err.message || 'Une erreur s\'est produite';
       setError(errorMsg);
       
       toast({
-        title: "Erreur lors du mint",
-        description: errorMsg,
-        variant: "destructive"
+        title: 'Erreur lors du mint',
+        description: errorMsg.substring(0, 100) + (errorMsg.length > 100 ? '...' : ''),
+        variant: 'destructive',
       });
       
       setMintStatus({
         success: false,
-        error: errorMsg
+        error: errorMsg,
       });
     } finally {
-      setLoading(false);
+      setIsMinting(false);
     }
   };
   
@@ -155,7 +176,7 @@ export default function NftMinter() {
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm text-gray-400">Statut</span>
-          {wallet.isConnected ? (
+          {isConnected ? (
             <Badge variant="outline" className="bg-green-900/30 text-green-400 hover:bg-green-900/40">
               Connecté
             </Badge>
@@ -166,34 +187,34 @@ export default function NftMinter() {
           )}
         </div>
         
-        {wallet.isConnected && (
+        {isConnected && (
           <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
             <div>
               <span className="text-gray-500">Adresse:</span>
-              <div className="text-white font-mono mt-1">{shortenAddress(wallet.address)}</div>
+              <div className="text-white font-mono mt-1">{shortenAddress(address || '')}</div>
             </div>
             <div>
               <span className="text-gray-500">Réseau:</span>
-              <div className="text-white capitalize mt-1">{wallet.network}</div>
+              <div className="text-white capitalize mt-1">{isSepoliaNetwork ? 'Sepolia' : chainId ? `Chain ID: ${chainId}` : 'Inconnu'}</div>
             </div>
           </div>
         )}
         
         <Button 
-          onClick={handleConnectWallet}
-          className={wallet.isConnected ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}
-          disabled={loading}
+          onClick={isConnected ? disconnectWallet : connectWallet}
+          className={isConnected ? "bg-red-600 hover:bg-red-700" : "bg-blue-600 hover:bg-blue-700"}
+          disabled={isLoading}
           size="sm"
           variant="default"
         >
-          {loading ? "Chargement..." : wallet.isConnected ? "Déconnecter" : "Connecter MetaMask"}
+          {isLoading ? "Chargement..." : isConnected ? "Déconnecter" : "Connecter MetaMask"}
         </Button>
         
-        {wallet.isConnected && !isOnTestnet && (
+        {isConnected && !isSepoliaNetwork && (
           <Button 
             onClick={handleSwitchToTestnet}
             className="ml-2 bg-purple-600 hover:bg-purple-700"
-            disabled={loading}
+            disabled={isLoading}
             size="sm"
             variant="default"
           >
@@ -209,7 +230,7 @@ export default function NftMinter() {
       )}
       
       {/* Interface de mint */}
-      {wallet.isConnected && (
+      {isConnected && (
         <div className="border border-gray-700 rounded-lg p-3 mb-4">
           <h3 className="text-md font-semibold text-white mb-3">Minter un NFT de test</h3>
           
@@ -229,13 +250,13 @@ export default function NftMinter() {
           <Button
             onClick={handleMintNft}
             className="w-full bg-green-600 hover:bg-green-700"
-            disabled={loading || !isOnTestnet}
+            disabled={isMinting || !isSepoliaNetwork}
             size="sm"
           >
-            {loading ? "Transaction en cours..." : "Minter le NFT"}
+            {isMinting ? "Transaction en cours..." : "Minter le NFT"}
           </Button>
           
-          {!isOnTestnet && (
+          {!isSepoliaNetwork && (
             <p className="text-xs text-amber-400 mt-2">
               Vous devez être sur le réseau Sepolia Testnet pour minter
             </p>

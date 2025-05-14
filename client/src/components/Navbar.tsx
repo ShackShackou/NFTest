@@ -103,11 +103,11 @@ export function Navbar() {
               <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
             </Link>
             <div className="pt-4">
-              {wallet.isConnected ? (
+              {isConnected ? (
                 <div className="space-y-2">
                   <div className="text-primary font-medium bg-neutral-darker px-3 py-2 rounded-md flex items-center">
                     <Wallet className="h-4 w-4 mr-2" />
-                    <span>{wallet.address}</span>
+                    <span>{shortenAddress(address || '')}</span>
                   </div>
                   <Button 
                     variant="ghost"
@@ -122,9 +122,9 @@ export function Navbar() {
                 <Button 
                   className="w-full bg-accent hover:bg-accent/80 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors duration-300"
                   onClick={connectWallet}
-                  disabled={loading}
+                  disabled={isLoading}
                 >
-                  {loading ? "Connecting..." : "Connect Wallet"}
+                  {isLoading ? "Connecting..." : "Connect Wallet"}
                 </Button>
               )}
             </div>
