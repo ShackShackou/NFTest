@@ -2231,6 +2231,90 @@ export function NftDisplay({ className }: NftDisplayProps) {
       </div>
     </div>
   );
+  
+  // Rendu de l'écran pour les codes secrets (ARG)
+  const renderSecretCodesScreen = () => (
+    <div className="relative w-full h-full flex flex-col bg-gray-900 text-white p-4 overflow-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-purple-300">Mode ARG - Codes Secrets</h2>
+        <button 
+          onClick={() => setActiveScreen('main')}
+          className="text-gray-400 hover:text-white"
+        >
+          Retour au jeu
+        </button>
+      </div>
+      
+      {/* Interface pour entrer des codes secrets */}
+      <div className="mb-6 bg-gray-800 p-3 rounded-lg">
+        <p className="text-xs mb-2 text-gray-400">Entrez un code secret pour débloquer du contenu caché</p>
+        <div className="flex space-x-2">
+          <input
+            type="text"
+            value={secretCode}
+            onChange={(e) => setSecretCode(e.target.value)}
+            placeholder="ENTREZ CODE"
+            className="flex-1 bg-gray-700 text-white px-2 py-1 rounded text-sm uppercase tracking-wider"
+            maxLength={15}
+          />
+          <button
+            onClick={handleSecretCodeSubmit}
+            className="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded text-xs"
+          >
+            Valider
+          </button>
+        </div>
+      </div>
+      
+      {/* Affichage des indices découverts */}
+      <div className="mb-4">
+        <h4 className="text-sm font-semibold mb-2 text-purple-300">Indices découverts</h4>
+        {foundClues.length > 0 ? (
+          <ul className="bg-gray-800 rounded-lg p-2 text-xs space-y-2">
+            {foundClues.map((clue, index) => (
+              <li key={index} className="border-b border-gray-700 pb-1">
+                <span className="text-yellow-400">💡</span> {clue}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500 text-xs italic">Explorez et cliquez selon des motifs spécifiques pour découvrir des indices cachés...</p>
+        )}
+      </div>
+      
+      {/* Messages décryptés */}
+      <div>
+        <h4 className="text-sm font-semibold mb-2 text-purple-300">Messages décryptés</h4>
+        {secretMessages.length > 0 ? (
+          <ul className="bg-gray-800 rounded-lg p-2 text-xs space-y-2">
+            {secretMessages.map((message, index) => (
+              <li key={index} className="border-b border-gray-700 pb-1">
+                <span className="text-green-400">🔓</span> {message}
+                <span className="block text-xs text-gray-500 mt-1">
+                  Débloqué avec: {index === secretMessages.length - 1 ? lastDecryptionKey : "???"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500 text-xs italic">Entrez des codes secrets pour débloquer des messages...</p>
+        )}
+      </div>
+      
+      {/* Indicateur de progression ARG */}
+      <div className="mt-auto pt-4">
+        <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
+          <div 
+            className="bg-gradient-to-r from-purple-500 to-pink-500 h-full"
+            style={{ width: `${Math.min(100, (foundClues.length + secretMessages.length) * 10)}%` }}
+          ></div>
+        </div>
+        <p className="text-xs text-gray-400 text-center mt-1">
+          Progression ARG: {Math.min(100, (foundClues.length + secretMessages.length) * 10)}%
+        </p>
+      </div>
+    </div>
+  );
 
   return (
     <div className={`flex flex-col ${className}`}>
