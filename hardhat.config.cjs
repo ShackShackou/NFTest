@@ -1,17 +1,18 @@
-import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
-import dotenv from "dotenv";
-
-dotenv.config();
+const { HardhatUserConfig } = require("hardhat/config");
+require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
 
 // Variable d'environnement pour la clé privée du déploiement
 // Sera configurée plus tard
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
+const PRIVATE_KEY = process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000000"; // Clé fictive pour la compilation
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || "https://sepolia.infura.io/v3/";
 
-const config: HardhatUserConfig = {
+const config = {
   solidity: "0.8.20",
   networks: {
+    hardhat: {
+      chainId: 31337,
+    },
     sepolia: {
       url: SEPOLIA_RPC_URL,
       accounts: [PRIVATE_KEY],
@@ -23,4 +24,4 @@ const config: HardhatUserConfig = {
   },
 };
 
-export default config;
+module.exports = config;

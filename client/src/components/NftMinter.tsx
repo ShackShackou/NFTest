@@ -19,6 +19,7 @@ export default function NftMinter() {
     connectWallet, 
     disconnectWallet 
   } = useWallet();
+  
   const [error, setError] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   
@@ -34,7 +35,7 @@ export default function NftMinter() {
   
   const handleSwitchToTestnet = async () => {
     try {
-      if (!window.ethereum) {
+      if (!window?.ethereum) {
         throw new Error('MetaMask n\'est pas installé');
       }
       
@@ -106,7 +107,7 @@ export default function NftMinter() {
     setError(null);
     
     try {
-      if (!window.ethereum) {
+      if (!window?.ethereum) {
         throw new Error('MetaMask n\'est pas installé');
       }
       
