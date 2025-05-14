@@ -1076,11 +1076,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
           
           // Vérifier si le jeu est terminé
           if (newPairs === 8) {
-            toast({
-              title: "Félicitations!",
-              description: `Vous avez terminé le jeu de mémoire en ${newMoves} mouvements!`,
-              variant: "success"
-            });
+            showToast(
+              "Félicitations!",
+              `Vous avez terminé le jeu de mémoire en ${newMoves} mouvements!`,
+              "success"
+            );
             
             // Récompense pour avoir terminé le jeu
             const pointsEarned = Math.max(100, 800 - (newMoves * 20));
@@ -1169,11 +1169,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
       const completed = newPieces.every(piece => piece.position === piece.correctPosition);
       
       if (completed) {
-        toast({
-          title: "Félicitations!",
-          description: `Vous avez résolu le puzzle en ${newMoves} mouvements!`,
-          variant: "success"
-        });
+        showToast(
+          "Félicitations!",
+          `Vous avez résolu le puzzle en ${newMoves} mouvements!`,
+          "success"
+        );
         
         // Récompense pour avoir terminé le jeu
         const pointsEarned = Math.max(150, 1000 - (newMoves * 10));
@@ -1201,11 +1201,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
           // Ajouter les points de récompense
           setPoints(prev => prev + quest.reward);
           
-          toast({
-            title: "Récompense réclamée!",
-            description: `Vous avez reçu ${quest.reward} points!`,
-            variant: "success"
-          });
+          showToast(
+            "Récompense réclamée!",
+            `Vous avez reçu ${quest.reward} points!`,
+            "success"
+          );
           
           return { ...quest, claimed: true };
         }
@@ -1235,11 +1235,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
       )
     );
     
-    toast({
-      title: "Achat réussi!",
-      description: `Vous avez acheté ${item.name}!`,
-      variant: "success"
-    });
+    showToast(
+      "Achat réussi!",
+      `Vous avez acheté ${item.name}!`,
+      "success"
+    );
   };
 
   // Application d'un item
