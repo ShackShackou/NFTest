@@ -13,6 +13,25 @@ interface GameEffect {
   color: string;
   opacity: number;
   scale: number;
+  rotation?: number;
+  type: 'text' | 'particle' | 'shockwave';
+}
+
+// Type pour les statistiques de jeu
+interface GameStats {
+  totalClicks: number;
+  maxCombo: number;
+  maxSpeed: number;
+  bestScore: number;
+  unlockedAchievements: string[];
+}
+
+// Type pour les états du personnage
+interface CharacterState {
+  isAttacking: boolean;
+  isCrouching: boolean;
+  isJumping: boolean;
+  direction: 'left' | 'right';
 }
 
 interface NftDisplayProps {
@@ -20,6 +39,7 @@ interface NftDisplayProps {
 }
 
 export function NftDisplay({ className }: NftDisplayProps) {
+  // États de base
   const [isLoading, setIsLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isFrozen, setIsFrozen] = useState(false);
@@ -27,6 +47,32 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const [gameEffects, setGameEffects] = useState<GameEffect[]>([]);
   const [comboText, setComboText] = useState("");
   const [animationSpeed, setAnimationSpeed] = useState(1);
+  
+  // Système de combos et statistiques
+  const [currentCombo, setCurrentCombo] = useState(0);
+  const [comboMultiplier, setComboMultiplier] = useState(1);
+  const [lastClickTime, setLastClickTime] = useState(0);
+  const [particleEffects, setParticleEffects] = useState<GameEffect[]>([]);
+  const [shockwaves, setShockwaves] = useState<GameEffect[]>([]);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  
+  // Statistiques et progression
+  const [gameStats, setGameStats] = useState<GameStats>({
+    totalClicks: 0,
+    maxCombo: 0,
+    maxSpeed: 1,
+    bestScore: 0,
+    unlockedAchievements: []
+  });
+  
+  // État du personnage
+  const [characterState, setCharacterState] = useState<CharacterState>({
+    isAttacking: false,
+    isCrouching: false,
+    isJumping: false,
+    direction: 'right'
+  });
   
   // État pour les accessoires et objets dans la boutique
   const [shopItems, setShopItems] = useState<ShopItem[]>([
@@ -90,28 +136,71 @@ export function NftDisplay({ className }: NftDisplayProps) {
     "Legendary!"
   ];
   
-  // Effets de particules en fonction du nombre de clics
-  const createEffect = (x: number, y: number, clickCount: number) => {
+  // Effets de particules en fonction du nombre de clics et du type d'effet
+  const createEffect = (x: number, y: number, clickCount: number, type: GameEffect['type'] = 'text', multiplier = 1) => {
     const id = effectIdRef.current++;
     const colors = ["#FF5252", "#FFD740", "#64FFDA", "#448AFF", "#E040FB"];
+    const selectedColor = colors[Math.floor(Math.random() * colors.length)];
     
-    // Détermine le texte à afficher en fonction du nombre de clics
-    let text = "+1";
+    // Détermine le texte à afficher en fonction du nombre de clics et du multiplicateur
+    let text = `+${multiplier}`;
     if (clickCount % 10 === 0) {
-      text = `+${clickCount}!`;
+      text = `+${clickCount * multiplier}!`;
     } else if (clickCount % 5 === 0) {
-      text = "+5!";
+      text = `+${5 * multiplier}!`;
     }
     
-    return {
-      id,
-      text,
-      x,
-      y,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      opacity: 1,
-      scale: 1
-    };
+    // Paramètres différents selon le type d'effet
+    if (type === 'particle') {
+      return {
+        id,
+        text: '', // Les particules n'ont pas de texte
+        x: x + (Math.random() * 40) - 20,
+        y: y + (Math.random() * 40) - 20,
+        color: selectedColor,
+        opacity: 0.8,
+        scale: 0.5 + Math.random() * 0.5,
+        rotation: Math.random() * 360,
+        type
+      };
+    } else if (type === 'shockwave') {
+      return {
+        id,
+        text: '', // Les ondes de choc n'ont pas de texte
+        x,
+        y,
+        color: `${selectedColor}50`, // Ajoute de la transparence pour les ondes de choc
+        opacity: 0.7,
+        scale: 0.1, // Commence petit puis grandit
+        type
+      };
+    } else {
+      // Type 'text' par défaut
+      return {
+        id,
+        text,
+        x,
+        y,
+        color: selectedColor,
+        opacity: 1,
+        scale: 1,
+        type
+      };
+    }
+  };
+  
+  // Crée un groupe de particules
+  const createParticles = (x: number, y: number, count: number) => {
+    const particles: GameEffect[] = [];
+    for (let i = 0; i < count; i++) {
+      particles.push(createEffect(x, y, 0, 'particle'));
+    }
+    return particles;
+  };
+  
+  // Crée une onde de choc
+  const createShockwave = (x: number, y: number) => {
+    return createEffect(x, y, 0, 'shockwave');
   };
   
   // Une fois que l'image est chargée, on met isLoading à false
@@ -123,23 +212,60 @@ export function NftDisplay({ className }: NftDisplayProps) {
     };
   }, []);
   
-  // Effet pour animer et supprimer les effets visuels
+  // Effet pour animer les effets visuels (texte, particules, ondes de choc)
   useEffect(() => {
-    if (gameEffects.length === 0) return;
+    if (gameEffects.length === 0 && particleEffects.length === 0 && shockwaves.length === 0) return;
     
     const animationInterval = setInterval(() => {
+      // Animation des textes "+1", etc.
       setGameEffects(prev => 
-        prev.map(effect => ({
-          ...effect,
-          y: effect.y - 2, // Monte vers le haut
-          opacity: effect.opacity - 0.02, // Disparaît progressivement
-          scale: effect.scale + 0.01 // Grandit légèrement
-        })).filter(effect => effect.opacity > 0) // Supprime les effets invisibles
+        prev.map(effect => {
+          if (effect.type === 'text') {
+            return {
+              ...effect,
+              y: effect.y - 2, // Monte vers le haut
+              opacity: effect.opacity - 0.02, // Disparaît progressivement
+              scale: effect.scale + 0.01 // Grandit légèrement
+            };
+          }
+          return effect;
+        }).filter(effect => effect.opacity > 0) // Supprime les effets invisibles
+      );
+      
+      // Animation des particules
+      setParticleEffects(prev => 
+        prev.map(effect => {
+          if (effect.type === 'particle') {
+            return {
+              ...effect,
+              y: effect.y - 3 * Math.random(), // Monte plus vite et aléatoirement
+              x: effect.x + (Math.random() - 0.5) * 2, // Léger mouvement latéral
+              opacity: effect.opacity - 0.03, // Disparaît plus rapidement
+              rotation: (effect.rotation || 0) + 5, // Tourne
+              scale: effect.scale - 0.01 // Rétrécit
+            };
+          }
+          return effect;
+        }).filter(effect => effect.opacity > 0) // Supprime les effets invisibles
+      );
+      
+      // Animation des ondes de choc
+      setShockwaves(prev => 
+        prev.map(effect => {
+          if (effect.type === 'shockwave') {
+            return {
+              ...effect,
+              scale: effect.scale + 0.2, // Grandit rapidement
+              opacity: effect.opacity - 0.05 // Disparaît encore plus vite
+            };
+          }
+          return effect;
+        }).filter(effect => effect.opacity > 0 && effect.scale < 5) // Supprime les ondes trop grandes ou invisibles
       );
     }, 16); // ~60 FPS
     
     return () => clearInterval(animationInterval);
-  }, [gameEffects]);
+  }, [gameEffects, particleEffects, shockwaves]);
   
   // Effet pour afficher et supprimer le texte de combo
   useEffect(() => {
@@ -204,38 +330,137 @@ export function NftDisplay({ className }: NftDisplayProps) {
     ));
   };
 
-  // Fonction pour accélérer l'animation au clic et ajouter le game feel
+  // Gestion des combos et multiplicateurs
+  const updateCombo = () => {
+    const now = Date.now();
+    // Si le clic est assez rapide après le dernier (moins de 1 seconde)
+    if (now - lastClickTime < 1000) {
+      const newCombo = currentCombo + 1;
+      setCurrentCombo(newCombo);
+      
+      // Mise à jour du multiplicateur en fonction du combo
+      if (newCombo >= 15) {
+        setComboMultiplier(4); // x4 pour 15+ clics consécutifs
+      } else if (newCombo >= 10) {
+        setComboMultiplier(3); // x3 pour 10+ clics consécutifs
+      } else if (newCombo >= 5) {
+        setComboMultiplier(2); // x2 pour 5+ clics consécutifs
+      }
+      
+      // Mettre à jour les statistiques si nécessaire
+      if (newCombo > gameStats.maxCombo) {
+        setGameStats(prev => ({ ...prev, maxCombo: newCombo }));
+      }
+    } else {
+      // Réinitialiser le combo si trop lent
+      setCurrentCombo(1);
+      setComboMultiplier(1);
+    }
+    
+    setLastClickTime(now);
+  };
+  
+  // Fonction pour simuler la réaction du personnage
+  const updateCharacterState = (x: number, containerWidth: number) => {
+    // Change la direction du personnage en fonction de la position du clic
+    const newDirection = x < containerWidth / 2 ? 'left' as const : 'right' as const;
+    
+    // Déclenche une animation d'attaque ou de saut aléatoirement
+    const randomAction = Math.random();
+    const newState = { 
+      ...characterState, 
+      direction: newDirection,
+      isAttacking: false,
+      isJumping: false,
+      isCrouching: false
+    };
+    
+    if (randomAction < 0.3) {
+      newState.isAttacking = true;
+      setTimeout(() => setCharacterState(prev => ({ ...prev, isAttacking: false })), 300);
+    } else if (randomAction < 0.6) {
+      newState.isJumping = true;
+      setTimeout(() => setCharacterState(prev => ({ ...prev, isJumping: false })), 500);
+    } else {
+      newState.isCrouching = true;
+      setTimeout(() => setCharacterState(prev => ({ ...prev, isCrouching: false })), 200);
+    }
+    
+    setCharacterState(newState);
+  };
+
+  // Fonction pour accélérer l'animation au clic et ajouter tous les effets visuels
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Incrémenter le compteur de clics
-    const newClickCount = clickCount + 1;
+    // Mise à jour du combo
+    updateCombo();
+    
+    // Incrémenter le compteur de clics (multiplié par le multiplicateur de combo)
+    const pointsToAdd = comboMultiplier;
+    const newClickCount = clickCount + pointsToAdd;
     setClickCount(newClickCount);
     
-    // Augmenter la vitesse d'animation (jusqu'à 3x plus rapide après plusieurs clics)
-    const newSpeed = Math.min(3, 1 + (newClickCount % 10) / 5);
+    // Mettre à jour les statistiques totales
+    setGameStats(prev => ({ 
+      ...prev, 
+      totalClicks: prev.totalClicks + 1,
+      bestScore: Math.max(prev.bestScore, newClickCount)
+    }));
+    
+    // Augmenter la vitesse d'animation (jusqu'à 5x plus rapide après plusieurs clics)
+    const newSpeed = Math.min(5, 1 + (currentCombo / 5));
     setAnimationSpeed(newSpeed);
+    
+    // Mettre à jour les statistiques si c'est une nouvelle vitesse maximale
+    if (newSpeed > gameStats.maxSpeed) {
+      setGameStats(prev => ({ ...prev, maxSpeed: newSpeed }));
+    }
     
     // Créer une position relative à l'intérieur du conteneur
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Ajouter un nouvel effet visuel "+1"
-    const newEffect = createEffect(x, y, newClickCount);
+    // Mettre à jour l'état du personnage
+    updateCharacterState(x, rect.width);
+    
+    // Ajouter un nouvel effet visuel "+1" ou plus selon le multiplicateur
+    const newEffect = createEffect(x, y, newClickCount, 'text', comboMultiplier);
     setGameEffects(prev => [...prev, newEffect]);
     
-    // Afficher un message de combo après chaque 3 clics
-    if (newClickCount % 3 === 0) {
-      const comboIndex = Math.min(Math.floor(newClickCount / 3) - 1, comboMessages.length - 1);
+    // Ajouter des particules
+    const particles = createParticles(x, y, 5 + Math.floor(comboMultiplier * 2));
+    setParticleEffects(prev => [...prev, ...particles]);
+    
+    // Ajouter une onde de choc
+    const shockwave = createShockwave(x, y);
+    setShockwaves(prev => [...prev, shockwave]);
+    
+    // Afficher un message de combo basé sur le nombre consécutif de clics
+    if (currentCombo >= 3) {
+      const comboIndex = Math.min(Math.floor(currentCombo / 3) - 1, comboMessages.length - 1);
       setComboText(comboMessages[comboIndex]);
+      
+      // Débloquer des succès
+      if (currentCombo === 10 && !gameStats.unlockedAchievements.includes('Combo Master')) {
+        setGameStats(prev => ({
+          ...prev,
+          unlockedAchievements: [...prev.unlockedAchievements, 'Combo Master']
+        }));
+        setComboText("🏆 SUCCÈS DÉBLOQUÉ: Combo Master!");
+      }
     }
     
     // Quand l'utilisateur clique, on fait un traitement spécial sur l'image
     setIsFrozen(true);
     
     if (imgRef.current) {
-      // Appliquer des effets visuels dynamiques de game feel
-      imgRef.current.style.filter = `brightness(1.3) contrast(1.4) hue-rotate(${newClickCount * 10}deg)`;
-      imgRef.current.style.transform = `scale(1.05) rotate(${Math.sin(newClickCount) * 3}deg)`;
+      // Appliquer des effets visuels dynamiques de game feel qui changent avec le combo
+      const hueRotate = currentCombo * 15;
+      const brightness = 1 + (currentCombo / 20);
+      const contrast = 1 + (currentCombo / 15);
+      
+      imgRef.current.style.filter = `brightness(${brightness}) contrast(${contrast}) hue-rotate(${hueRotate}deg)`;
+      imgRef.current.style.transform = `scale(${1 + (currentCombo / 50)}) rotate(${Math.sin(currentCombo) * 5}deg)`;
       
       // Accélérer l'animation GIF avec animation-duration
       imgRef.current.style.animationDuration = `${1 / newSpeed}s`;
@@ -245,18 +470,28 @@ export function NftDisplay({ className }: NftDisplayProps) {
         window.clearTimeout(timeoutRef.current);
       }
       
-      // Reprendre l'animation après un court délai
+      // Reprendre l'animation après un court délai, plus court si le combo est élevé
+      const freezeTime = Math.max(200, 800 - (currentCombo * 20));
       timeoutRef.current = window.setTimeout(() => {
         setIsFrozen(false);
         setIsPaused(false);
         
         if (imgRef.current) {
+          // Transition plus douce pour revenir à la normale
+          imgRef.current.style.transition = "filter 0.3s ease-out, transform 0.3s ease-out";
           imgRef.current.style.filter = 'none';
           imgRef.current.style.transform = 'none';
           imgRef.current.style.animationPlayState = 'running';
           // Laisser la nouvelle vitesse d'animation
+          
+          // Réinitialiser la transition après
+          setTimeout(() => {
+            if (imgRef.current) {
+              imgRef.current.style.transition = "";
+            }
+          }, 300);
         }
-      }, 800);
+      }, freezeTime);
     }
   };
 
@@ -329,10 +564,66 @@ export function NftDisplay({ className }: NftDisplayProps) {
                 </div>
               )}
               
-              {/* Compteur de score */}
+              {/* Particules */}
+              {particleEffects.map(effect => (
+                <div
+                  key={effect.id}
+                  className="absolute pointer-events-none z-20"
+                  style={{
+                    left: `${effect.x}px`,
+                    top: `${effect.y}px`,
+                    width: '8px',
+                    height: '8px',
+                    backgroundColor: effect.color,
+                    opacity: effect.opacity,
+                    transform: `scale(${effect.scale}) rotate(${effect.rotation || 0}deg)`,
+                    borderRadius: '50%'
+                  }}
+                />
+              ))}
+              
+              {/* Ondes de choc */}
+              {shockwaves.map(effect => (
+                <div
+                  key={effect.id}
+                  className="absolute pointer-events-none z-10"
+                  style={{
+                    left: `${effect.x}px`,
+                    top: `${effect.y}px`,
+                    width: '10px',
+                    height: '10px',
+                    border: `2px solid ${effect.color}`,
+                    opacity: effect.opacity,
+                    transform: `translate(-50%, -50%) scale(${effect.scale})`,
+                    borderRadius: '50%'
+                  }}
+                />
+              ))}
+              
+              {/* État du personnage (animation) */}
+              {characterState.isAttacking && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-4xl">
+                  ⚔️
+                </div>
+              )}
+              
+              {characterState.isJumping && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 text-4xl animate-bounce">
+                  ↑
+                </div>
+              )}
+              
+              {/* Compteur de score et combo */}
               <div className="absolute bottom-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm">
-                Score: {clickCount}
+                Score: {clickCount} | Combo: x{comboMultiplier}
               </div>
+              
+              {/* Succès débloqués */}
+              {gameStats.unlockedAchievements.length > 0 && (
+                <div className="absolute top-4 left-4 bg-black bg-opacity-70 text-gold px-3 py-1 rounded-full text-xs">
+                  🏆 Succès: {gameStats.unlockedAchievements.length}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -120,11 +120,75 @@
     }
   }
   
+  /* Animations pour les effets spéciaux */
+  @keyframes shockwave {
+    0% {
+      transform: translate(-50%, -50%) scale(0.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(5);
+      opacity: 0;
+    }
+  }
+  
+  .shockwave {
+    animation: shockwave 0.8s ease-out forwards;
+  }
+  
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+    }
+    40% {
+      transform: translateY(-20px);
+    }
+    60% {
+      transform: translateY(-10px);
+    }
+  }
+  
+  .bounce {
+    animation: bounce 1s ease-in-out;
+  }
+  
+  @keyframes spin {
+    0% { 
+      transform: rotate(0deg); 
+    }
+    100% { 
+      transform: rotate(360deg); 
+    }
+  }
+  
+  .spin {
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes flash {
+    0%, 50%, 100% {
+      opacity: 1;
+    }
+    25%, 75% {
+      opacity: 0.3;
+    }
+  }
+  
+  .flash {
+    animation: flash 0.5s linear;
+  }
+  
   /* Pixels pour l'effet d'animation du GIF */
   .pixelated {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+  }
+  
+  /* Style pour les succès */
+  .text-gold {
+    color: #FFD700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
   }
   
   @keyframes pulse {
