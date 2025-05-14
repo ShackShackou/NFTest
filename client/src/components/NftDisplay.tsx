@@ -212,12 +212,96 @@ export function NftDisplay({ className }: NftDisplayProps) {
     lastEvent: string;
     eventHistory: string[];
     unlockedLore: string[];
+    choices: {
+      active: boolean;
+      question: string;
+      options: { text: string; outcome: string; effect: 'good' | 'neutral' | 'bad' }[];
+      selected?: number;
+    };
+    endings: {
+      good: boolean;
+      neutral: boolean;
+      bad: boolean;
+    };
   }>({
     currentChapter: 1,
     totalChapters: 5,
     lastEvent: "Début de l'aventure",
     eventHistory: ["Vous avez trouvé un NFT mystérieux..."],
-    unlockedLore: ["Prologue: Le NFT mystérieux"]
+    unlockedLore: ["Prologue: Le NFT mystérieux"],
+    choices: {
+      active: false,
+      question: "",
+      options: [],
+      selected: undefined
+    },
+    endings: {
+      good: false,
+      neutral: false,
+      bad: false
+    }
+  });
+  
+  // Système de mini-jeux
+  const [miniGames, setMiniGames] = useState<{
+    unlocked: { memory: boolean; puzzle: boolean; platformer: boolean };
+    active: null | 'memory' | 'puzzle' | 'platformer';
+    memoryGame: {
+      cards: { id: number; icon: string; matched: boolean; flipped: boolean }[];
+      firstCard?: number;
+      secondCard?: number;
+      moves: number;
+      pairs: number;
+      completed: boolean;
+    };
+    puzzleGame: {
+      pieces: { id: number; position: number; correctPosition: number }[];
+      moves: number;
+      completed: boolean;
+    };
+    platformerGame: {
+      position: { x: number; y: number };
+      platforms: { x: number; y: number; width: number }[];
+      obstacles: { x: number; y: number; type: string }[];
+      goal: { x: number; y: number };
+      completed: boolean;
+    };
+  }>({
+    unlocked: { memory: false, puzzle: false, platformer: false },
+    active: null,
+    memoryGame: {
+      cards: Array(12).fill(null).map((_, i) => ({
+        id: i,
+        icon: ['🍎', '🍌', '🍓', '🍉', '🍇', '🍊'][Math.floor(i/2)],
+        matched: false,
+        flipped: false
+      })),
+      moves: 0,
+      pairs: 0,
+      completed: false
+    },
+    puzzleGame: {
+      pieces: Array(9).fill(null).map((_, i) => ({
+        id: i,
+        position: i,
+        correctPosition: i
+      })),
+      moves: 0,
+      completed: false
+    },
+    platformerGame: {
+      position: { x: 50, y: 200 },
+      platforms: [
+        { x: 0, y: 250, width: 100 },
+        { x: 150, y: 200, width: 100 },
+        { x: 300, y: 150, width: 100 }
+      ],
+      obstacles: [
+        { x: 120, y: 230, type: 'spike' }
+      ],
+      goal: { x: 350, y: 100 },
+      completed: false
+    }
   });
   
   // Particules d'arrière-plan
@@ -635,7 +719,328 @@ export function NftDisplay({ className }: NftDisplayProps) {
     });
   };
   
-  // Cette fonction n'est plus utilisée, nous utilisons une fonction inline dans le bouton directement
+  // Fonction pour démarrer un mini-jeu
+  const startMiniGame = (game: 'memory' | 'puzzle' | 'platformer') => {
+    if (!miniGames.unlocked[game]) {
+      toast({
+        title: "🔒 Mini-jeu verrouillé",
+        description: `Ce mini-jeu n'est pas encore débloqué. Continuez à jouer pour le débloquer!`,
+        duration: 3000,
+      });
+      return;
+    }
+    
+    setMiniGames(prev => ({
+      ...prev,
+      active: game
+    }));
+    
+    toast({
+      title: `🎮 Mini-jeu: ${game === 'memory' ? 'Mémoire' : game === 'puzzle' ? 'Puzzle' : 'Platformer'}`,
+      description: (
+        <div className="text-sm space-y-2">
+          {game === 'memory' && (
+            <>
+              <p>Retournez les cartes pour trouver les paires!</p>
+              <div className="grid grid-cols-4 gap-1 mt-2">
+                {miniGames.memoryGame.cards.map(card => (
+                  <button
+                    key={card.id}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center text-lg ${
+                      card.flipped || card.matched 
+                        ? 'bg-blue-600' 
+                        : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Logique du memory game
+                      if (card.matched || card.flipped) return;
+                      
+                      setMiniGames(prev => {
+                        // Si déjà deux cartes retournées, ignorer
+                        if (prev.memoryGame.secondCard !== undefined) return prev;
+                        
+                        const newCards = [...prev.memoryGame.cards];
+                        newCards[card.id] = { ...card, flipped: true };
+                        
+                        // Première carte retournée
+                        if (prev.memoryGame.firstCard === undefined) {
+                          return {
+                            ...prev,
+                            memoryGame: {
+                              ...prev.memoryGame,
+                              firstCard: card.id,
+                              cards: newCards
+                            }
+                          };
+                        }
+                        
+                        // Deuxième carte retournée
+                        const firstCard = prev.memoryGame.cards[prev.memoryGame.firstCard];
+                        const isMatch = firstCard.icon === card.icon;
+                        
+                        // Vérifier si les cartes correspondent
+                        setTimeout(() => {
+                          setMiniGames(prev => {
+                            const newCards = [...prev.memoryGame.cards];
+                            
+                            if (isMatch) {
+                              // Si match, marquer les cartes comme matched
+                              newCards[prev.memoryGame.firstCard!] = { 
+                                ...newCards[prev.memoryGame.firstCard!], 
+                                matched: true, 
+                                flipped: false 
+                              };
+                              newCards[card.id] = { 
+                                ...newCards[card.id], 
+                                matched: true, 
+                                flipped: false 
+                              };
+                              
+                              const newPairs = prev.memoryGame.pairs + 1;
+                              const completed = newPairs === 6;
+                              
+                              if (completed) {
+                                // Donner une récompense
+                                setClickCount(c => c + 200);
+                                toast({
+                                  title: "🏆 Mini-jeu terminé!",
+                                  description: "Félicitations! Vous avez gagné 200 points!",
+                                  duration: 3000,
+                                });
+                              }
+                              
+                              return {
+                                ...prev,
+                                memoryGame: {
+                                  ...prev.memoryGame,
+                                  cards: newCards,
+                                  firstCard: undefined,
+                                  secondCard: undefined,
+                                  moves: prev.memoryGame.moves + 1,
+                                  pairs: newPairs,
+                                  completed
+                                }
+                              };
+                            } else {
+                              // Si pas match, retourner les cartes
+                              newCards[prev.memoryGame.firstCard!] = { 
+                                ...newCards[prev.memoryGame.firstCard!], 
+                                flipped: false 
+                              };
+                              newCards[card.id] = { ...newCards[card.id], flipped: false };
+                              
+                              return {
+                                ...prev,
+                                memoryGame: {
+                                  ...prev.memoryGame,
+                                  cards: newCards,
+                                  firstCard: undefined,
+                                  secondCard: undefined,
+                                  moves: prev.memoryGame.moves + 1
+                                }
+                              };
+                            }
+                          });
+                        }, 1000);
+                        
+                        return {
+                          ...prev,
+                          memoryGame: {
+                            ...prev.memoryGame,
+                            secondCard: card.id,
+                            cards: newCards
+                          }
+                        };
+                      });
+                    }}
+                  >
+                    {card.flipped || card.matched ? card.icon : '?'}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs mt-2">Mouvements: {miniGames.memoryGame.moves} | Paires: {miniGames.memoryGame.pairs}/6</p>
+            </>
+          )}
+          
+          {game === 'puzzle' && (
+            <>
+              <p>Déplacez les pièces pour reconstituer l'image!</p>
+              {/* Ici, implementer le jeu de puzzle */}
+            </>
+          )}
+          
+          {game === 'platformer' && (
+            <>
+              <p>Atteignez le drapeau sans toucher les obstacles!</p>
+              {/* Ici, implementer le jeu de platformer */}
+            </>
+          )}
+          
+          <div className="flex justify-end mt-2">
+            <button
+              className="px-3 py-1 bg-gray-700 text-white rounded-md hover:bg-gray-600 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMiniGames(prev => ({
+                  ...prev,
+                  active: null
+                }));
+              }}
+            >
+              Fermer
+            </button>
+          </div>
+        </div>
+      ),
+      duration: 30000,
+    });
+  };
+  
+  // Fonction pour présenter un choix narratif
+  const presentStoryChoice = () => {
+    // Ne présenter un choix que si on n'en a pas déjà un actif
+    if (storyEvents.choices.active) return;
+    
+    // Générer un choix narratif selon le chapitre actuel
+    const choices = [
+      {
+        chapter: 1,
+        question: "Vous découvrez une aura étrange autour du NFT. Que faites-vous?",
+        options: [
+          { 
+            text: "Vous l'étudiez attentivement", 
+            outcome: "Vous avez découvert des symboles cachés dans l'image.",
+            effect: 'good' as const
+          },
+          { 
+            text: "Vous le montrez à un ami", 
+            outcome: "Votre ami vous conseille de continuer à l'explorer.",
+            effect: 'neutral' as const
+          },
+          { 
+            text: "Vous l'ignorez", 
+            outcome: "Quelque chose semble déçu de votre manque d'intérêt.",
+            effect: 'bad' as const
+          }
+        ]
+      },
+      {
+        chapter: 2,
+        question: "Une porte dimensionnelle s'ouvre dans le NFT. Votre réaction?",
+        options: [
+          { 
+            text: "Vous entrez courageusement", 
+            outcome: "Vous découvrez un monde virtuel fascinant!",
+            effect: 'good' as const
+          },
+          { 
+            text: "Vous observez depuis la sécurité", 
+            outcome: "Vous apercevez des entités qui vous font signe.",
+            effect: 'neutral' as const
+          },
+          { 
+            text: "Vous tentez de fermer la porte", 
+            outcome: "La porte résiste et émane une énergie puissante.",
+            effect: 'bad' as const
+          }
+        ]
+      }
+    ];
+    
+    // Sélectionner un choix approprié pour le chapitre actuel
+    const availableChoices = choices.filter(c => c.chapter === storyEvents.currentChapter);
+    if (availableChoices.length === 0) return;
+    
+    const choice = availableChoices[0];
+    
+    // Mettre à jour l'état avec le choix actif
+    setStoryEvents(prev => ({
+      ...prev,
+      choices: {
+        active: true,
+        question: choice.question,
+        options: choice.options,
+        selected: undefined
+      }
+    }));
+    
+    // Afficher le choix dans un toast
+    toast({
+      title: "📜 Choix Narratif",
+      description: (
+        <div className="text-sm space-y-2">
+          <p className="font-medium">{choice.question}</p>
+          <div className="flex flex-col space-y-2 mt-2">
+            {choice.options.map((option, index) => (
+              <button
+                key={index}
+                className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-md text-left"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  
+                  // Marquer le choix comme sélectionné
+                  setStoryEvents(prev => ({
+                    ...prev,
+                    choices: {
+                      ...prev.choices,
+                      selected: index
+                    },
+                    eventHistory: [...prev.eventHistory, option.outcome],
+                    lastEvent: option.outcome
+                  }));
+                  
+                  // Si c'est un bon choix, débloquer un fragment d'histoire
+                  if (option.effect === 'good') {
+                    const newLore = `Chapitre ${storyEvents.currentChapter}: Fragment débloqué par votre choix judicieux`;
+                    setStoryEvents(prev => ({
+                      ...prev,
+                      unlockedLore: [...prev.unlockedLore, newLore]
+                    }));
+                    
+                    // Bonus de points pour un bon choix
+                    setClickCount(c => c + 50);
+                  }
+                  
+                  // Mettre à jour les fins débloquées
+                  if (storyEvents.currentChapter === storyEvents.totalChapters) {
+                    setStoryEvents(prev => ({
+                      ...prev,
+                      endings: {
+                        ...prev.endings,
+                        [option.effect]: true
+                      }
+                    }));
+                  }
+                  
+                  // Afficher le résultat
+                  toast({
+                    title: "Résultat de votre choix",
+                    description: option.outcome,
+                    duration: 5000,
+                  });
+                  
+                  // Désactiver le choix
+                  setTimeout(() => {
+                    setStoryEvents(prev => ({
+                      ...prev,
+                      choices: {
+                        ...prev.choices,
+                        active: false
+                      }
+                    }));
+                  }, 1000);
+                }}
+              >
+                {option.text}
+              </button>
+            ))}
+          </div>
+        </div>
+      ),
+      duration: 20000,
+    });
+  };
   
   // Fonction pour réinitialiser les statistiques
   const resetStats = (e: React.MouseEvent) => {
@@ -681,7 +1086,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
             <button 
               className="px-3 py-1 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
               onClick={() => {
-                toast.dismiss();
+                // Fermer simplement la fenêtre de dialogue
               }}
             >
               Annuler
@@ -1392,6 +1797,63 @@ export function NftDisplay({ className }: NftDisplayProps) {
                   }}
                 >
                   📜
+                </button>
+                
+                {/* Bouton pour les mini-jeux */}
+                <button 
+                  className="bg-black bg-opacity-70 hover:bg-opacity-80 text-white p-2 rounded-full text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toast({
+                      title: "🎮 Mini-jeux",
+                      description: (
+                        <div className="text-sm space-y-2">
+                          <p className="font-bold mb-2">Sélectionnez un mini-jeu:</p>
+                          <div className="grid grid-cols-1 gap-2">
+                            <button
+                              className={`px-3 py-2 rounded-md text-left flex items-center ${miniGames.unlocked.memory ? 'bg-blue-700 hover:bg-blue-600' : 'bg-gray-800 text-gray-400'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startMiniGame('memory');
+                              }}
+                            >
+                              <span className="mr-2">🧠</span>
+                              <span>Jeu de Mémoire {!miniGames.unlocked.memory && '(Niveau 2+)'}</span>
+                            </button>
+                            
+                            <button
+                              className={`px-3 py-2 rounded-md text-left flex items-center ${miniGames.unlocked.puzzle ? 'bg-purple-700 hover:bg-purple-600' : 'bg-gray-800 text-gray-400'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startMiniGame('puzzle');
+                              }}
+                            >
+                              <span className="mr-2">🧩</span>
+                              <span>Puzzle {!miniGames.unlocked.puzzle && '(Niveau 3+)'}</span>
+                            </button>
+                            
+                            <button
+                              className={`px-3 py-2 rounded-md text-left flex items-center ${miniGames.unlocked.platformer ? 'bg-green-700 hover:bg-green-600' : 'bg-gray-800 text-gray-400'}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startMiniGame('platformer');
+                              }}
+                            >
+                              <span className="mr-2">🏃</span>
+                              <span>Platformer {!miniGames.unlocked.platformer && '(Niveau 4+)'}</span>
+                            </button>
+                          </div>
+                          
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Complétez des mini-jeux pour gagner des récompenses spéciales!
+                          </p>
+                        </div>
+                      ),
+                      duration: 8000,
+                    });
+                  }}
+                >
+                  🎮
                 </button>
                 
                 {/* Bouton pour réinitialiser les stats */}
