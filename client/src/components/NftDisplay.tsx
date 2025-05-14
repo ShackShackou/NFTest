@@ -460,6 +460,75 @@ export function NftDisplay({ className }: NftDisplayProps) {
     });
   };
   
+  // Gère la soumission d'un code secret
+  const handleSecretCodeSubmit = () => {
+    if (checkSecretCode(secretCode)) {
+      // Code valide
+      const decryptedMessage = atob(encryptedMessages[secretCode.toUpperCase()]);
+      setSecretMessages(prev => [...prev, decryptedMessage]);
+      setLastDecryptionKey(secretCode);
+      
+      // Activer fonctionnalité cachée
+      setHasHiddenFeature(true);
+      
+      // Récompenser le joueur
+      setPoints(prev => prev + 500);
+      setGameStats(prev => ({
+        ...prev,
+        unlockedAchievements: [...prev.unlockedAchievements, `Code secret: ${secretCode}`]
+      }));
+      
+      showToast(
+        "Code secret validé!",
+        "Vous avez débloqué un contenu exclusif (+500 points)",
+        "success"
+      );
+      
+      // Réinitialiser le champ de code
+      setSecretCode('');
+    } else {
+      // Code invalide
+      showToast(
+        "Code invalide",
+        "Ce code secret n'existe pas. Continuez à chercher!",
+        "destructive"
+      );
+    }
+  };
+  
+  // Vérifie si un motif de clic spécifique est effectué
+  const checkClickPattern = (pattern: number[]) => {
+    const clue = revealHiddenClue(pattern);
+    if (clue && !foundClues.includes(clue)) {
+      setFoundClues(prev => [...prev, clue]);
+      
+      showToast(
+        "Indice ARG découvert!",
+        clue,
+        "success"
+      );
+    }
+  };
+  
+  // Mise à jour du motif de clic lors d'un clic sur le NFT
+  const updateClickPattern = (event: React.MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Diviser la zone en grille 3x3 pour suivre les motifs
+    const gridX = Math.floor((x / rect.width) * 3) + 1;
+    const gridY = Math.floor((y / rect.height) * 3) + 1;
+    const gridPosition = (gridY - 1) * 3 + gridX; // 1 à 9, représentant la position
+    
+    // Stocker les 5 derniers clics pour le motif
+    const newPattern = [...clickPattern, gridPosition].slice(-5);
+    setClickPattern(newPattern);
+    
+    // Vérifier le motif
+    checkClickPattern(newPattern);
+  };
+  
   // Initialisation et chargement
   useEffect(() => {
     // Simuler le temps de chargement
@@ -669,6 +738,42 @@ export function NftDisplay({ className }: NftDisplayProps) {
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     
+    // ==== Système ARG: Détection de motifs de clics ====
+    // Diviser la zone en grille 3x3 pour le suivi des motifs
+    const gridX = Math.floor((x / 100) * 3) + 1;
+    const gridY = Math.floor((y / 100) * 3) + 1;
+    const gridPosition = (gridY - 1) * 3 + gridX; // 1 à 9, représentant la position dans la grille
+    
+    // Stocker les 5 derniers clics pour le motif
+    const newPattern = [...clickPattern, gridPosition].slice(-5);
+    setClickPattern(newPattern);
+    
+    // Vérifier si le motif correspond à un indice caché
+    const clue = revealHiddenClue(newPattern);
+    if (clue && !foundClues.includes(clue)) {
+      setFoundClues(prev => [...prev, clue]);
+      
+      // Animation spéciale pour la découverte d'un indice
+      const clueEffect: GameEffect = {
+        id: Date.now() + 100,
+        text: "💡 INDICE TROUVÉ!",
+        x: 50,
+        y: 40,
+        color: '#f5f542',
+        opacity: 1,
+        scale: 1.5,
+        type: 'text'
+      };
+      setGameEffects(prev => [...prev, clueEffect]);
+      
+      showToast(
+        "Indice ARG découvert!",
+        clue,
+        "success"
+      );
+    }
+    
+    // ==== Gameplay standard ====
     // Incrémenter le compteur de clics
     setClickCount(prev => prev + 1);
     
@@ -2136,6 +2241,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
         {activeScreen === 'shop' && renderShopScreen()}
         {activeScreen === 'story' && showStoryDetails()}
         {activeScreen === 'minigames' && renderMiniGamesSelectionScreen()}
+        {activeScreen === 'secretcodes' && renderSecretCodesScreen()}
         
         {/* Affichage des mini-jeux actifs par-dessus tout */}
         {miniGames.active && renderMiniGame()}
