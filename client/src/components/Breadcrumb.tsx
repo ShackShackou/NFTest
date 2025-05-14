@@ -25,7 +25,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
               <span className="text-primary">{item.label}</span>
             ) : item.href ? (
               <Link href={item.href}>
-                <a className="hover:text-primary">{item.label}</a>
+                <span className="hover:text-primary cursor-pointer">{item.label}</span>
               </Link>
             ) : (
               <span>{item.label}</span>

@@ -1,0 +1,39 @@
+[vite] connecting...
+[vite] connected.
+Warning: validateDOMNesting(...): <a> cannot appear as a descendant of &lt;a&gt;.
+    at a
+    at a
+    at https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:337:18
+    at div
+    at div
+    at div
+    at Breadcrumb (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/src/components/Breadcrumb.tsx:19:30)
+    at main
+    at NftMarketplace (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/src/pages/NftMarketplace.tsx?t=1747181739298:28:25)
+    at Route (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:323:16)
+    at Switch (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:379:17)
+    at Router
+    at Provider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-FW7CIZRJ.js?v=ef380358:38:15)
+    at TooltipProvider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=ef380358:2217:5)
+    at QueryClientProvider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ef380358:2805:3)
+    at App
+at a
+at a
+at https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:337:18
+at div
+at div
+at div
+at Breadcrumb (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/src/components/Breadcrumb.tsx:19:30)
+at main
+at NftMarketplace (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/src/pages/NftMarketplace.tsx?t=1747181739298:28:25)
+at Route (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:323:16)
+at Switch (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=ef380358:379:17)
+at Router
+at Provider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-FW7CIZRJ.js?v=ef380358:38:15)
+at TooltipProvider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=ef380358:2217:5)
+at QueryClientProvider (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=ef380358:2805:3)
+at App
+at t.value (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:17465)
+at new t (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:12630)
+at t.value (https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:32766)
+at https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/__replco/static/devtools/eruda/3.2.3/eruda.js:2:34400

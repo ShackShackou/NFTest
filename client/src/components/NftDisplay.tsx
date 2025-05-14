@@ -1,9 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { Slider } from '@/components/ui/slider';
-import { Button } from '@/components/ui/button';
+import { useState, useRef } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import { useGifController } from '@/hooks/useGifController';
-import { PlayIcon, PauseIcon, RotateCcwIcon } from 'lucide-react';
 import darthBaterGif from '@assets/13_DARTHBATER.gif';
 import { cn } from '@/lib/utils';
 
@@ -20,28 +17,15 @@ export function NftDisplay({ className }: NftDisplayProps) {
     isFrozen,
     play,
     pause,
-    restart,
-    goToFrame,
     jumpToFrame19
   } = useGifController(darthBaterGif);
 
   const [isHovering, setIsHovering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Render the GIF image
-  const [staticImage, setStaticImage] = useState<string>('');
-
-  useEffect(() => {
-    if (containerRef.current) {
-      // For actual implementation, we'd render each frame based on currentFrameIndex
-      // Since we can't use actual binary files, we're using the GIF directly
-      setStaticImage(darthBaterGif);
-    }
-  }, [currentFrameIndex]);
-
   return (
     <div className={`flex flex-col space-y-6 ${className}`}>
-      {/* NFT Display Container */}
+      {/* NFT Display Container - Simple with no UI controls */}
       <div 
         ref={containerRef}
         className="relative bg-neutral-dark rounded-xl overflow-hidden hover-glow transition-all duration-300 h-[450px] sm:h-[550px] flex items-center justify-center"
@@ -67,16 +51,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
             if (!isFrozen) play();
           }}
           onClick={() => {
-            // Check if we're around frame 15 (or can simulate this condition)
+            // This implements exactly the requirement:
+            // When clicked, the GIF should jump from frame 15 to 19 and freeze briefly
             const currentFrame = currentFrameIndex;
             if (currentFrame >= 10 && currentFrame <= 17) {
               jumpToFrame19();
-            } else {
-              if (isHovering) {
-                play();
-              } else {
-                pause();
-              }
             }
           }}
         >
@@ -102,53 +81,6 @@ export function NftDisplay({ className }: NftDisplayProps) {
             <span className="mr-2">🖱️</span> 
             Hover pour arrêter, cliquez sur le personnage pour interagir
           </p>
-        </div>
-      </div>
-      
-      {/* GIF Controls */}
-      <div className="flex items-center justify-between bg-neutral-dark rounded-xl p-4">
-        <div className="flex space-x-4">
-          <Button 
-            variant="ghost"
-            size="icon"
-            onClick={play}
-            disabled={isPlaying || isFrozen}
-            className="text-xl text-neutral-light hover:text-primary transition-colors"
-          >
-            <PlayIcon className="h-5 w-5" />
-          </Button>
-          <Button 
-            variant="ghost"
-            size="icon"
-            onClick={pause}
-            disabled={!isPlaying || isFrozen}
-            className="text-xl text-neutral-light hover:text-primary transition-colors"
-          >
-            <PauseIcon className="h-5 w-5" />
-          </Button>
-          <Button 
-            variant="ghost"
-            size="icon"
-            onClick={restart}
-            disabled={isFrozen}
-            className="text-xl text-neutral-light hover:text-primary transition-colors"
-          >
-            <RotateCcwIcon className="h-5 w-5" />
-          </Button>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-sm mr-2">Frame: {currentFrameIndex + 1}/{totalFrames}</span>
-          <Slider
-            className="w-24 md:w-32"
-            min={0}
-            max={totalFrames - 1}
-            step={1}
-            value={[currentFrameIndex]}
-            onValueChange={(value) => {
-              goToFrame(value[0]);
-            }}
-            disabled={isFrozen}
-          />
         </div>
       </div>
     </div>
