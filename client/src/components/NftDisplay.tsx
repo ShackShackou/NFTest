@@ -172,7 +172,23 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const [animationSpeed, setAnimationSpeed] = useState(1);
   
   // État pour la navigation à l'intérieur du NFT
-  const [activeScreen, setActiveScreen] = useState<'main' | 'stats' | 'shop' | 'quests' | 'story' | 'minigames'>('main');
+  const [activeScreen, setActiveScreen] = useState<'main' | 'stats' | 'shop' | 'quests' | 'story' | 'minigames' | 'secretcodes'>('main');
+  
+  // États pour les fonctionnalités ARG
+  const [clickPattern, setClickPattern] = useState<number[]>([]);
+  const [foundClues, setFoundClues] = useState<string[]>([]);
+  const [secretCode, setSecretCode] = useState<string>('');
+  const [secretMessages, setSecretMessages] = useState<string[]>([]);
+  const [hasHiddenFeature, setHasHiddenFeature] = useState<boolean>(false);
+  const [lastDecryptionKey, setLastDecryptionKey] = useState<string>('');
+  
+  // Messages cryptés pour l'ARG
+  const [encryptedMessages] = useState<{[key: string]: string}>({
+    'PIXEL42': 'KFdeWEJQSlBEUVJAWFo=', // Message codé à décrypter
+    'DARKBATER': 'QEdKS0BQQ0dLQkFUQ0ZH',
+    'NFTHUNTER': 'REpAR05AQ1pNQVRDQEA=',
+    'CHAINMASTER': 'QEBIRkNURkdARkBDSEFGR0BEUQ=='
+  });
   
   // Système de combos et statistiques
   const [currentCombo, setCurrentCombo] = useState(0);
@@ -1274,6 +1290,48 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const getRandomColor = () => {
     const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
     return colors[Math.floor(Math.random() * colors.length)];
+  };
+  
+  // Système de cryptographie pour les ARG (Alternate Reality Games)
+  const decryptMessage = (encryptedMessage: string, key: string): string => {
+    // Simple XOR encryption/decryption
+    let decrypted = '';
+    for (let i = 0; i < encryptedMessage.length; i++) {
+      const encryptedChar = encryptedMessage.charCodeAt(i);
+      const keyChar = key.charCodeAt(i % key.length);
+      decrypted += String.fromCharCode(encryptedChar ^ keyChar);
+    }
+    return decrypted;
+  };
+  
+  // Fonction pour vérifier un code secret entré par le joueur
+  const checkSecretCode = (code: string): boolean => {
+    // Les codes secrets peuvent déclencher des événements spéciaux dans le jeu
+    const secretCodes = [
+      "PIXEL42", 
+      "DARKBATER", 
+      "NFTHUNTER",
+      "CHAINMASTER"
+    ];
+    
+    return secretCodes.includes(code.toUpperCase());
+  };
+  
+  // Fonction pour révéler progressivement des indices cachés
+  const revealHiddenClue = (clickPattern: number[]): string | null => {
+    // Certains motifs de clics spécifiques peuvent révéler des indices
+    // Exemple : cliquer dans la séquence coin supérieur gauche, 
+    // centre, coin inférieur droit, centre
+    
+    const patterns = {
+      "1,4,7,4": "Cherchez dans le coin sombre de l'image...",
+      "2,2,5,5": "Le code est caché dans les métadonnées",
+      "3,6,3,6": "Suivez @creator sur Twitter pour le prochain indice",
+      "7,7,7": "Discord: rejoignez le canal #secret-hunters"
+    };
+    
+    const patternKey = clickPattern.join(',');
+    return patterns[patternKey as keyof typeof patterns] || null;
   };
 
   // Fonction pour afficher le récit
