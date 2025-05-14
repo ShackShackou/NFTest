@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
 :root {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
