@@ -41,31 +41,31 @@ export function NftDisplay({ className }: NftDisplayProps) {
     }
   };
 
-  // Fonction pour simuler le saut de frames spécifiques (barre horizontale → verticale)
+  // Fonction pour simuler le saut de frames et transition entre barre horizontale et verticale
   const handleImageClick = () => {
-    // Quand l'utilisateur clique, on simule un saut de la frame où la barre rouge
-    // est horizontale à celle où elle est verticale
+    // Quand l'utilisateur clique, on fait un traitement spécial
     setIsFrozen(true);
     
     if (imgRef.current) {
-      // On applique une classe qui fait apparaître la barre verticale
-      imgRef.current.classList.add('vertical-saber');
-      imgRef.current.classList.remove('horizontal-saber');
+      // Appliquer des effets visuels pour simuler le changement de frame
+      // Transformation de l'apparence pour faire apparaître le changement de barre (horizontale → verticale)
+      imgRef.current.style.filter = 'brightness(1.2) contrast(1.3)';
+      imgRef.current.style.transform = 'scale(1.02)';
       
       // Nettoyer le timeout existant si nécessaire
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
       }
       
-      // Reprendre l'animation après un délai
+      // Reprendre l'animation après un court délai
       timeoutRef.current = window.setTimeout(() => {
         setIsFrozen(false);
         setIsPaused(false);
         
         if (imgRef.current) {
+          imgRef.current.style.filter = 'none';
+          imgRef.current.style.transform = 'none';
           imgRef.current.style.animationPlayState = 'running';
-          imgRef.current.classList.remove('vertical-saber');
-          imgRef.current.classList.add('horizontal-saber');
         }
       }, 800);
     }
@@ -95,10 +95,12 @@ export function NftDisplay({ className }: NftDisplayProps) {
               <Spinner size="lg" />
             </div>
           ) : (
-            <div 
+            <img 
               ref={imgRef}
+              src={darthBaterGif}
+              alt="Interactive NFT - DARTHBATER" 
               className={cn(
-                "horizontal-saber", // Par défaut, affiche l'image avec barre horizontale
+                "pixelated max-h-[400px] max-w-full mx-auto",
                 isPaused && "paused-gif",
                 isFrozen && "frozen-gif"
               )}
