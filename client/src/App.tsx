@@ -6,6 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NftMarketplace from "@/pages/NftMarketplace";
 import NftMintPage from "@/pages/NftMintPage";
 import NotFound from "@/pages/not-found";
+import { WalletProvider } from "@/components/WalletProvider";
+import { WagmiConfig } from "wagmi";
+import { config } from "@/lib/walletConfig";
 
 function Router() {
   return (
@@ -21,10 +24,14 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <WagmiConfig config={config}>
+        <WalletProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </WalletProvider>
+      </WagmiConfig>
     </QueryClientProvider>
   );
 }

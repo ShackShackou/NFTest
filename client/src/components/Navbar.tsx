@@ -1,46 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "wouter";
 import { MenuIcon, X, Wallet, LogOut } from "lucide-react";
 import { shortenAddress } from "@/lib/utils";
-
-// Définir une interface pour les informations du portefeuille
-interface WalletState {
-  address: string;
-  isConnected: boolean;
-}
+import { useWallet } from "@/components/WalletProvider";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [wallet, setWallet] = useState<WalletState>({
-    address: '',
-    isConnected: false
-  });
-  const [loading, setLoading] = useState(false);
-  
-  // Simulons la connexion du portefeuille pour l'instant
-  const connectWallet = async () => {
-    setLoading(true);
-    try {
-      // Simule un délai pour l'UX
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setWallet({
-        address: "0x1234...5678",
-        isConnected: true
-      });
-    } catch (error) {
-      console.error("Failed to connect wallet:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const disconnectWallet = () => {
-    setWallet({
-      address: '',
-      isConnected: false
-    });
-  };
+  const { 
+    address, 
+    isConnected, 
+    balance,
+    isLoading,
+    connectWallet, 
+    disconnectWallet 
+  } = useWallet();
 
   return (
     <nav className="bg-neutral-dark/80 backdrop-blur-sm fixed w-full z-50">
@@ -73,11 +47,11 @@ export function Navbar() {
           </div>
           <div className="hidden md:block">
             <div className="ml-4 flex items-center md:ml-6">
-              {wallet.isConnected ? (
+              {isConnected ? (
                 <div className="flex items-center space-x-2">
                   <div className="text-primary font-medium bg-neutral-darker px-3 py-1 rounded-md flex items-center">
                     <Wallet className="h-4 w-4 mr-2" />
-                    <span>{wallet.address}</span>
+                    <span>{shortenAddress(address || '')}</span>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -92,9 +66,9 @@ export function Navbar() {
                 <Button 
                   className="bg-accent hover:bg-accent/80 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors duration-300"
                   onClick={connectWallet}
-                  disabled={loading}
+                  disabled={isLoading}
                 >
-                  {loading ? "Connecting..." : "Connect Wallet"}
+                  {isLoading ? "Connecting..." : "Connect Wallet"}
                 </Button>
               )}
             </div>
