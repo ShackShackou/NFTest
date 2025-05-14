@@ -73,10 +73,10 @@ export class MemStorage implements IStorage {
     ];
     
     const demoNft: Nft = {
-      id: this.nftId++,
+      id: 42,  // Set id to 42 to match the expected url path in NftMarketplace component
       tokenId: "42",
       name: "DARTHBATER #42",
-      description: "This interactive NFT features a pixel art character with special powers. The NFT responds to user interaction - hover to pause the animation, click to advance to the final frame. Part of the \"Pixel Warriors\" collection with unique on-chain properties.",
+      description: "Cet NFT interactif présente un personnage en pixel art avec des pouvoirs spéciaux. Le NFT répond à l'interaction de l'utilisateur - survolez pour mettre en pause l'animation, cliquez sur le personnage pour déclencher une animation spéciale (de la frame 15 à 19). Un objet de collection unique avec des propriétés rares.",
       image: "/assets/13_DARTHBATER.gif",
       price: "0.42 ETH",
       usdPrice: "($720.84)",
@@ -91,6 +91,7 @@ export class MemStorage implements IStorage {
       properties: darthBaterProperties,
       created: new Date(2023, 3, 13) // April 13, 2023
     };
+    this.nftId = 43; // Make sure nftId is correctly set after creating this NFT
     this.nfts.set(demoNft.id, demoNft);
     
     // Create related NFTs in the same collection
