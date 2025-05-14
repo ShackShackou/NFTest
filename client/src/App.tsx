@@ -10,6 +10,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={NftMarketplace} />
+      <Route path="/collections/pixel" component={NftMarketplace} /> 
       <Route component={NotFound} />
     </Switch>
   );
