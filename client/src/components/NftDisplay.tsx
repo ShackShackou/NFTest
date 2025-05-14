@@ -1876,6 +1876,12 @@ export function NftDisplay({ className }: NftDisplayProps) {
         >
           Mini-jeux
         </button>
+        <button
+          onClick={() => setActiveScreen('secretcodes')}
+          className="bg-indigo-800/70 hover:bg-indigo-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          ARG
+        </button>
       </div>
       
       {/* Info de base */}
