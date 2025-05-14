@@ -4,13 +4,15 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NftMarketplace from "@/pages/NftMarketplace";
+import NftMintPage from "@/pages/NftMintPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={NftMarketplace} />
-      <Route path="/collections/pixel" component={NftMarketplace} /> 
+      <Route path="/collections/pixel" component={NftMarketplace} />
+      <Route path="/mint" component={NftMintPage} />
       <Route component={NotFound} />
     </Switch>
   );
