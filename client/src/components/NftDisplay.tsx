@@ -431,6 +431,19 @@ export function NftDisplay({ className }: NftDisplayProps) {
   
   const { toast } = useToast();
   
+  // Fonction pour corriger les erreurs de type de variant toast
+  const showToast = (title: string, description: string, variant: 'default' | 'destructive' | 'success' = 'default') => {
+    // Convertir 'success' en 'default' pour être compatible avec le type attendu
+    const toastVariant: 'default' | 'destructive' | undefined = 
+      variant === 'success' ? 'default' : variant;
+      
+    toast({
+      title,
+      description,
+      variant: toastVariant
+    });
+  };
+  
   // Initialisation et chargement
   useEffect(() => {
     // Simuler le temps de chargement
@@ -558,11 +571,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
           if (newProgress >= quest.requirement && !completed) {
             completed = true;
             // Notification de quête complétée
-            toast({
-              title: "Quête complétée!",
-              description: `${quest.title} - Réclamer ${quest.reward} points`,
-              variant: "success"
-            });
+            showToast(
+              "Quête complétée!",
+              `${quest.title} - Réclamer ${quest.reward} points`,
+              "success"
+            );
           }
           
           return { ...quest, currentProgress: newProgress, completed };
@@ -818,11 +831,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
         newXpNeeded = Math.floor(newXpNeeded * 1.5);
         
         // Notification de niveau supérieur
-        toast({
-          title: "Niveau supérieur!",
-          description: `Vous avez atteint le niveau ${newLevel}!`,
-          variant: "success"
-        });
+        showToast(
+          "Niveau supérieur!",
+          `Vous avez atteint le niveau ${newLevel}!`,
+          "success"
+        );
         
         // Débloquer des mini-jeux en fonction du niveau
         if (newLevel === 3 && !miniGames.unlocked.memory) {
@@ -909,11 +922,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
           newChapters[chapterIndex].fragments[0].unlocked = true;
         }
         
-        toast({
-          title: "Nouveau chapitre débloqué!",
-          description: `Le chapitre "${newChapters[chapterIndex].title}" est maintenant disponible!`,
-          variant: "success"
-        });
+        showToast(
+          "Nouveau chapitre débloqué!",
+          `Le chapitre "${newChapters[chapterIndex].title}" est maintenant disponible!`,
+          "success"
+        );
       }
       
       return { ...prev, chapters: newChapters };
@@ -1719,11 +1732,13 @@ export function NftDisplay({ className }: NftDisplayProps) {
       </div>
       
       {/* Cursor personnalisé (rendu en CSS) */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .cursor-custom {
           cursor: url('/assets/custom-cursor.svg'), auto;
         }
-      `}</style>
+        `
+      }} />
     </div>
   );
 
