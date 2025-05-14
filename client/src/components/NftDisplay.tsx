@@ -171,6 +171,9 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const [comboText, setComboText] = useState("");
   const [animationSpeed, setAnimationSpeed] = useState(1);
   
+  // État pour la navigation à l'intérieur du NFT
+  const [activeScreen, setActiveScreen] = useState<'main' | 'stats' | 'shop' | 'quests' | 'story' | 'minigames'>('main');
+  
   // Système de combos et statistiques
   const [currentCombo, setCurrentCombo] = useState(0);
   const [comboMultiplier, setComboMultiplier] = useState(1);
@@ -1262,8 +1265,6 @@ export function NftDisplay({ className }: NftDisplayProps) {
 
   // Fonction pour afficher le récit
   const showStoryDetails = () => {
-    if (!storyState.showStoryUI) return null;
-    
     const currentChapter = storyState.chapters.find(c => c.id === storyState.currentChapter);
     if (!currentChapter) return null;
     
@@ -1271,30 +1272,30 @@ export function NftDisplay({ className }: NftDisplayProps) {
     if (!currentFragment) return null;
     
     return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 overflow-auto">
-        <div className="bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-auto">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-white">{currentChapter.title}</h2>
+      <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50 overflow-auto">
+        <div className="bg-gray-800 rounded-lg p-4 w-full h-full overflow-auto">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-bold text-white">{currentChapter.title}</h2>
             <button 
-              onClick={toggleStoryUI}
+              onClick={() => setActiveScreen('main')}
               className="text-gray-400 hover:text-white"
             >
-              Fermer
+              Retour au jeu
             </button>
           </div>
           
-          <div className="mb-6">
-            <p className="text-gray-200 mb-4">{currentFragment.text}</p>
+          <div className="mb-4">
+            <p className="text-gray-200 mb-3 text-sm">{currentFragment.text}</p>
             
             {currentFragment.choices && currentFragment.choices.length > 0 && (
-              <div className="mt-4 space-y-2">
-                <h3 className="text-lg font-medium text-white mb-2">Choisissez une action:</h3>
+              <div className="mt-3 space-y-2">
+                <h3 className="text-sm font-medium text-white mb-2">Choisissez une action:</h3>
                 {currentFragment.choices.map(choice => (
                   <button
                     key={choice.id}
                     onClick={() => makeStoryChoice(choice.id)}
                     disabled={choice.selected}
-                    className={`block w-full text-left p-3 rounded ${
+                    className={`block w-full text-left p-2 rounded text-xs ${
                       choice.selected 
                         ? 'bg-blue-900 text-blue-100' 
                         : 'bg-gray-700 hover:bg-gray-600 text-white'
@@ -1302,7 +1303,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
                   >
                     {choice.text}
                     {choice.selected && (
-                      <div className="mt-2 text-sm text-blue-300">
+                      <div className="mt-1 text-xs text-blue-300">
                         {choice.consequence}
                       </div>
                     )}
@@ -1312,20 +1313,20 @@ export function NftDisplay({ className }: NftDisplayProps) {
             )}
           </div>
           
-          <div className="border-t border-gray-700 pt-4">
-            <h3 className="text-lg font-medium text-white mb-3">Chapitres:</h3>
-            <div className="space-y-4">
+          <div className="border-t border-gray-700 pt-3">
+            <h3 className="text-sm font-medium text-white mb-2">Chapitres:</h3>
+            <div className="space-y-3 max-h-[200px] overflow-y-auto">
               {storyState.chapters.filter(chapter => chapter.unlocked).map(chapter => (
-                <div key={chapter.id} className="space-y-2">
-                  <h4 className="font-medium text-gray-200">{chapter.title}</h4>
-                  <div className="ml-4 space-y-1">
+                <div key={chapter.id} className="space-y-1">
+                  <h4 className="font-medium text-gray-200 text-xs">{chapter.title}</h4>
+                  <div className="ml-2 space-y-1">
                     {chapter.fragments
                       .filter(fragment => fragment.unlocked)
                       .map(fragment => (
                         <button
                           key={fragment.id}
                           onClick={() => readStoryFragment(chapter.id, fragment.id)}
-                          className={`block text-left px-2 py-1 rounded ${
+                          className={`block text-left px-2 py-1 rounded text-xs ${
                             storyState.currentChapter === chapter.id && 
                             storyState.currentFragment === fragment.id
                               ? 'bg-blue-800 text-white'
@@ -1353,18 +1354,21 @@ export function NftDisplay({ className }: NftDisplayProps) {
     if (!miniGames.active) return null;
     
     return (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-lg p-6 max-w-4xl w-full">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-white">
+      <div className="absolute inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div className="bg-gray-800 rounded-lg p-4 w-full h-full overflow-auto">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="text-lg font-bold text-white">
               {miniGames.active === 'memory' ? 'Jeu de Mémoire' : 
                miniGames.active === 'puzzle' ? 'Puzzle' : 'Platformer'}
             </h2>
             <button 
-              onClick={handleCloseMiniGame}
+              onClick={() => {
+                handleCloseMiniGame();
+                setActiveScreen('main');
+              }}
               className="text-gray-400 hover:text-white"
             >
-              Fermer
+              Retour au jeu
             </button>
           </div>
           
@@ -1503,320 +1507,285 @@ export function NftDisplay({ className }: NftDisplayProps) {
     );
   }
 
-  return (
-    <div className={`flex flex-col ${className}`}>
-      {/* NFT Display Container - Tout est à l'intérieur du NFT */}
-      <div 
-        className="relative border rounded-lg overflow-hidden cursor-none"
-        style={{ aspectRatio: "1", maxWidth: "600px", margin: "0 auto", height: "600px" }}
-        ref={containerRef}
-      >
-        {/* Fond interactif avec particles */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {backgroundParticles.map(particle => (
-            <div 
-              key={particle.id}
-              className={cn(
-                "absolute w-2 h-2 rounded-full opacity-50",
-                particle.type === 0 ? "bg-blue-500" : 
-                particle.type === 1 ? "bg-purple-500" : "bg-pink-500"
-              )}
-              style={{
-                left: `${particle.x}%`,
-                top: `${particle.y}%`,
-                transform: `scale(${1 + (Math.sin(particle.id) * 0.5)})`,
-                transition: "transform 0.5s ease-out"
-              }}
-            />
-          ))}
-        </div>
-        
-        {/* Fond personnalisé */}
-        {shopItems.find(item => item.category === 'background' && item.applied) && (
-          <div className="absolute inset-0 pointer-events-none z-10" ref={backgroundRef}>
-            <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 opacity-70"></div>
-          </div>
-        )}
-        
-        {/* NFT Gif animé */}
-        <img 
-          ref={gifRef}
-          src={darthBaterGif} 
-          alt="NFT Animation" 
-          className="w-full h-full object-cover"
-          style={{
-            animation: `pulse ${3/animationSpeed}s infinite alternate`,
-            filter: isFrozen ? "grayscale(100%)" : "none",
-            opacity: isPaused ? 0.7 : 1
-          }}
-        />
-        
-        {/* Boss overlay (si actif) */}
-        {boss.active && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
-            {/* Barre de vie du boss */}
-            <div className="w-4/5 h-4 bg-gray-800 rounded-full overflow-hidden mb-2">
-              <div 
-                className="h-full bg-red-600 transition-all duration-300 ease-out"
-                style={{ width: `${(boss.health / boss.maxHealth) * 100}%` }}
-              ></div>
-            </div>
-            
-            <div className="text-white text-xs mb-4">
-              {boss.name} - Niveau {boss.level}
-            </div>
-            
-            {boss.defeated && (
-              <div className="text-3xl font-bold text-yellow-400 animate-bounce shadow-lg p-2">
-                BOSS VAINCU!
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Overlay pour les particules et effets visuels */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Effets de texte popup */}
-          {gameEffects.map(effect => (
-            <div
-              key={effect.id}
-              className="absolute font-bold transition-all ease-out pointer-events-none"
-              style={{
-                left: `${effect.x}%`,
-                top: `${effect.y}%`,
-                color: effect.color,
-                opacity: effect.opacity,
-                transform: `translate(-50%, -50%) scale(${effect.scale})`,
-                textShadow: "0 0 5px rgba(0,0,0,0.5)"
-              }}
-            >
-              {effect.text}
-            </div>
-          ))}
-          
-          {/* Particules */}
-          {particleEffects.map(effect => (
-            <div
-              key={effect.id}
-              className="absolute transition-all ease-out pointer-events-none text-xl"
-              style={{
-                left: `${effect.x}%`,
-                top: `${effect.y}%`,
-                color: effect.color,
-                opacity: effect.opacity,
-                transform: `translate(-50%, -50%) scale(${effect.scale}) rotate(${effect.rotation}deg)`,
-                textShadow: "0 0 5px rgba(0,0,0,0.5)"
-              }}
-            >
-              {effect.text}
-            </div>
-          ))}
-          
-          {/* Ondes de choc */}
-          {shockwaves.map(effect => (
-            <div
-              key={effect.id}
-              className="absolute rounded-full transition-all ease-out pointer-events-none border-2 border-white"
-              style={{
-                left: `${effect.x}%`,
-                top: `${effect.y}%`,
-                opacity: effect.opacity,
-                transform: `translate(-50%, -50%) scale(${effect.scale})`,
-                width: "50px",
-                height: "50px"
-              }}
-            ></div>
-          ))}
-        </div>
-        
-        {/* Overlay pour les accessoires appliqués */}
-        <div className="absolute inset-0 pointer-events-none z-20">
-          {shopItems.find(item => item.category === 'hat' && item.applied) && (
-            <img 
-              ref={capRef}
-              src="/assets/shop/cap.svg" 
-              alt="Cap" 
-              className="absolute top-5 left-1/2 transform -translate-x-1/2 w-24 h-auto"
-              style={{
-                filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))"
-              }}
-            />
-          )}
-          
-          {shopItems.find(item => item.category === 'accessory' && item.applied) && (
-            <img 
-              ref={glassesRef}
-              src="/assets/shop/glasses.svg" 
-              alt="Glasses" 
-              className="absolute top-20 left-1/2 transform -translate-x-1/2 w-20 h-auto"
-              style={{
-                filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))"
-              }}
-            />
-          )}
-          
-          {shopItems.find(item => item.category === 'effect' && item.applied) && (
-            <img 
-              ref={effectRef}
-              src="/assets/shop/effect.svg" 
-              alt="Effect" 
-              className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
-              style={{
-                opacity: 0.6,
-                animation: "pulse 2s infinite"
-              }}
-            />
-          )}
-        </div>
-        
-        {/* Cursor personnalisé (rendu en CSS) */}
-        <style jsx>{`
-          .cursor-custom {
-            cursor: url('/assets/custom-cursor.svg'), auto;
-          }
-        `}</style>
-      </div>
-      
-      {/* Stats de jeu et progression */}
-      <div className="bg-gray-900 rounded-lg p-4 max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-2">
-          <div className="text-lg font-bold text-white">Niveau {gameStats.level}</div>
-          <div className="text-lg font-bold text-yellow-400">{points} points</div>
-        </div>
-        
-        {/* Barre de progression XP */}
-        <div className="w-full h-2 bg-gray-800 rounded-full mb-4">
+  // Fonction pour rendre l'écran principal (jeu)
+  const renderMainScreen = () => (
+    <div className="relative w-full h-full cursor-none" onClick={handleNftClick}>
+      {/* Fond interactif avec particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {backgroundParticles.map(particle => (
           <div 
-            className="h-full bg-blue-600 rounded-full"
-            style={{ width: `${(gameStats.xp / gameStats.xpNeeded) * 100}%` }}
-          ></div>
-        </div>
-        
-        <div className="text-xs text-gray-400 text-center mb-4">
-          {gameStats.xp} / {gameStats.xpNeeded} XP jusqu'au niveau suivant
-        </div>
-        
-        {/* Statistiques du joueur */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <div className="bg-gray-800 p-2 rounded">
-            <div className="text-xs text-gray-500">Clics totaux</div>
-            <div className="text-lg font-medium text-white">{gameStats.totalClicks}</div>
-          </div>
-          <div className="bg-gray-800 p-2 rounded">
-            <div className="text-xs text-gray-500">Combo max</div>
-            <div className="text-lg font-medium text-white">{gameStats.maxCombo}x</div>
-          </div>
-          <div className="bg-gray-800 p-2 rounded">
-            <div className="text-xs text-gray-500">Vitesse max</div>
-            <div className="text-lg font-medium text-white">{gameStats.maxSpeed.toFixed(1)}x</div>
-          </div>
-          <div className="bg-gray-800 p-2 rounded">
-            <div className="text-xs text-gray-500">Meilleur score</div>
-            <div className="text-lg font-medium text-white">{gameStats.bestScore}</div>
-          </div>
-        </div>
-        
-        {/* Boutons d'action */}
-        <div className="flex flex-wrap gap-2 justify-center">
-          <button 
-            onClick={() => handleOpenMiniGame('memory')}
-            className={`px-3 py-2 rounded text-xs font-medium ${
-              miniGames.unlocked.memory 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!miniGames.unlocked.memory}
-          >
-            Mini-jeu: Mémoire
-          </button>
-          
-          <button 
-            onClick={() => handleOpenMiniGame('puzzle')}
-            className={`px-3 py-2 rounded text-xs font-medium ${
-              miniGames.unlocked.puzzle 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!miniGames.unlocked.puzzle}
-          >
-            Mini-jeu: Puzzle
-          </button>
-          
-          <button 
-            onClick={() => handleOpenMiniGame('platformer')}
-            className={`px-3 py-2 rounded text-xs font-medium ${
-              miniGames.unlocked.platformer 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-            }`}
-            disabled={!miniGames.unlocked.platformer}
-          >
-            Mini-jeu: Plateforme
-          </button>
-          
-          <button 
-            onClick={toggleStoryUI}
-            className="px-3 py-2 rounded text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            Histoire
-          </button>
-        </div>
+            key={particle.id}
+            className={cn(
+              "absolute w-2 h-2 rounded-full opacity-50",
+              particle.type === 0 ? "bg-blue-500" : 
+              particle.type === 1 ? "bg-purple-500" : "bg-pink-500"
+            )}
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              transform: `scale(${1 + (Math.sin(particle.id) * 0.5)})`,
+              transition: "transform 0.5s ease-out"
+            }}
+          />
+        ))}
       </div>
       
-      {/* Quêtes journalières */}
-      <div className="bg-gray-900 rounded-lg p-4 max-w-md mx-auto">
-        <h3 className="text-lg font-bold text-white mb-3">Quêtes Journalières</h3>
-        <div className="space-y-3">
-          {dailyQuests.map(quest => (
+      {/* Fond personnalisé */}
+      {shopItems.find(item => item.category === 'background' && item.applied) && (
+        <div className="absolute inset-0 pointer-events-none z-10" ref={backgroundRef}>
+          <div className="w-full h-full bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 opacity-70"></div>
+        </div>
+      )}
+      
+      {/* NFT Gif animé */}
+      <img 
+        ref={gifRef}
+        src={darthBaterGif} 
+        alt="NFT Animation" 
+        className="w-full h-full object-cover"
+        style={{
+          animation: `pulse ${3/animationSpeed}s infinite alternate`,
+          filter: isFrozen ? "grayscale(100%)" : "none",
+          opacity: isPaused ? 0.7 : 1
+        }}
+      />
+      
+      {/* Boss overlay (si actif) */}
+      {boss.active && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
+          {/* Barre de vie du boss */}
+          <div className="w-4/5 h-4 bg-gray-800 rounded-full overflow-hidden mb-2">
             <div 
-              key={quest.id}
-              className={`p-3 rounded-lg ${
-                quest.completed ? 'bg-green-900/50' : 'bg-gray-800'
-              }`}
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="font-medium text-white">{quest.title}</h4>
-                  <p className="text-sm text-gray-400">{quest.description}</p>
-                </div>
-                {quest.completed && !quest.claimed && (
-                  <button
-                    onClick={() => claimQuest(quest.id)}
-                    className="px-2 py-1 bg-yellow-600 hover:bg-yellow-500 text-white text-xs rounded"
-                  >
-                    Réclamer {quest.reward} pts
-                  </button>
-                )}
-                {quest.claimed && (
-                  <span className="text-xs text-green-400">Réclamé</span>
-                )}
-              </div>
-              
-              <div className="mt-2">
-                <div className="w-full h-2 bg-gray-700 rounded-full">
-                  <div 
-                    className="h-full bg-blue-600 rounded-full"
-                    style={{ width: `${(quest.currentProgress / quest.requirement) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-right mt-1 text-gray-400">
-                  {quest.currentProgress}/{quest.requirement}
-                </div>
-              </div>
+              className="h-full bg-red-600 transition-all duration-300 ease-out"
+              style={{ width: `${(boss.health / boss.maxHealth) * 100}%` }}
+            ></div>
+          </div>
+          
+          <div className="text-white text-xs mb-4">
+            {boss.name} - Niveau {boss.level}
+          </div>
+          
+          {boss.defeated && (
+            <div className="text-3xl font-bold text-yellow-400 animate-bounce shadow-lg p-2">
+              BOSS VAINCU!
             </div>
-          ))}
+          )}
+        </div>
+      )}
+      
+      {/* Overlay pour les particules et effets visuels */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Effets de texte popup */}
+        {gameEffects.map(effect => (
+          <div
+            key={effect.id}
+            className="absolute font-bold transition-all ease-out pointer-events-none"
+            style={{
+              left: `${effect.x}%`,
+              top: `${effect.y}%`,
+              color: effect.color,
+              opacity: effect.opacity,
+              transform: `translate(-50%, -50%) scale(${effect.scale})`,
+              textShadow: "0 0 5px rgba(0,0,0,0.5)"
+            }}
+          >
+            {effect.text}
+          </div>
+        ))}
+        
+        {/* Particules */}
+        {particleEffects.map(effect => (
+          <div
+            key={effect.id}
+            className="absolute transition-all ease-out pointer-events-none text-xl"
+            style={{
+              left: `${effect.x}%`,
+              top: `${effect.y}%`,
+              color: effect.color,
+              opacity: effect.opacity,
+              transform: `translate(-50%, -50%) scale(${effect.scale}) rotate(${effect.rotation}deg)`,
+              textShadow: "0 0 5px rgba(0,0,0,0.5)"
+            }}
+          >
+            {effect.text}
+          </div>
+        ))}
+        
+        {/* Ondes de choc */}
+        {shockwaves.map(effect => (
+          <div
+            key={effect.id}
+            className="absolute rounded-full transition-all ease-out pointer-events-none border-2 border-white"
+            style={{
+              left: `${effect.x}%`,
+              top: `${effect.y}%`,
+              opacity: effect.opacity,
+              transform: `translate(-50%, -50%) scale(${effect.scale})`,
+              width: "50px",
+              height: "50px"
+            }}
+          ></div>
+        ))}
+      </div>
+      
+      {/* Overlay pour les accessoires appliqués */}
+      <div className="absolute inset-0 pointer-events-none z-20">
+        {shopItems.find(item => item.category === 'hat' && item.applied) && (
+          <img 
+            ref={capRef}
+            src="/assets/shop/cap.svg" 
+            alt="Cap" 
+            className="absolute top-5 left-1/2 transform -translate-x-1/2 w-24 h-auto"
+            style={{
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))"
+            }}
+          />
+        )}
+        
+        {shopItems.find(item => item.category === 'accessory' && item.applied) && (
+          <img 
+            ref={glassesRef}
+            src="/assets/shop/glasses.svg" 
+            alt="Glasses" 
+            className="absolute top-20 left-1/2 transform -translate-x-1/2 w-20 h-auto"
+            style={{
+              filter: "drop-shadow(0 0 2px rgba(0,0,0,0.5))"
+            }}
+          />
+        )}
+        
+        {shopItems.find(item => item.category === 'effect' && item.applied) && (
+          <img 
+            ref={effectRef}
+            src="/assets/shop/effect.svg" 
+            alt="Effect" 
+            className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
+            style={{
+              opacity: 0.6,
+              animation: "pulse 2s infinite"
+            }}
+          />
+        )}
+      </div>
+      
+      {/* Barre d'état et navigation */}
+      <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2 z-30">
+        <button
+          onClick={() => setActiveScreen('stats')}
+          className="bg-gray-800/70 hover:bg-gray-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          Stats
+        </button>
+        <button
+          onClick={() => setActiveScreen('quests')}
+          className="bg-gray-800/70 hover:bg-gray-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          Quêtes
+        </button>
+        <button
+          onClick={() => setActiveScreen('shop')}
+          className="bg-gray-800/70 hover:bg-gray-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          Boutique
+        </button>
+        <button
+          onClick={() => setActiveScreen('story')}
+          className="bg-purple-800/70 hover:bg-purple-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          Histoire
+        </button>
+        <button
+          onClick={() => setActiveScreen('minigames')}
+          className="bg-blue-800/70 hover:bg-blue-700/90 text-white text-xs px-2 py-1 rounded"
+        >
+          Mini-jeux
+        </button>
+      </div>
+      
+      {/* Info de base */}
+      <div className="absolute top-2 left-2 right-2 flex justify-between z-30">
+        <div className="bg-gray-800/70 text-white text-xs px-2 py-1 rounded flex items-center gap-2">
+          <span className="font-bold">Niv. {gameStats.level}</span>
+          <div className="w-16 h-1.5 bg-gray-700 rounded">
+            <div 
+              className="h-full bg-blue-500 rounded"
+              style={{ width: `${(gameStats.xp / gameStats.xpNeeded) * 100}%` }}
+            ></div>
+          </div>
+        </div>
+        <div className="bg-gray-800/70 text-yellow-400 text-xs px-2 py-1 rounded font-bold">
+          {points} pts
         </div>
       </div>
       
+      {/* Cursor personnalisé (rendu en CSS) */}
+      <style jsx>{`
+        .cursor-custom {
+          cursor: url('/assets/custom-cursor.svg'), auto;
+        }
+      `}</style>
+    </div>
+  );
+
+  // Fonction pour rendre l'écran des statistiques
+  const renderStatsScreen = () => (
+    <div className="relative w-full h-full bg-gray-900 p-4 overflow-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-white">Statistiques</h2>
+        <button 
+          onClick={() => setActiveScreen('main')}
+          className="text-gray-400 hover:text-white"
+        >
+          Retour au jeu
+        </button>
+      </div>
+      
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-md font-bold text-white">Niveau {gameStats.level}</div>
+        <div className="text-md font-bold text-yellow-400">{points} points</div>
+      </div>
+      
+      {/* Barre de progression XP */}
+      <div className="w-full h-2 bg-gray-800 rounded-full mb-2">
+        <div 
+          className="h-full bg-blue-600 rounded-full"
+          style={{ width: `${(gameStats.xp / gameStats.xpNeeded) * 100}%` }}
+        ></div>
+      </div>
+      
+      <div className="text-xs text-gray-400 text-center mb-4">
+        {gameStats.xp} / {gameStats.xpNeeded} XP jusqu'au niveau suivant
+      </div>
+      
+      {/* Statistiques du joueur */}
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="bg-gray-800 p-2 rounded">
+          <div className="text-xs text-gray-500">Clics totaux</div>
+          <div className="text-md font-medium text-white">{gameStats.totalClicks}</div>
+        </div>
+        <div className="bg-gray-800 p-2 rounded">
+          <div className="text-xs text-gray-500">Combo max</div>
+          <div className="text-md font-medium text-white">{gameStats.maxCombo}x</div>
+        </div>
+        <div className="bg-gray-800 p-2 rounded">
+          <div className="text-xs text-gray-500">Vitesse max</div>
+          <div className="text-md font-medium text-white">{gameStats.maxSpeed.toFixed(1)}x</div>
+        </div>
+        <div className="bg-gray-800 p-2 rounded">
+          <div className="text-xs text-gray-500">Meilleur score</div>
+          <div className="text-md font-medium text-white">{gameStats.bestScore}</div>
+        </div>
+      </div>
+
       {/* Événements temporels (si actifs) */}
       {timeEvents.active && timeEvents.currentEvent && (
-        <div className="bg-indigo-900 rounded-lg p-4 max-w-md mx-auto animate-pulse">
-          <h3 className="text-lg font-bold text-white mb-2">
+        <div className="bg-indigo-900 rounded-lg p-3 mt-4 animate-pulse">
+          <h3 className="text-sm font-bold text-white mb-1">
             Événement: {timeEvents.currentEvent.name}
           </h3>
-          <p className="text-indigo-100 mb-2">{timeEvents.currentEvent.description}</p>
+          <p className="text-indigo-100 mb-2 text-xs">{timeEvents.currentEvent.description}</p>
           
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="flex flex-wrap gap-1 mb-2">
             {timeEvents.currentEvent.rewards.map((reward, idx) => (
               <span 
                 key={idx}
@@ -1833,22 +1802,276 @@ export function NftDisplay({ className }: NftDisplayProps) {
         </div>
       )}
       
-      {/* Shop - utilise le composant NftShop */}
-      <NftShop 
-        points={points}
-        onPurchase={handlePurchase}
-        onApply={handleApply}
-        items={shopItems}
-      />
-      
-      {/* Indicateur de vitesse d'animation */}
-      <div className="text-xs text-gray-500 text-center">
-        Vitesse: {animationSpeed.toFixed(1)}x
+      {/* Tableau des meilleurs scores */}
+      <div className="mt-4">
+        <h3 className="text-sm font-bold text-white mb-2">Meilleurs scores</h3>
+        <div className="bg-gray-800 rounded overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-gray-700">
+              <tr>
+                <th className="p-2 text-left text-gray-300">Joueur</th>
+                <th className="p-2 text-left text-gray-300">Score</th>
+                <th className="p-2 text-left text-gray-300">Niveau</th>
+                <th className="p-2 text-left text-gray-300">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {highScores.map((score, idx) => (
+                <tr key={idx} className={idx % 2 === 0 ? 'bg-gray-800' : 'bg-gray-850'}>
+                  <td className="p-2 text-white">{score.name}</td>
+                  <td className="p-2 text-white">{score.score}</td>
+                  <td className="p-2 text-white">{score.level}</td>
+                  <td className="p-2 text-gray-400">{new Date(score.date).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Fonction pour rendre l'écran des quêtes
+  const renderQuestsScreen = () => (
+    <div className="relative w-full h-full bg-gray-900 p-4 overflow-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-white">Quêtes Journalières</h2>
+        <button 
+          onClick={() => setActiveScreen('main')}
+          className="text-gray-400 hover:text-white"
+        >
+          Retour au jeu
+        </button>
       </div>
       
-      {/* Overlay pour les accessoires appliqués */}
-      {renderMiniGame()}
-      {showStoryDetails()}
+      <div className="space-y-3">
+        {dailyQuests.map(quest => (
+          <div 
+            key={quest.id}
+            className={`p-3 rounded-lg ${
+              quest.completed ? 'bg-green-900/50' : 'bg-gray-800'
+            }`}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="font-medium text-white text-sm">{quest.title}</h4>
+                <p className="text-xs text-gray-400">{quest.description}</p>
+              </div>
+              {quest.completed && !quest.claimed && (
+                <button
+                  onClick={() => claimQuest(quest.id)}
+                  className="px-2 py-1 bg-yellow-600 hover:bg-yellow-500 text-white text-xs rounded"
+                >
+                  Réclamer {quest.reward} pts
+                </button>
+              )}
+              {quest.claimed && (
+                <span className="text-xs text-green-400">Réclamé</span>
+              )}
+            </div>
+            
+            <div className="mt-2">
+              <div className="w-full h-2 bg-gray-700 rounded-full">
+                <div 
+                  className="h-full bg-blue-600 rounded-full"
+                  style={{ width: `${(quest.currentProgress / quest.requirement) * 100}%` }}
+                ></div>
+              </div>
+              <div className="text-xs text-right mt-1 text-gray-400">
+                {quest.currentProgress}/{quest.requirement}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Fonction pour rendre l'écran du shop
+  const renderShopScreen = () => (
+    <div className="relative w-full h-full bg-gray-900 p-4 overflow-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-white">Boutique</h2>
+        <button 
+          onClick={() => setActiveScreen('main')}
+          className="text-gray-400 hover:text-white"
+        >
+          Retour au jeu
+        </button>
+      </div>
+      
+      <div className="flex justify-end mb-3">
+        <div className="px-3 py-1 bg-gray-800 rounded text-yellow-400 text-sm font-medium">
+          {points} points disponibles
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-2">
+        {shopItems.map(item => (
+          <div
+            key={item.id}
+            className="bg-gray-800 rounded-lg overflow-hidden"
+          >
+            <div className="h-24 bg-gray-700 flex items-center justify-center p-2">
+              <img 
+                src={item.imageSrc} 
+                alt={item.name}
+                className="h-full object-contain" 
+              />
+            </div>
+            <div className="p-2">
+              <h3 className="font-medium text-white text-sm">{item.name}</h3>
+              <p className="text-gray-400 text-xs mb-2">{item.description}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-yellow-400 text-xs font-medium">{item.price} pts</span>
+                {item.owned ? (
+                  <button
+                    onClick={() => handleApply(item)}
+                    className={`px-2 py-1 text-xs rounded ${
+                      item.applied
+                        ? 'bg-green-700 text-white'
+                        : 'bg-blue-600 hover:bg-blue-500 text-white'
+                    }`}
+                  >
+                    {item.applied ? 'Appliqué' : 'Appliquer'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handlePurchase(item)}
+                    disabled={points < item.price}
+                    className={`px-2 py-1 text-xs rounded ${
+                      points >= item.price
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white'
+                        : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Acheter
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Fonction pour rendre l'écran de sélection des mini-jeux
+  const renderMiniGamesSelectionScreen = () => (
+    <div className="relative w-full h-full bg-gray-900 p-4 overflow-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-white">Mini-jeux</h2>
+        <button 
+          onClick={() => setActiveScreen('main')}
+          className="text-gray-400 hover:text-white"
+        >
+          Retour au jeu
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div 
+          className={`border rounded-lg overflow-hidden ${
+            miniGames.unlocked.memory 
+              ? 'border-blue-500 hover:border-blue-400 cursor-pointer' 
+              : 'border-gray-700 opacity-50'
+          }`}
+          onClick={() => miniGames.unlocked.memory && handleOpenMiniGame('memory')}
+        >
+          <div className="bg-gray-800 p-3">
+            <h3 className="font-medium text-white">Jeu de Mémoire</h3>
+            <p className="text-gray-400 text-xs mt-1">Testez votre mémoire en trouvant toutes les paires</p>
+          </div>
+          <div className="bg-gray-700 p-3 text-center">
+            {miniGames.unlocked.memory ? (
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded">
+                Jouer
+              </button>
+            ) : (
+              <div className="text-xs text-gray-400">
+                Débloqué au niveau 3
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div 
+          className={`border rounded-lg overflow-hidden ${
+            miniGames.unlocked.puzzle 
+              ? 'border-blue-500 hover:border-blue-400 cursor-pointer' 
+              : 'border-gray-700 opacity-50'
+          }`}
+          onClick={() => miniGames.unlocked.puzzle && handleOpenMiniGame('puzzle')}
+        >
+          <div className="bg-gray-800 p-3">
+            <h3 className="font-medium text-white">Puzzle</h3>
+            <p className="text-gray-400 text-xs mt-1">Remettez les pièces dans le bon ordre</p>
+          </div>
+          <div className="bg-gray-700 p-3 text-center">
+            {miniGames.unlocked.puzzle ? (
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded">
+                Jouer
+              </button>
+            ) : (
+              <div className="text-xs text-gray-400">
+                Débloqué au niveau 5
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <div 
+          className={`border rounded-lg overflow-hidden ${
+            miniGames.unlocked.platformer 
+              ? 'border-blue-500 hover:border-blue-400 cursor-pointer' 
+              : 'border-gray-700 opacity-50'
+          }`}
+          onClick={() => miniGames.unlocked.platformer && handleOpenMiniGame('platformer')}
+        >
+          <div className="bg-gray-800 p-3">
+            <h3 className="font-medium text-white">Platformer</h3>
+            <p className="text-gray-400 text-xs mt-1">Atteignez l'objectif en évitant les obstacles</p>
+          </div>
+          <div className="bg-gray-700 p-3 text-center">
+            {miniGames.unlocked.platformer ? (
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded">
+                Jouer
+              </button>
+            ) : (
+              <div className="text-xs text-gray-400">
+                Débloqué au niveau 8
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={`flex flex-col ${className}`}>
+      {/* NFT Display Container - Tout est à l'intérieur du NFT */}
+      <div 
+        className="relative border rounded-lg overflow-hidden"
+        style={{ aspectRatio: "1", maxWidth: "600px", margin: "0 auto", height: "600px" }}
+        ref={containerRef}
+      >
+        {/* Contenu dynamique basé sur l'écran actif */}
+        {activeScreen === 'main' && renderMainScreen()}
+        {activeScreen === 'stats' && renderStatsScreen()}
+        {activeScreen === 'quests' && renderQuestsScreen()}
+        {activeScreen === 'shop' && renderShopScreen()}
+        {activeScreen === 'story' && showStoryDetails()}
+        {activeScreen === 'minigames' && renderMiniGamesSelectionScreen()}
+        
+        {/* Affichage des mini-jeux actifs par-dessus tout */}
+        {miniGames.active && renderMiniGame()}
+      </div>
+      
+      {/* Indicateur de vitesse d'animation - petit texte en dessous */}
+      <div className="text-xs text-gray-500 text-center mt-2">
+        Vitesse: {animationSpeed.toFixed(1)}x
+      </div>
     </div>
   );
 }
