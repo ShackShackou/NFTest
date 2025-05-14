@@ -23,7 +23,7 @@ const nftAbi = [
 // Options pour le web3modal
 const providerOptions = {};
 
-const useWallet = () => {
+export const useWallet = () => {
   const [walletInfo, setWalletInfo] = useState<WalletInfo>({
     address: '',
     chainId: 0,
@@ -254,4 +254,6 @@ const useWallet = () => {
   };
 };
 
+// Export the hook
+// Keep default export for backward compatibility
 export default useWallet;
