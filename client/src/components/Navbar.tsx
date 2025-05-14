@@ -13,24 +13,24 @@ export function Navbar() {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/">
-                <a className="font-pixel text-primary text-xl">
+                <span className="font-pixel text-primary text-xl cursor-pointer">
                   PIXEL<span className="text-accent">NFT</span>
-                </a>
+                </span>
               </Link>
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
                 <Link href="#">
-                  <a className="px-3 py-2 rounded-md text-sm font-medium text-primary">Explore</a>
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-primary cursor-pointer">Explore</span>
                 </Link>
                 <Link href="#">
-                  <a className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary">Collections</a>
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary cursor-pointer">Collections</span>
                 </Link>
                 <Link href="#">
-                  <a className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary">Create</a>
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary cursor-pointer">Create</span>
                 </Link>
                 <Link href="#">
-                  <a className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary">Activity</a>
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
                 </Link>
               </div>
             </div>
@@ -60,16 +60,16 @@ export function Navbar() {
         <div className="md:hidden bg-neutral-dark/95 backdrop-blur-sm">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link href="#">
-              <a className="block px-3 py-2 rounded-md text-base font-medium text-primary">Explore</a>
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-primary cursor-pointer">Explore</span>
             </Link>
             <Link href="#">
-              <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary">Collections</a>
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Collections</span>
             </Link>
             <Link href="#">
-              <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary">Create</a>
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Create</span>
             </Link>
             <Link href="#">
-              <a className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary">Activity</a>
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
             </Link>
             <div className="pt-4">
               <Button className="w-full bg-accent hover:bg-accent/80 px-4 py-2 rounded-md text-sm font-medium text-white transition-colors duration-300">

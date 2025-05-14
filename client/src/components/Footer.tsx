@@ -38,28 +38,28 @@ export function Footer() {
           <div>
             <h4 className="font-medium text-white mb-4">Marketplace</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">All NFTs</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Pixel Art</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Interactive</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">New</a></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">All NFTs</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Pixel Art</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Interactive</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">New</span></Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-medium text-white mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Help Center</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Platform Status</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Partners</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Blog</a></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Help Center</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Platform Status</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Partners</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Blog</span></Link></li>
             </ul>
           </div>
           <div>
             <h4 className="font-medium text-white mb-4">Company</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">About</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Careers</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Terms of Service</a></Link></li>
-              <li><Link href="#"><a className="text-neutral-light/70 hover:text-primary">Privacy Policy</a></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">About</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Careers</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Terms of Service</span></Link></li>
+              <li><Link href="#"><span className="text-neutral-light/70 hover:text-primary cursor-pointer">Privacy Policy</span></Link></li>
             </ul>
           </div>
         </div>
