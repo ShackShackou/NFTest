@@ -667,6 +667,21 @@ export function NftDisplay({ className }: NftDisplayProps) {
     });
   };
   
+  // Génération des particules d'arrière-plan
+  useEffect(() => {
+    // Créer quelques particules d'arrière-plan
+    const particles = [];
+    for (let i = 0; i < 15; i++) {
+      particles.push({
+        id: i,
+        x: Math.random() * 100, // Position x en pourcentage
+        y: Math.random() * 100, // Position y en pourcentage
+        type: Math.floor(Math.random() * 3) + 1 // Type de particule (1, 2 ou 3)
+      });
+    }
+    setBackgroundParticles(particles);
+  }, []);
+
   // Une fois que l'image est chargée, on met isLoading à false
   useEffect(() => {
     const img = new Image();
