@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
 import darthBaterGif from '@assets/13_DARTHBATER.gif';
 import { cn } from '@/lib/utils';
+import { NftShop, ShopItem } from './NftShop';
 
 // Types pour les effets visuels de game feel
 interface GameEffect {
@@ -25,10 +26,55 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const [clickCount, setClickCount] = useState(0);
   const [gameEffects, setGameEffects] = useState<GameEffect[]>([]);
   const [comboText, setComboText] = useState("");
-  const [frameOrder, setFrameOrder] = useState<string[]>([]);
+  const [animationSpeed, setAnimationSpeed] = useState(1);
+  
+  // État pour les accessoires et objets dans la boutique
+  const [shopItems, setShopItems] = useState<ShopItem[]>([
+    {
+      id: 1,
+      name: "Casquette Rouge",
+      description: "Une casquette tendance pour votre NFT",
+      price: 50,
+      imageSrc: "/assets/shop/cap.svg",
+      category: "hat",
+      owned: false,
+      applied: false
+    },
+    {
+      id: 2,
+      name: "Lunettes Pixel",
+      description: "Des lunettes stylées pour donner un look cool",
+      price: 30,
+      imageSrc: "/assets/shop/glasses.svg",
+      category: "accessory",
+      owned: false,
+      applied: false
+    },
+    {
+      id: 3,
+      name: "Fond Spatial",
+      description: "Un arrière-plan spatial qui ajoute de la profondeur",
+      price: 100,
+      imageSrc: "/assets/shop/background.svg",
+      category: "background",
+      owned: false,
+      applied: false
+    },
+    {
+      id: 4,
+      name: "Effet Particules",
+      description: "Des particules colorées qui suivent votre personnage",
+      price: 75,
+      imageSrc: "/assets/shop/effect.svg",
+      category: "effect",
+      owned: false,
+      applied: false
+    }
+  ]);
   
   const imgRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const capRef = useRef<HTMLImageElement>(null);
   const timeoutRef = useRef<number | null>(null);
   const effectIdRef = useRef(0);
   
@@ -123,11 +169,50 @@ export function NftDisplay({ className }: NftDisplayProps) {
     }
   };
 
-  // Fonction pour simuler le game feel avec des effets visuels lors du clic
+  // Fonction pour acheter un élément de la boutique
+  const handlePurchase = (item: ShopItem) => {
+    if (clickCount >= item.price) {
+      // Déduire le coût de l'item des points
+      setClickCount(prev => prev - item.price);
+      
+      // Mettre à jour l'état de l'item pour le marquer comme possédé
+      setShopItems(prev => prev.map(shopItem => 
+        shopItem.id === item.id ? { ...shopItem, owned: true } : shopItem
+      ));
+      
+      // Afficher un message de confirmation
+      setComboText(`${item.name} acheté!`);
+    }
+  };
+  
+  // Fonction pour appliquer ou retirer un élément
+  const handleApply = (item: ShopItem) => {
+    // Trouver si l'élément est déjà appliqué
+    const isCurrentlyApplied = shopItems.find(shopItem => shopItem.id === item.id)?.applied;
+    
+    // Si la catégorie est "hat", on met à jour l'animation de la casquette
+    if (item.category === "hat" && capRef.current) {
+      capRef.current.style.display = !isCurrentlyApplied ? "block" : "none";
+    }
+    
+    // Mettre à jour l'état des items - désactiver tous les éléments de la même catégorie
+    // et activer/désactiver celui sélectionné
+    setShopItems(prev => prev.map(shopItem => 
+      shopItem.category === item.category
+        ? { ...shopItem, applied: shopItem.id === item.id ? !isCurrentlyApplied : false }
+        : shopItem
+    ));
+  };
+
+  // Fonction pour accélérer l'animation au clic et ajouter le game feel
   const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Incrémenter le compteur de clics
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
+    
+    // Augmenter la vitesse d'animation (jusqu'à 3x plus rapide après plusieurs clics)
+    const newSpeed = Math.min(3, 1 + (newClickCount % 10) / 5);
+    setAnimationSpeed(newSpeed);
     
     // Créer une position relative à l'intérieur du conteneur
     const rect = e.currentTarget.getBoundingClientRect();
@@ -152,6 +237,9 @@ export function NftDisplay({ className }: NftDisplayProps) {
       imgRef.current.style.filter = `brightness(1.3) contrast(1.4) hue-rotate(${newClickCount * 10}deg)`;
       imgRef.current.style.transform = `scale(1.05) rotate(${Math.sin(newClickCount) * 3}deg)`;
       
+      // Accélérer l'animation GIF avec animation-duration
+      imgRef.current.style.animationDuration = `${1 / newSpeed}s`;
+      
       // Nettoyer le timeout existant si nécessaire
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current);
@@ -166,6 +254,7 @@ export function NftDisplay({ className }: NftDisplayProps) {
           imgRef.current.style.filter = 'none';
           imgRef.current.style.transform = 'none';
           imgRef.current.style.animationPlayState = 'running';
+          // Laisser la nouvelle vitesse d'animation
         }
       }, 800);
     }
@@ -249,10 +338,41 @@ export function NftDisplay({ className }: NftDisplayProps) {
         </div>
         
         {/* Interaction hint overlay */}
+        {/* Boutique */}
+        <NftShop
+          points={clickCount}
+          onPurchase={handlePurchase}
+          onApply={handleApply}
+          items={shopItems}
+        />
+        
+        {/* Indicateur de vitesse d'animation */}
+        <div className="absolute top-3 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-xs">
+          Vitesse: {animationSpeed.toFixed(1)}x
+        </div>
+        
+        {/* Overlay pour les accessoires appliqués */}
+        {shopItems.find(item => item.id === 1 && item.applied) && (
+          <div className="absolute top-[80px] left-0 right-0 flex justify-center pointer-events-none z-20">
+            <img 
+              ref={capRef}
+              src="/assets/shop/cap.svg"
+              alt="Casquette"
+              className="casquette-overlay"
+              style={{
+                width: '64px',
+                height: '32px',
+                transform: isFrozen ? 'translateY(-2px) rotate(3deg)' : 'translateY(0)',
+                transition: 'transform 0.3s ease-out'
+              }}
+            />
+          </div>
+        )}
+        
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-neutral-dark/90 to-transparent text-center py-4 px-6 opacity-0 hover:opacity-100 transition-opacity duration-300">
           <p className="text-xs md:text-sm font-medium">
             <span className="mr-2">🖱️</span> 
-            Hover pour arrêter, cliquez sur le personnage pour interagir
+            Cliquez pour interagir et accélérer l'animation
           </p>
         </div>
       </div>
