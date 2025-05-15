@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minter & Transférer - S.H.A.C.K.E.R.</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-button {
+            background-color: #374151;
+            color: #9ca3af;
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem 0.25rem 0 0;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #1f2937;
+            color: #f3f4f6;
+            border-bottom: 2px solid #8b5cf6;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-input {
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #f3f4f6;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .button-primary {
+            background-color: #8b5cf6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            border: none;
+        }
+        .button-primary:hover {
+            background-color: #7c3aed;
+        }
+        .button-secondary {
+            background-color: #4b5563;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            border: none;
+        }
+        .button-secondary:hover {
+            background-color: #6b7280;
+        }
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #10b981;
+        }
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #ef4444;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-active {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        .status-inactive {
+            background-color: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <nav class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-purple-400">S.H.A.C.K.E.R.</h1>
+                <p class="text-gray-400">Minter et transférer des NFTs</p>
+            </div>
+            <div>
+                <a href="/" class="button-secondary mr-2">Retour au NFT</a>
+                <a href="/admin-nft.html" class="button-secondary mr-2">Console Admin</a>
+                <button id="connect-wallet" class="button-primary">Connecter wallet</button>
+                <div id="wallet-info" class="hidden mt-2 text-right">
+                    <p class="text-sm text-gray-400">Connecté: <span id="wallet-address" class="text-white font-mono">...</span></p>
+                    <p class="text-sm text-gray-400">Réseau: <span id="network-name" class="text-white">...</span></p>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="flex mb-4 border-b border-gray-700">
+            <div class="tab-button active" data-tab="mint">Mint NFT</div>
+            <div class="tab-button" data-tab="transfer">Transfert NFT</div>
+            <div class="tab-button" data-tab="nfts">Mes NFTs</div>
+        </div>
+        
+        <div class="tab-content active" id="mint-tab">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Minter un nouveau NFT</h2>
+                
+                <div id="mint-message" class="hidden alert"></div>
+                
+                <form id="mint-form">
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Adresse du contrat</label>
+                        <input type="text" id="mint-contract-address" class="form-input" value="0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037" readonly>
+                        <p class="text-xs text-gray-500 mt-1">Contrat déployé sur Sepolia testnet</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Prix</label>
+                        <p class="text-white">Gratuit (frais de gas uniquement)</p>
+                    </div>
+                    
+                    <div id="network-warning" class="mb-4 alert alert-error hidden">
+                        Vous n'êtes pas sur le réseau Sepolia. Veuillez changer de réseau pour continuer.
+                    </div>
+                    
+                    <button type="submit" id="mint-button" class="button-primary w-full" disabled>Minter le NFT</button>
+                </form>
+                
+                <div id="transaction-info" class="mt-6 space-y-4 hidden">
+                    <h3 class="text-lg font-medium text-gray-300">Informations de transaction</h3>
+                    
+                    <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div class="text-gray-400">Status:</div>
+                            <div class="col-span-2" id="tx-status">En attente...</div>
+                            
+                            <div class="text-gray-400">Token ID:</div>
+                            <div class="col-span-2 font-mono" id="tx-token-id">-</div>
+                            
+                            <div class="text-gray-400">Transaction:</div>
+                            <div class="col-span-2 break-all">
+                                <a id="tx-link" href="#" target="_blank" class="text-blue-400 hover:underline font-mono">-</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="transfer-tab">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Transférer un NFT</h2>
+                
+                <div id="transfer-message" class="hidden alert"></div>
+                
+                <form id="transfer-form">
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Adresse du contrat</label>
+                        <input type="text" id="transfer-contract-address" class="form-input" value="0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">ID du token</label>
+                        <input type="number" id="transfer-token-id" class="form-input" placeholder="0" min="0">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-400 mb-2">Adresse du destinataire</label>
+                        <input type="text" id="transfer-recipient" class="form-input" placeholder="0x...">
+                    </div>
+                    
+                    <button type="submit" id="transfer-button" class="button-primary w-full" disabled>Transférer le NFT</button>
+                </form>
+                
+                <div id="transfer-transaction-info" class="mt-6 space-y-4 hidden">
+                    <h3 class="text-lg font-medium text-gray-300">Informations de transaction</h3>
+                    
+                    <div class="p-4 bg-gray-800 rounded-lg border border-gray-700">
+                        <div class="grid grid-cols-3 gap-2 text-sm">
+                            <div class="text-gray-400">Status:</div>
+                            <div class="col-span-2" id="transfer-tx-status">En attente...</div>
+                            
+                            <div class="text-gray-400">Transaction:</div>
+                            <div class="col-span-2 break-all">
+                                <a id="transfer-tx-link" href="#" target="_blank" class="text-blue-400 hover:underline font-mono">-</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="nfts-tab">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Mes NFTs</h2>
+                
+                <div id="nfts-message" class="hidden alert"></div>
+                
+                <div class="mb-4 flex justify-between items-center">
+                    <div>
+                        <label class="block text-gray-400 mb-2">Filtre par collection</label>
+                        <select id="collection-filter" class="form-input w-auto">
+                            <option value="all">Toutes les collections</option>
+                            <option value="0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037">S.H.A.C.K.E.R.</option>
+                        </select>
+                    </div>
+                    
+                    <button id="refresh-nfts" class="button-secondary">
+                        Actualiser
+                    </button>
+                </div>
+                
+                <div id="nfts-loading" class="py-8 text-center">
+                    <p class="text-gray-400">Chargement de vos NFTs...</p>
+                </div>
+                
+                <div id="nfts-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 hidden"></div>
+                
+                <div id="no-nfts" class="py-8 text-center hidden">
+                    <p class="text-gray-400">Vous ne possédez pas encore de NFTs dans cette collection</p>
+                    <button id="go-to-mint" class="button-primary mt-4">Minter un nouveau NFT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <script>
+        // Configuration
+        const CONTRACT_ADDRESS = "0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037";
+        const CONTRACT_ABI = [
+            "function mint() public",
+            "function safeMint(address to) public",
+            "function transferFrom(address from, address to, uint256 tokenId) public",
+            "function ownerOf(uint256 tokenId) public view returns (address)"
+        ];
+        const SEPOLIA_CHAIN_ID = 11155111;
+        const ETHERSCAN_BASE_URL = "https://sepolia.etherscan.io";
+        
+        // Variables globales
+        let provider;
+        let signer;
+        let contract;
+        let walletAddress;
+        let chainId;
+        
+        // Gestion des onglets
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab-button').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                
+                // Si l'onglet NFTs est sélectionné, charger les NFTs
+                if (tab.dataset.tab === 'nfts' && walletAddress) {
+                    loadNFTs();
+                }
+            });
+        });
+        
+        // Connexion du wallet
+        document.getElementById('connect-wallet').addEventListener('click', async () => {
+            try {
+                if (window.ethereum) {
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    
+                    // Demander la connexion du wallet
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    
+                    signer = provider.getSigner();
+                    walletAddress = await signer.getAddress();
+                    
+                    // Récupérer le réseau
+                    const network = await provider.getNetwork();
+                    chainId = network.chainId;
+                    
+                    // Afficher les informations du wallet
+                    document.getElementById('wallet-address').textContent = 
+                        `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                    document.getElementById('network-name').textContent = 
+                        chainId === SEPOLIA_CHAIN_ID ? 'Sepolia' : `ChainID: ${chainId}`;
+                    document.getElementById('wallet-info').classList.remove('hidden');
+                    
+                    // Vérifier si nous sommes sur Sepolia
+                    const isSepolia = chainId === SEPOLIA_CHAIN_ID;
+                    
+                    // Afficher/masquer l'avertissement de réseau
+                    document.getElementById('network-warning').classList.toggle('hidden', isSepolia);
+                    
+                    // Activer/désactiver les boutons
+                    document.getElementById('mint-button').disabled = !isSepolia;
+                    document.getElementById('transfer-button').disabled = !isSepolia;
+                    
+                    // Créer l'instance du contrat si nous sommes sur Sepolia
+                    if (isSepolia) {
+                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+                        
+                        // Charger les NFTs
+                        if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
+                            loadNFTs();
+                        }
+                    }
+                    
+                    // Écouter les changements de compte
+                    window.ethereum.on('accountsChanged', handleAccountsChanged);
+                    
+                    // Écouter les changements de réseau
+                    window.ethereum.on('chainChanged', handleChainChanged);
+                } else {
+                    showMessage('mint-message', 'MetaMask n\'est pas installé. Veuillez l\'installer pour continuer.', 'error');
+                }
+            } catch (error) {
+                console.error('Erreur de connexion:', error);
+                showMessage('mint-message', `Erreur de connexion: ${error.message}`, 'error');
+            }
+        });
+        
+        // Gestion du changement de compte
+        function handleAccountsChanged(accounts) {
+            if (accounts.length === 0) {
+                // L'utilisateur s'est déconnecté
+                walletAddress = null;
+                document.getElementById('wallet-info').classList.add('hidden');
+                document.getElementById('mint-button').disabled = true;
+                document.getElementById('transfer-button').disabled = true;
+            } else {
+                // Nouvelle adresse
+                walletAddress = accounts[0];
+                document.getElementById('wallet-address').textContent = 
+                    `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                
+                // Recharger les NFTs si nous sommes sur l'onglet NFTs
+                if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
+                    loadNFTs();
+                }
+            }
+        }
+        
+        // Gestion du changement de réseau
+        function handleChainChanged() {
+            // Recharger la page pour éviter des problèmes d'état
+            window.location.reload();
+        }
+        
+        // Traitement du formulaire de mint
+        document.getElementById('mint-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!contract) {
+                showMessage('mint-message', 'Veuillez d\'abord connecter votre wallet', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('mint-message', 'Transaction en cours...', 'success');
+                
+                // Cacher les informations de transaction précédentes
+                document.getElementById('transaction-info').classList.add('hidden');
+                
+                // Préparer les fonctions à appeler
+                let mintFunction;
+                
+                try {
+                    // Essayer d'utiliser mint()
+                    mintFunction = contract.mint;
+                } catch (error) {
+                    console.log("Fonction mint() non disponible, utilisation de safeMint()");
+                    // Utiliser safeMint() comme fallback
+                    mintFunction = () => contract.safeMint(walletAddress);
+                }
+                
+                // Appeler la fonction de mint
+                const tx = await mintFunction();
+                
+                // Afficher les informations de transaction
+                document.getElementById('tx-status').textContent = 'En attente de confirmation...';
+                document.getElementById('tx-link').textContent = `${tx.hash.substring(0, 10)}...`;
+                document.getElementById('tx-link').href = `${ETHERSCAN_BASE_URL}/tx/${tx.hash}`;
+                document.getElementById('transaction-info').classList.remove('hidden');
+                
+                showMessage('mint-message', 'Transaction envoyée. En attente de confirmation...', 'success');
+                
+                // Attendre la confirmation
+                const receipt = await tx.wait();
+                
+                // Extraire le tokenId
+                let tokenId = 'Inconnu';
+                
+                // Vérifier les logs pour trouver l'événement Transfer (ERC-721)
+                for (const log of receipt.logs) {
+                    try {
+                        // Format d'un événement ERC-721 Transfer
+                        if (log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {
+                            // Le tokenId est dans le troisième sujet (index 3)
+                            tokenId = ethers.BigNumber.from(log.topics[3]).toString();
+                            break;
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de l\'analyse des logs:', error);
+                    }
+                }
+                
+                // Mettre à jour l'interface
+                document.getElementById('tx-status').textContent = 'Confirmée';
+                document.getElementById('tx-token-id').textContent = tokenId;
+                
+                showMessage('mint-message', `NFT minté avec succès ! Token ID: ${tokenId}`, 'success');
+                
+                // Recharger les NFTs si nous sommes sur l'onglet NFTs
+                if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
+                    setTimeout(loadNFTs, 2000); // Attendre un peu pour que les API soient à jour
+                }
+            } catch (error) {
+                console.error('Erreur de mint:', error);
+                
+                // Extraire un message d'erreur plus convivial
+                let errorMessage = error.message;
+                
+                if (errorMessage.includes('user rejected') || errorMessage.includes('User denied')) {
+                    errorMessage = 'Transaction rejetée par l\'utilisateur';
+                } else if (errorMessage.includes('insufficient funds')) {
+                    errorMessage = 'Fonds insuffisants pour cette transaction';
+                } else if (errorMessage.toLowerCase().includes('gas')) {
+                    errorMessage = 'Problème avec les frais de gas. Essayez d\'augmenter la limite de gas.';
+                } else if (errorMessage.includes('execution reverted')) {
+                    // Essayer d'extraire le message d'erreur spécifique au contrat
+                    const revertReason = errorMessage.match(/reason="([^"]+)"/);
+                    errorMessage = revertReason ? revertReason[1] : 'Transaction échouée sur le contrat';
+                }
+                
+                showMessage('mint-message', `Erreur: ${errorMessage}`, 'error');
+                
+                // Mettre à jour l'interface en cas d'erreur
+                if (!document.getElementById('transaction-info').classList.contains('hidden')) {
+                    document.getElementById('tx-status').textContent = 'Échouée';
+                }
+            }
+        });
+        
+        // Traitement du formulaire de transfert
+        document.getElementById('transfer-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!contract) {
+                showMessage('transfer-message', 'Veuillez d\'abord connecter votre wallet', 'error');
+                return;
+            }
+            
+            const tokenId = document.getElementById('transfer-token-id').value;
+            const recipient = document.getElementById('transfer-recipient').value;
+            
+            if (!tokenId) {
+                showMessage('transfer-message', 'Veuillez spécifier un ID de token', 'error');
+                return;
+            }
+            
+            if (!recipient || !ethers.utils.isAddress(recipient)) {
+                showMessage('transfer-message', 'Veuillez spécifier une adresse de destinataire valide', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('transfer-message', 'Vérification de la propriété...', 'success');
+                
+                // Cacher les informations de transaction précédentes
+                document.getElementById('transfer-transaction-info').classList.add('hidden');
+                
+                // Vérifier que l'utilisateur est bien le propriétaire
+                try {
+                    const owner = await contract.ownerOf(tokenId);
+                    
+                    if (owner.toLowerCase() !== walletAddress.toLowerCase()) {
+                        showMessage('transfer-message', 'Vous n\'êtes pas le propriétaire de ce NFT', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la vérification du propriétaire:', error);
+                    showMessage('transfer-message', 'Impossible de vérifier le propriétaire de ce NFT. Il n\'existe peut-être pas.', 'error');
+                    return;
+                }
+                
+                showMessage('transfer-message', 'Transaction en cours...', 'success');
+                
+                // Effectuer le transfert
+                const tx = await contract.transferFrom(walletAddress, recipient, tokenId);
+                
+                // Afficher les informations de transaction
+                document.getElementById('transfer-tx-status').textContent = 'En attente de confirmation...';
+                document.getElementById('transfer-tx-link').textContent = `${tx.hash.substring(0, 10)}...`;
+                document.getElementById('transfer-tx-link').href = `${ETHERSCAN_BASE_URL}/tx/${tx.hash}`;
+                document.getElementById('transfer-transaction-info').classList.remove('hidden');
+                
+                showMessage('transfer-message', 'Transaction envoyée. En attente de confirmation...', 'success');
+                
+                // Attendre la confirmation
+                const receipt = await tx.wait();
+                
+                // Mettre à jour l'interface
+                document.getElementById('transfer-tx-status').textContent = 'Confirmée';
+                
+                showMessage('transfer-message', `NFT #${tokenId} transféré avec succès à ${recipient.substring(0, 6)}...${recipient.substring(recipient.length - 4)}`, 'success');
+                
+                // Recharger les NFTs si nous sommes sur l'onglet NFTs
+                if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
+                    setTimeout(loadNFTs, 2000); // Attendre un peu pour que les API soient à jour
+                }
+            } catch (error) {
+                console.error('Erreur de transfert:', error);
+                
+                // Extraire un message d'erreur plus convivial
+                let errorMessage = error.message;
+                
+                if (errorMessage.includes('user rejected') || errorMessage.includes('User denied')) {
+                    errorMessage = 'Transaction rejetée par l\'utilisateur';
+                } else if (errorMessage.includes('insufficient funds')) {
+                    errorMessage = 'Fonds insuffisants pour cette transaction';
+                } else if (errorMessage.toLowerCase().includes('gas')) {
+                    errorMessage = 'Problème avec les frais de gas. Essayez d\'augmenter la limite de gas.';
+                } else if (errorMessage.includes('execution reverted')) {
+                    // Essayer d'extraire le message d'erreur spécifique au contrat
+                    const revertReason = errorMessage.match(/reason="([^"]+)"/);
+                    errorMessage = revertReason ? revertReason[1] : 'Transaction échouée sur le contrat';
+                }
+                
+                showMessage('transfer-message', `Erreur: ${errorMessage}`, 'error');
+                
+                // Mettre à jour l'interface en cas d'erreur
+                if (!document.getElementById('transfer-transaction-info').classList.contains('hidden')) {
+                    document.getElementById('transfer-tx-status').textContent = 'Échouée';
+                }
+            }
+        });
+        
+        // Chargement des NFTs
+        async function loadNFTs() {
+            if (!walletAddress) {
+                return;
+            }
+            
+            try {
+                // Afficher le chargement
+                document.getElementById('nfts-loading').classList.remove('hidden');
+                document.getElementById('nfts-list').classList.add('hidden');
+                document.getElementById('no-nfts').classList.add('hidden');
+                
+                // Récupérer les NFTs depuis l'API Alchemy
+                const alchemyUrl = `https://eth-sepolia.g.alchemy.com/nft/v3/demo/getNFTs?owner=${walletAddress}&contractAddresses[]=${CONTRACT_ADDRESS}&pageSize=100&withMetadata=true`;
+                
+                // Simulation de délai pour démo
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Simuler des données de NFT pour la démo
+                const mockNFTs = [
+                    {
+                        id: {
+                            tokenId: '0',
+                            tokenMetadata: {
+                                tokenType: 'ERC721'
+                            }
+                        },
+                        contractAddress: CONTRACT_ADDRESS,
+                        title: 'S.H.A.C.K.E.R. #1',
+                        description: 'Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.',
+                        tokenUri: {
+                            gateway: 'https://raw-nfts.replit.app/metadata/0'
+                        },
+                        media: [
+                            {
+                                gateway: '/images/shacker01.jpg'
+                            }
+                        ],
+                        metadata: {
+                            name: 'S.H.A.C.K.E.R. #1',
+                            description: 'Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.',
+                            image: '/images/shacker01.jpg',
+                            attributes: [
+                                { trait_type: 'Gender', value: 'Male' },
+                                { trait_type: 'Type', value: 'Demon' },
+                                { trait_type: 'Eyes', value: 'Yellow Flames' }
+                            ]
+                        }
+                    }
+                ];
+                
+                // Dans une vraie application, cette partie utiliserait l'API Alchemy pour récupérer les vrais NFTs
+                // const response = await fetch(alchemyUrl);
+                // const data = await response.json();
+                // const nfts = data.ownedNfts;
+                
+                const nfts = mockNFTs;
+                
+                // Masquer le chargement
+                document.getElementById('nfts-loading').classList.add('hidden');
+                
+                if (nfts.length === 0) {
+                    // Aucun NFT trouvé
+                    document.getElementById('no-nfts').classList.remove('hidden');
+                    return;
+                }
+                
+                // Afficher les NFTs
+                const nftsListElement = document.getElementById('nfts-list');
+                nftsListElement.innerHTML = '';
+                
+                nfts.forEach(nft => {
+                    const nftCard = document.createElement('div');
+                    nftCard.className = 'bg-gray-800 rounded-lg overflow-hidden border border-gray-700';
+                    
+                    const image = nft.media && nft.media.length > 0 
+                        ? nft.media[0].gateway 
+                        : '/images/placeholder.png';
+                    
+                    nftCard.innerHTML = `
+                        <div class="aspect-square relative overflow-hidden">
+                            <img src="${image}" alt="${nft.title}" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2 bg-purple-800 text-white px-2 py-1 rounded-full text-xs">
+                                #${nft.id.tokenId}
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-lg font-medium text-white mb-1">${nft.title}</h3>
+                            <p class="text-sm text-gray-400 mb-3">${nft.description.substring(0, 60)}${nft.description.length > 60 ? '...' : ''}</p>
+                            
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                ${nft.metadata && nft.metadata.attributes ? nft.metadata.attributes.slice(0, 3).map(attr => 
+                                    `<span class="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
+                                        ${attr.trait_type}: ${attr.value}
+                                    </span>`
+                                ).join('') : ''}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="text-center py-1 bg-purple-700 hover:bg-purple-600 text-white rounded text-sm transfer-button" data-token-id="${nft.id.tokenId}">
+                                    Transférer
+                                </button>
+                                <a href="${ETHERSCAN_BASE_URL}/token/${nft.contractAddress}?a=${nft.id.tokenId}" target="_blank" class="text-center py-1 bg-blue-700 hover:bg-blue-600 text-white rounded text-sm">
+                                    Etherscan
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    nftsListElement.appendChild(nftCard);
+                });
+                
+                // Ajouter des gestionnaires d'événements pour les boutons de transfert
+                document.querySelectorAll('.transfer-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tokenId = button.dataset.tokenId;
+                        
+                        // Basculer vers l'onglet de transfert
+                        document.querySelector('.tab-button[data-tab="transfer"]').click();
+                        
+                        // Remplir l'ID du token
+                        document.getElementById('transfer-token-id').value = tokenId;
+                    });
+                });
+                
+                // Afficher la liste
+                nftsListElement.classList.remove('hidden');
+            } catch (error) {
+                console.error('Erreur lors du chargement des NFTs:', error);
+                showMessage('nfts-message', `Erreur lors du chargement des NFTs: ${error.message}`, 'error');
+                
+                // Masquer le chargement
+                document.getElementById('nfts-loading').classList.add('hidden');
+            }
+        }
+        
+        // Gestionnaire pour le bouton d'actualisation des NFTs
+        document.getElementById('refresh-nfts').addEventListener('click', loadNFTs);
+        
+        // Gestionnaire pour le bouton "Minter un nouveau NFT"
+        document.getElementById('go-to-mint').addEventListener('click', () => {
+            document.querySelector('.tab-button[data-tab="mint"]').click();
+        });
+        
+        // Fonction pour afficher un message
+        function showMessage(elementId, message, type) {
+            const messageElement = document.getElementById(elementId);
+            messageElement.textContent = message;
+            messageElement.classList.remove('hidden', 'alert-success', 'alert-error');
+            messageElement.classList.add(`alert-${type}`);
+        }
+    </script>
+</body>
+</html>
