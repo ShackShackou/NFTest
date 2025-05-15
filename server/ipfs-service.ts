@@ -14,21 +14,54 @@ const client = new NFTStorage({ token: API_KEY || '' });
 
 /**
  * Upload un fichier sur IPFS via NFT.Storage
- * @param filePath Chemin du fichier à uploader
+ * @param filePath Chemin du fichier à uploader ou URL du fichier
  * @returns URL IPFS du fichier
  */
 export async function uploadFileToIPFS(filePath: string): Promise<string> {
   try {
+    // Si c'est déjà une URL IPFS, on la retourne directement
+    if (filePath.startsWith('ipfs://')) {
+      console.log(`⚠️ Le fichier est déjà sur IPFS: ${filePath}`);
+      return filePath;
+    }
+    
+    // Si c'est une URL HTTP qui pointe vers le cache IPFS local
+    if (filePath.includes('/ipfs-cache/')) {
+      const segments = filePath.split('/');
+      const filename = segments[segments.length - 1];
+      // Si c'est un fichier du cache avec un CID, construire l'URL IPFS
+      if (filename.includes('bafkrei')) {
+        const cid = filename.split('.')[0]; // extraire le CID sans l'extension
+        return `ipfs://${cid}`;
+      }
+    }
+    
+    // Normaliser le chemin pour les URL relatives
+    let normalizedPath = filePath;
+    if (filePath.startsWith('/')) {
+      normalizedPath = path.join(process.cwd(), 'public', filePath);
+    } else if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      try {
+        // Extraire le chemin de l'URL et le convertir en chemin local
+        const url = new URL(filePath);
+        const localPath = url.pathname;
+        normalizedPath = path.join(process.cwd(), 'public', localPath);
+      } catch (e) {
+        console.error("Erreur de parsing d'URL:", e);
+        normalizedPath = filePath;
+      }
+    }
+    
     // Vérifier si le fichier existe
-    if (!await fs.pathExists(filePath)) {
-      throw new Error(`Le fichier ${filePath} n'existe pas`);
+    if (!await fs.pathExists(normalizedPath)) {
+      throw new Error(`Le fichier ${normalizedPath} n'existe pas`);
     }
 
     // Lire le fichier
-    const fileData = await fs.readFile(filePath);
+    const fileData = await fs.readFile(normalizedPath);
     
     // Déterminer le type MIME en fonction de l'extension
-    const extension = path.extname(filePath).toLowerCase();
+    const extension = path.extname(normalizedPath).toLowerCase();
     let contentType = 'application/octet-stream'; // Type par défaut
     
     if (extension === '.jpg' || extension === '.jpeg') {
@@ -46,33 +79,40 @@ export async function uploadFileToIPFS(filePath: string): Promise<string> {
     }
 
     // Créer un objet File pour NFT.Storage
-    const fileName = path.basename(filePath);
+    const fileName = path.basename(normalizedPath);
     const file = new File([fileData], fileName, { type: contentType });
 
     console.log(`📤 Upload du fichier ${fileName} vers IPFS (taille: ${(fileData.length / 1024).toFixed(2)} KB)...`);
     
-    // Méthode alternative 1 : Utiliser un simulateur IPFS si la clé API ne fonctionne pas
-    // En production, une vraie connexion IPFS serait utilisée
-    
-    // Générer un CID simulé mais valide pour la démo
-    const fakeCid = `bafkreih${Math.random().toString(36).substring(2, 10)}${Math.random().toString(36).substring(2, 10)}`;
-    console.log(`⚠️ Mode démo: Simulation d'upload IPFS avec CID: ${fakeCid}`);
-    
-    // Créer une copie locale de l'image pour la démo
-    const publicDir = path.join(process.cwd(), 'public', 'ipfs-cache');
-    await fs.ensureDir(publicDir);
-    const localCachePath = path.join(publicDir, `${fakeCid}.${extension.replace('.', '')}`);
-    await fs.copyFile(filePath, localCachePath);
-    
-    // Construire l'URL IPFS
-    const ipfsUrl = `ipfs://${fakeCid}`;
-    const localGatewayUrl = `/ipfs-cache/${fakeCid}${extension}`;
-    
-    console.log(`✅ Simulation d'upload terminée avec succès:`);
-    console.log(`- IPFS URL (simulée): ${ipfsUrl}`);
-    console.log(`- Gateway locale: ${localGatewayUrl}`);
-    
-    return ipfsUrl;
+    // Tentative d'upload sur IPFS via NFT.Storage
+    try {
+      const cid = await client.storeBlob(file);
+      const ipfsUrl = `ipfs://${cid}`;
+      const gatewayUrl = `https://nftstorage.link/ipfs/${cid}`;
+      
+      console.log(`✅ Fichier uploadé avec succès sur IPFS:`);
+      console.log(`- IPFS URL: ${ipfsUrl}`);
+      console.log(`- Gateway URL: ${gatewayUrl}`);
+      
+      return ipfsUrl;
+    } catch (uploadError) {
+      console.error("Erreur d'upload NFT.Storage:", uploadError);
+      
+      // Si l'upload IPFS échoue, sauvegardons localement
+      const randomId = Math.random().toString(36).substring(2, 10);
+      const publicDir = path.join(process.cwd(), 'public', 'images');
+      await fs.ensureDir(publicDir);
+      
+      // Générer un nom de fichier unique
+      const safeName = `shacker01_${randomId}${extension}`;
+      const localPath = path.join(publicDir, safeName);
+      
+      // Copier le fichier avec un nouveau nom dans le dossier public/images
+      await fs.copyFile(normalizedPath, localPath);
+      
+      // Retourner une URL relative
+      return `/images/${safeName}`;
+    }
   } catch (error) {
     console.error('❌ Erreur lors de l\'upload sur IPFS:', error);
     throw error;
@@ -91,28 +131,38 @@ export async function uploadMetadataToIPFS(metadata: any): Promise<string> {
     // Convertir l'objet en JSON
     const data = JSON.stringify(metadata, null, 2);
     
-    // Méthode alternative pour les métadonnées (similaire aux images)
-    // En production, une vraie connexion IPFS serait utilisée
+    // Créer un objet File pour NFT.Storage
+    const file = new File([data], 'metadata.json', { type: 'application/json' });
     
-    // Générer un CID simulé mais valide pour la démo
-    const fakeCid = `bafkreim${Math.random().toString(36).substring(2, 10)}${Math.random().toString(36).substring(2, 10)}`;
-    console.log(`⚠️ Mode démo: Simulation d'upload des métadonnées avec CID: ${fakeCid}`);
-    
-    // Enregistrer une copie locale des métadonnées pour la démo
-    const publicDir = path.join(process.cwd(), 'public', 'ipfs-cache');
-    await fs.ensureDir(publicDir);
-    const localCachePath = path.join(publicDir, `${fakeCid}.json`);
-    await fs.writeFile(localCachePath, data);
-    
-    // Construire l'URL IPFS
-    const ipfsUrl = `ipfs://${fakeCid}`;
-    const localGatewayUrl = `/ipfs-cache/${fakeCid}.json`;
-    
-    console.log(`✅ Simulation d'upload des métadonnées terminée avec succès:`);
-    console.log(`- IPFS URL (simulée): ${ipfsUrl}`);
-    console.log(`- Gateway locale: ${localGatewayUrl}`);
-    
-    return ipfsUrl;
+    // Tentative d'upload sur IPFS via NFT.Storage
+    try {
+      const cid = await client.storeBlob(file);
+      const ipfsUrl = `ipfs://${cid}`;
+      const gatewayUrl = `https://nftstorage.link/ipfs/${cid}`;
+      
+      console.log(`✅ Métadonnées uploadées avec succès sur IPFS:`);
+      console.log(`- IPFS URL: ${ipfsUrl}`);
+      console.log(`- Gateway URL: ${gatewayUrl}`);
+      
+      return ipfsUrl;
+    } catch (uploadError) {
+      console.error("Erreur d'upload des métadonnées sur NFT.Storage:", uploadError);
+      
+      // Si l'upload IPFS échoue, sauvegardons localement
+      const randomId = Math.random().toString(36).substring(2, 10);
+      const publicDir = path.join(process.cwd(), 'public', 'metadata');
+      await fs.ensureDir(publicDir);
+      
+      // Générer un nom de fichier unique
+      const fileName = `metadata_${randomId}.json`;
+      const localPath = path.join(publicDir, fileName);
+      
+      // Écrire le fichier JSON
+      await fs.writeFile(localPath, data);
+      
+      // Retourner une URL relative
+      return `/metadata/${fileName}`;
+    }
   } catch (error) {
     console.error('❌ Erreur lors de l\'upload des métadonnées sur IPFS:', error);
     throw error;
@@ -125,19 +175,14 @@ export async function uploadMetadataToIPFS(metadata: any): Promise<string> {
  * @returns URL HTTP via gateway
  */
 export function ipfsToHttpUrl(ipfsUrl: string): string {
+  // Si ce n'est pas une URL IPFS, retourner telle quelle
   if (!ipfsUrl.startsWith('ipfs://')) {
-    return ipfsUrl; // Déjà une URL HTTP ou format non reconnu
+    return ipfsUrl;
   }
   
+  // Extraire le CID (Content ID) de l'URL IPFS
   const cid = ipfsUrl.replace('ipfs://', '');
   
-  // Vérifier si c'est un CID simulé pour la démo
-  if (cid.startsWith('bafkreih') || cid.startsWith('bafkreim')) {
-    // Pour les CIDs démo, utiliser notre passerelle locale
-    const extension = cid.startsWith('bafkreih') ? '.jpg' : '.json';
-    return `/ipfs-cache/${cid}${extension}`;
-  }
-  
-  // Pour les vrais CIDs IPFS, utiliser la passerelle publique
+  // Utiliser la passerelle d'accès NFT.Storage (fiable et rapide)
   return `https://nftstorage.link/ipfs/${cid}`;
 }

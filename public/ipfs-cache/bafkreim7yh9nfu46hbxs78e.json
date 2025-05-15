@@ -1,0 +1,45 @@
+{
+  "name": "S.H.A.C.K.E.R. #01",
+  "description": "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
+  "image": "ipfs://bafkreihr0ri4a3oieh09590",
+  "animation_url": "/",
+  "attributes": [
+    {
+      "trait_type": "Gender",
+      "value": "Male"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Demon"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Yellow Flames"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Piercings"
+    },
+    {
+      "trait_type": "Accessory",
+      "value": "Small Horns"
+    },
+    {
+      "trait_type": "Damages",
+      "value": "Bloody Nose"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "Shackers OGs"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "#86"
+    },
+    {
+      "trait_type": "Interactive",
+      "value": "Yes"
+    }
+  ],
+  "lastUpdated": "2025-05-15T19:31:00.316Z"
+}
