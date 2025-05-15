@@ -175,7 +175,7 @@
 
             async function uploadFile() {
                 if (!selectedFile) {
-                    showAlert('Veuillez sélectionner un fichier d'abord.', 'error');
+                    showAlert("Veuillez sélectionner un fichier d'abord.", 'error');
                     return;
                 }
 
@@ -194,7 +194,7 @@
                     const data = await response.json();
                     
                     if (!response.ok) {
-                        throw new Error(data.error || 'Erreur lors de l'upload');
+                        throw new Error(data.error || "Erreur lors de l'upload");
                     }
                     
                     // Afficher les résultats

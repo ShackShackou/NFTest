@@ -206,7 +206,14 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-400 mb-2">URL de l'image</label>
-                        <input type="text" id="metadata-image" class="form-input" placeholder="https://...">
+                        <div class="flex space-x-2 mb-2">
+                            <input type="text" id="metadata-image" class="form-input flex-grow" placeholder="https://...">
+                            <button type="button" id="open-upload-tool" class="bg-purple-600 text-white px-3 py-2 rounded hover:bg-purple-700 transition flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
                         <div class="mt-2 flex justify-between items-center">
                             <span class="text-xs text-gray-500">Format: URL locale ou IPFS</span>
                             <button type="button" id="upload-to-ipfs" class="bg-indigo-500 text-white text-xs py-1 px-2 rounded hover:bg-indigo-600 transition">
@@ -772,6 +779,65 @@
                 }
             } catch (error) {
                 console.error('Erreur lors du chargement des métadonnées:', error);
+            }
+        });
+
+        // Ajout des fonctionnalités pour l'upload IPFS direct
+        document.getElementById('upload-to-ipfs').addEventListener('click', async function() {
+            const imageUrl = document.getElementById('metadata-image').value;
+            if (!imageUrl) {
+                alert('Veuillez d\'abord entrer une URL d\'image');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/ipfs/upload-nft-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tokenId: document.getElementById('token-id').value
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || data.details || 'Erreur d\'upload');
+                }
+                
+                // Afficher les informations IPFS
+                const ipfsInfo = document.getElementById('ipfs-info');
+                ipfsInfo.classList.remove('hidden');
+                
+                document.getElementById('ipfs-image-url').textContent = data.ipfsImageUrl || 'N/A';
+                document.getElementById('ipfs-http-url').textContent = data.httpImageUrl || 'N/A';
+                document.getElementById('ipfs-metadata-url').textContent = data.ipfsMetadataUrl || 'N/A';
+                
+                // Mettre à jour l'URL de l'image
+                document.getElementById('metadata-image').value = data.ipfsImageUrl;
+                
+                // Afficher un message de succès
+                alert('Upload IPFS réussi!');
+            } catch (error) {
+                console.error('Erreur d\'upload IPFS:', error);
+                alert('Erreur lors de l\'upload sur IPFS: ' + error.message);
+            }
+        });
+
+        // Bouton pour ouvrir l'outil d'upload direct
+        document.getElementById('open-upload-tool').addEventListener('click', function() {
+            window.open('/ipfs-upload.html', '_blank', 'width=600,height=700');
+        });
+
+        // Écouter les messages de l'outil d'upload
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'ipfs-url') {
+                document.getElementById('metadata-image').value = event.data.url;
+                
+                // Afficher un message confirmant que l'URL a été mise à jour
+                alert('URL IPFS reçue avec succès: ' + event.data.url);
             }
         });
     </script>
