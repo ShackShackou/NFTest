@@ -33,6 +33,28 @@ const connectedClients = new Map<string, any>();
 
 // Fonction d'initialisation des métadonnées pour les NFT
 function initializeMetadata() {
+  // Métadonnées pour S.H.A.C.K.E.R. #01 (ID=0 pour le NFT déjà minté)
+  if (!nftMetadataStore.has(0)) {
+    nftMetadataStore.set(0, {
+      name: "S.H.A.C.K.E.R. #01",
+      description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
+      image: "https://i.ibb.co/D1QyqcG/shacker01.jpg", // URL d'une image hébergée sur un service public
+      animation_url: "https://raw-nfts.replit.app/",  // URL du mini-jeu
+      attributes: [
+        { trait_type: "Gender", value: "Male" },
+        { trait_type: "Type", value: "Demon" },
+        { trait_type: "Eyes", value: "Yellow Flames" },
+        { trait_type: "Accessory", value: "Piercings" },
+        { trait_type: "Accessory", value: "Small Horns" },
+        { trait_type: "Damages", value: "Bloody Nose" },
+        { trait_type: "Collection", value: "Shackers OGs" },
+        { trait_type: "Rarity", value: "#86" },
+        { trait_type: "Interactive", value: "Yes" }
+      ],
+      lastUpdated: new Date()
+    });
+  }
+  
   // Métadonnées pour S.H.A.C.K.E.R. #01 (ID=1 pour OpenSea)
   if (!nftMetadataStore.has(1)) {
     nftMetadataStore.set(1, {
