@@ -1,4 +1,6 @@
 /** @type import('hardhat/config').HardhatUserConfig */
+require('dotenv').config();
+
 module.exports = {
   solidity: "0.8.20",
   networks: {
@@ -6,8 +8,9 @@ module.exports = {
       chainId: 31337,
     },
     sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia.publicnode.com",
-      accounts: [process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001"],
+      url: "https://eth-sepolia.g.alchemy.com/v2/jjtEulBKoXYssHNqKVz8BciDZnWfZWdw",
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 11155111,
     },
   },
 };
