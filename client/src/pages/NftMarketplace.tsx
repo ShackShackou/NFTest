@@ -15,17 +15,17 @@ export default function NftMarketplace() {
 
   const breadcrumbItems = [
     { label: "Home", href: "/" },
-    { label: "Pixel Collection", href: "/collections/pixel" },
-    { label: nft?.name || "DARTHBATER #42", isActive: true }
+    { label: "Shackers OGs", href: "/collections/shackers" },
+    { label: nft?.name || "S.H.A.C.K.E.R. #01", isActive: true }
   ];
 
   return (
     <>
       <Helmet>
-        <title>Original Studio #1 | PIXELNFT Marketplace</title>
-        <meta name="description" content="Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement." />
-        <meta property="og:title" content="Original Studio #1 | PIXELNFT Marketplace" />
-        <meta property="og:description" content="Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement." />
+        <title>S.H.A.C.K.E.R. #01 | PIXELNFT Marketplace</title>
+        <meta name="description" content="S.H.A.C.K.E.R. #01 - Demon avec des yeux jaunes flamboyants et des petites cornes. Un NFT rare de la collection Shackers OG sur Ethereum." />
+        <meta property="og:title" content="S.H.A.C.K.E.R. #01 | PIXELNFT Marketplace" />
+        <meta property="og:description" content="S.H.A.C.K.E.R. #01 - Demon avec des yeux jaunes flamboyants et des petites cornes. Un NFT rare de la collection Shackers OG sur Ethereum." />
         <meta property="og:type" content="website" />
       </Helmet>
 

@@ -1801,11 +1801,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
         </div>
       )}
       
-      {/* NFT Image (Original Studio #1) */}
+      {/* NFT Image (S.H.A.C.K.E.R. #01) */}
       <img 
         ref={gifRef}
-        src="/images/original-studio-1.jpg" 
-        alt="Original Studio #1" 
+        src="/images/shacker-01.jpg" 
+        alt="S.H.A.C.K.E.R. #01" 
         className="w-full h-full object-cover"
         style={{
           filter: isFrozen ? "grayscale(100%)" : "none",

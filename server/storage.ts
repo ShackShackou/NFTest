@@ -141,46 +141,46 @@ export class MemStorage implements IStorage {
     // Create a demo collection
     const demoCollection: Collection = {
       id: this.collectionId++,
-      name: "Original Studio",
-      description: "Original Studio est une collection exclusive d'art numérique explorant les frontières entre réalité virtuelle et perception humaine. Chaque œuvre est conçue comme un portail vers des expériences interactives et évolutives.",
+      name: "Shackers OGs",
+      description: "Shackers OGs est une collection de démons uniques avec des caractéristiques variées comme des yeux flamboyants, des cornes et d'autres traits rares qui font de chaque pièce un trésor numérique pour les collectionneurs.",
       creatorId: demoUser.id,
-      floorPrice: "1.0 ETH",
-      totalVolume: "895.32 ETH",
-      itemCount: 75,
+      floorPrice: "0.50 ETH",
+      totalVolume: "76.5 ETH",
+      itemCount: 100,
       created: new Date()
     };
     this.collections.set(demoCollection.id, demoCollection);
     
-    // Create demo NFTs - Données exactes de l'image fournie
-    const originalStudioProperties: NftProperty[] = [
-      { type: "Background", value: "Blue Mist", rarity: "8% have this trait" },
-      { type: "Jacket", value: "Abstract", rarity: "4% have this trait" },
-      { type: "Hairstyle", value: "Crystal", rarity: "6% have this trait" },
-      { type: "Eyes", value: "Holographic", rarity: "3% have this trait" },
-      { type: "Facial Features", value: "Neon Circuit", rarity: "2% have this trait" },
-      { type: "Expression", value: "Enigmatic", rarity: "5% have this trait" },
-      { type: "Accessory", value: "Digital Aura", rarity: "7% have this trait" },
-      { type: "Rarity Ranking", value: "Legendary", rarity: "Top 1%" }
+    // Create demo NFTs - Données exactes du NFT S.H.A.C.K.E.R. #01
+    const shackerProperties: NftProperty[] = [
+      { type: "Gender", value: "Male", rarity: "65%" },
+      { type: "Type", value: "Demon", rarity: "92%" },
+      { type: "Accessory", value: "Piercings", rarity: "38%" },
+      { type: "Floor", value: "1", rarity: "77%" },
+      { type: "Eyes", value: "Yellow Flames", rarity: "9%" },
+      { type: "Accessory", value: "Small Horns", rarity: "28%" },
+      { type: "Damages", value: "Bloody Nose", rarity: "6%" },
+      { type: "Favorite Food", value: "Carrots", rarity: "1%" }
     ];
     
     const demoNft: Nft = {
       id: 42,  // Set id to 42 to match the expected url path in NftMarketplace component
       tokenId: "1",
-      name: "Original Studio #1",
-      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
-      image: "/images/original-studio-1.jpg",
-      price: "1.2 ETH",
-      usdPrice: "($3,456.78)",
-      lastPrice: "0.9 ETH",
-      creator: "Art Dimension Labs",
-      owner: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
-      contractAddress: "0x4d9f9cc9d80fdf481a5f367343fdb11b208fee1f",
+      name: "S.H.A.C.K.E.R. #01",
+      description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.",
+      image: "/images/shacker-01.jpg",
+      price: "0.50 ETH",
+      usdPrice: "($1,250.00)",
+      lastPrice: "0.45 ETH",
+      creator: "Shackers OGs",
+      owner: "SHACK",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
-      endsIn: "12h 42m 03s",
-      properties: originalStudioProperties,
-      created: new Date(2024, 4, 15) // May 15, 2024
+      endsIn: "24h 00m 00s",
+      properties: shackerProperties,
+      created: new Date(2022, 4, 15) // May 15, 2022
     };
     this.nftId = 43; // Make sure nftId is correctly set after creating this NFT
     this.nfts.set(demoNft.id, demoNft);
@@ -189,84 +189,84 @@ export class MemStorage implements IStorage {
     const relatedNft1: Nft = {
       id: this.nftId++,
       tokenId: "2",
-      name: "Original Studio #2",
-      description: "Une œuvre fascinante explorant les thèmes de la conscience numérique et de l'évolution virtuelle.",
-      image: "/images/original-studio-2.jpg",
-      price: "1.3 ETH",
-      usdPrice: "($3,721.56)",
-      lastPrice: "1.1 ETH",
-      creator: "Art Dimension Labs",
+      name: "S.H.A.C.K.E.R. #02",
+      description: "Un autre démon unique de la collection Shackers OG avec des traits distinctifs.",
+      image: "/images/shacker-01.jpg", // Utilisé la même image temporairement
+      price: "0.55 ETH",
+      usdPrice: "($1,375.00)",
+      lastPrice: "0.48 ETH",
+      creator: "Shackers OGs",
       owner: "0x7a82F69a3db775C9c10F2b0A1D38699Ec4232d2b",
       contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
       endsIn: "8h 22m 45s",
-      properties: originalStudioProperties.slice(2, 7),
-      created: new Date(2024, 4, 14)
+      properties: shackerProperties.slice(0, 5),
+      created: new Date(2022, 4, 14)
     };
     this.nfts.set(relatedNft1.id, relatedNft1);
     
     const relatedNft2: Nft = {
       id: this.nftId++,
-      tokenId: "41",
-      name: "CYBER KNIGHT",
-      description: "A cyber knight with advanced tech",
-      image: "/cyber-knight.gif",
-      price: "0.45 ETH",
-      usdPrice: "($770.40)",
-      lastPrice: "0.32 ETH",
-      creator: "PixelMaster",
+      tokenId: "3",
+      name: "S.H.A.C.K.E.R. #03",
+      description: "Un démon de la collection Shackers OG avec des traits rares.",
+      image: "/images/shacker-01.jpg", // Utilisé la même image temporairement
+      price: "0.48 ETH",
+      usdPrice: "($1,200.00)",
+      lastPrice: "0.45 ETH",
+      creator: "Shackers OGs",
       owner: "0x9Ed30408f11D2bFC23c34f18275bBf23bB716Bc9",
-      contractAddress: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
       endsIn: "5h 30m 45s",
-      properties: [],
-      created: new Date(2023, 3, 12)
+      properties: shackerProperties.slice(2, 6),
+      created: new Date(2022, 4, 15)
     };
     this.nfts.set(relatedNft2.id, relatedNft2);
     
     const relatedNft3: Nft = {
       id: this.nftId++,
-      tokenId: "43",
-      name: "SPACE RIDER",
-      description: "A space rider navigating the cosmos",
-      image: "/space-rider.gif",
-      price: "0.38 ETH",
-      usdPrice: "($650.56)",
-      lastPrice: "0.30 ETH",
-      creator: "PixelMaster",
+      tokenId: "4",
+      name: "S.H.A.C.K.E.R. #04",
+      description: "Un membre effrayant de la collection Shackers OG.",
+      image: "/images/shacker-01.jpg", // Utilisé la même image temporairement
+      price: "0.52 ETH",
+      usdPrice: "($1,300.00)",
+      lastPrice: "0.46 ETH",
+      creator: "Shackers OGs",
       owner: "0xaFd30408f11D2bFC23c34f18275bBf23bB716Bca",
-      contractAddress: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
       endsIn: "8h 12m 33s",
-      properties: [],
-      created: new Date(2023, 3, 14)
+      properties: shackerProperties.slice(3, 7),
+      created: new Date(2022, 4, 16)
     };
     this.nfts.set(relatedNft3.id, relatedNft3);
     
     const relatedNft4: Nft = {
       id: this.nftId++,
-      tokenId: "45",
-      name: "TECH WIZARD",
-      description: "A technologically advanced wizard",
-      image: "/tech-wizard.gif",
-      price: "0.40 ETH",
-      usdPrice: "($684.80)",
-      lastPrice: "0.35 ETH",
-      creator: "PixelMaster",
+      tokenId: "5",
+      name: "S.H.A.C.K.E.R. #05",
+      description: "Un autre exemplaire unique de la collection Shackers OG.",
+      image: "/images/shacker-01.jpg", // Utilisé la même image temporairement
+      price: "0.49 ETH",
+      usdPrice: "($1,225.00)",
+      lastPrice: "0.43 ETH",
+      creator: "Shackers OGs",
       owner: "0xbEd30408f11D2bFC23c34f18275bBf23bB716Bcb",
-      contractAddress: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
       endsIn: "11h 45m 10s",
-      properties: [],
-      created: new Date(2023, 3, 15)
+      properties: shackerProperties.slice(1, 5),
+      created: new Date(2022, 4, 17)
     };
     this.nfts.set(relatedNft4.id, relatedNft4);
   }
