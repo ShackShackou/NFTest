@@ -20,6 +20,19 @@ export default function NftMinter() {
     disconnectWallet 
   } = useWallet();
   
+  // État pour suivre si nous sommes sur un réseau supporté (Sepolia ou Hardhat)
+  const [isOnSupportedNetwork, setIsOnSupportedNetwork] = useState<boolean>(false);
+  
+  // Vérifier si nous sommes sur un réseau supporté (Sepolia ou Hardhat)
+  useEffect(() => {
+    if (chainId) {
+      // Réseau Sepolia (11155111) ou Hardhat (31337)
+      setIsOnSupportedNetwork(chainId === 11155111 || chainId === 31337);
+    } else {
+      setIsOnSupportedNetwork(false);
+    }
+  }, [chainId]);
+  
   const [error, setError] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
   
@@ -32,6 +45,15 @@ export default function NftMinter() {
   
   // État pour stocker l'adresse du contrat
   const [contractAddress, setContractAddress] = useState<string>(defaultContractAddress);
+  
+  // Mettre à jour l'adresse du contrat en fonction du réseau
+  useEffect(() => {
+    if (chainId) {
+      const config = getContractConfig(chainId);
+      setContractAddress(config.contractAddress);
+      console.log(`Réseau détecté (chainId: ${chainId}), adresse du contrat mise à jour:`, config.contractAddress);
+    }
+  }, [chainId]);
   
   // État pour suivre si MetaMask est réellement détecté
   const [isMetaMaskDetected, setIsMetaMaskDetected] = useState<boolean>(false);
@@ -134,10 +156,10 @@ export default function NftMinter() {
       return;
     }
     
-    if (!isSepoliaNetwork) {
+    if (!isOnSupportedNetwork) {
       toast({
-        title: 'Mauvais réseau',
-        description: 'Veuillez passer sur le réseau Sepolia testnet pour minter',
+        title: 'Réseau non supporté',
+        description: 'Veuillez passer sur le réseau Sepolia testnet ou Hardhat local pour minter',
         variant: 'destructive',
       });
       return;
@@ -154,7 +176,14 @@ export default function NftMinter() {
       
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const nftContract = new ethers.Contract(contractAddress, contractABI, signer);
+      
+      // Récupérer la configuration du contrat en fonction du réseau actuel
+      const network = await provider.getNetwork();
+      const chainId = parseInt(network.chainId.toString());
+      const config = getContractConfig(chainId);
+      
+      console.log(`Utilisation du contrat sur le réseau ${network.name} (${chainId}):`, config.contractAddress);
+      const nftContract = new ethers.Contract(config.contractAddress, config.contractABI, signer);
       
       // Version simplifiée pour tester uniquement la connexion au contrat
       let transaction;
@@ -308,7 +337,12 @@ export default function NftMinter() {
             </div>
             <div>
               <span className="text-gray-500">Réseau:</span>
-              <div className="text-white capitalize mt-1">{isSepoliaNetwork ? 'Sepolia' : chainId ? `Chain ID: ${chainId}` : 'Inconnu'}</div>
+              <div className="text-white capitalize mt-1">
+                {isSepoliaNetwork ? 'Sepolia' : 
+                 chainId === 31337 ? 'Hardhat Local' : 
+                 chainId ? `Chain ID: ${chainId}` : 'Inconnu'}
+                {isOnSupportedNetwork && <span className="ml-2 text-xs text-green-500">(Supporté)</span>}
+              </div>
             </div>
           </div>
         )}
@@ -363,15 +397,21 @@ export default function NftMinter() {
           <Button
             onClick={handleMintNft}
             className="w-full bg-green-600 hover:bg-green-700"
-            disabled={isMinting || !isSepoliaNetwork}
+            disabled={isMinting || !isOnSupportedNetwork}
             size="sm"
           >
             {isMinting ? "Transaction en cours..." : "Minter le NFT"}
           </Button>
           
-          {!isSepoliaNetwork && (
+          {!isOnSupportedNetwork && (
             <p className="text-xs text-amber-400 mt-2">
-              Vous devez être sur le réseau Sepolia Testnet pour minter
+              Vous devez être sur le réseau Sepolia Testnet ou Hardhat Local pour minter
+            </p>
+          )}
+          
+          {isOnSupportedNetwork && chainId === 31337 && (
+            <p className="text-xs text-green-400 mt-2">
+              Vous êtes sur le réseau Hardhat Local, idéal pour tester!
             </p>
           )}
         </div>
@@ -393,18 +433,28 @@ export default function NftMinter() {
               
               <div>
                 <span className="text-gray-400">Transaction:</span>
-                <a 
-                  href={`https://sepolia.etherscan.io/tx/${mintStatus.transactionHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-2 text-blue-400 hover:underline break-all"
-                >
-                  {shortenAddress(mintStatus.transactionHash || '')}
-                </a>
+                {chainId === 31337 ? (
+                  <span className="ml-2 text-gray-400 font-mono">
+                    {shortenAddress(mintStatus.transactionHash || '')}
+                    <span className="text-xs text-amber-400 ml-2">(Réseau local)</span>
+                  </span>
+                ) : (
+                  <a 
+                    href={`https://sepolia.etherscan.io/tx/${mintStatus.transactionHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-400 hover:underline break-all"
+                  >
+                    {shortenAddress(mintStatus.transactionHash || '')}
+                  </a>
+                )}
               </div>
               
               <p className="text-gray-300 text-xs mt-2">
-                Vous pouvez voir votre NFT dans quelques instants sur OpenSea Testnet.
+                {chainId === 31337 ? 
+                  "Votre NFT est créé localement. Il n'est pas visible sur les explorateurs externes." :
+                  "Vous pouvez voir votre NFT dans quelques instants sur OpenSea Testnet."
+                }
               </p>
             </div>
           ) : (
