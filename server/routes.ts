@@ -116,9 +116,15 @@ function broadcastEvent(event: WebSocketEvent) {
   });
 }
 
+// Importer les routes NFT
+import { registerNFTRoutes } from './nft-routes';
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enregistrer les routes d'upload
   uploadService.registerRoutes(app);
+  
+  // Enregistrer les routes NFT
+  registerNFTRoutes(app);
   
   // Configuration de Multer pour l'upload de fichiers
   const multerStorage = multer.diskStorage({
