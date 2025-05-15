@@ -1,7 +1,10 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer } from 'ws';
+import { uploadFileToIPFS, uploadMetadataToIPFS, ipfsToHttpUrl } from './ipfs-service';
+import fs from 'fs-extra';
+import path from 'path';
 
 // Type pour les métadonnées du NFT
 interface NftMetadata {
