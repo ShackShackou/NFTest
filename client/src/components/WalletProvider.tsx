@@ -37,6 +37,9 @@ declare global {
   }
 }
 
+// Ne pas redéclarer la propriété ethereum
+// Cette redéclaration cause l'erreur TypeScript
+
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
 
 // Provider du wallet utilisant directement ethers.js

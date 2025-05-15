@@ -16,22 +16,10 @@ export default function NftMinter() {
     isLoading, 
     chainId,
     isSepoliaNetwork,
+    isOnSupportedNetwork,
     connectWallet, 
     disconnectWallet 
   } = useWallet();
-  
-  // État pour suivre si nous sommes sur un réseau supporté (Sepolia ou Hardhat)
-  const [isOnSupportedNetwork, setIsOnSupportedNetwork] = useState<boolean>(false);
-  
-  // Vérifier si nous sommes sur un réseau supporté (Sepolia ou Hardhat)
-  useEffect(() => {
-    if (chainId) {
-      // Réseau Sepolia (11155111) ou Hardhat (31337)
-      setIsOnSupportedNetwork(chainId === 11155111 || chainId === 31337);
-    } else {
-      setIsOnSupportedNetwork(false);
-    }
-  }, [chainId]);
   
   const [error, setError] = useState<string | null>(null);
   const [isMinting, setIsMinting] = useState(false);
