@@ -27,6 +27,7 @@ interface WalletContextType {
   connectWallet: () => void;
   disconnectWallet: () => void;
   isSepoliaNetwork: boolean;
+  isOnSupportedNetwork: boolean;
 }
 
 // Déclarer ethereum comme une propriété de window
@@ -50,6 +51,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   
   // Vérifier si nous sommes sur le réseau Sepolia testnet
   const isSepoliaNetwork = chainId === SEPOLIA_CHAIN_ID;
+  const isOnSupportedNetwork = chainId === SEPOLIA_CHAIN_ID || chainId === HARDHAT_CHAIN_ID;
   
   // Vérifier si MetaMask est disponible
   const checkIfMetaMaskIsAvailable = (): boolean => {
@@ -234,6 +236,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     connectWallet,
     disconnectWallet,
     isSepoliaNetwork,
+    isOnSupportedNetwork,
   };
   
   return (
