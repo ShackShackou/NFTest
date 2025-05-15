@@ -14,6 +14,7 @@ interface Ethereum {
 
 // Constantes pour les network IDs
 const SEPOLIA_CHAIN_ID = 11155111;
+const HARDHAT_CHAIN_ID = 31337;
 
 // Contexte pour les données du wallet
 interface WalletContextType {
