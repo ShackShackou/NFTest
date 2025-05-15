@@ -42,6 +42,9 @@ export function Navbar() {
                 <Link href="/manager">
                   <span className="px-3 py-2 rounded-md text-sm font-medium text-accent hover:text-accent/80 cursor-pointer">Manager</span>
                 </Link>
+                <Link href="/admin">
+                  <span className="px-3 py-2 rounded-md text-sm font-medium text-red-500 hover:text-red-400 cursor-pointer">Admin</span>
+                </Link>
                 <Link href="#">
                   <span className="px-3 py-2 rounded-md text-sm font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
                 </Link>
@@ -104,6 +107,9 @@ export function Navbar() {
             </Link>
             <Link href="/manager">
               <span className="block px-3 py-2 rounded-md text-base font-medium text-accent hover:text-accent/80 cursor-pointer">Manager</span>
+            </Link>
+            <Link href="/admin">
+              <span className="block px-3 py-2 rounded-md text-base font-medium text-red-500 hover:text-red-400 cursor-pointer">Admin</span>
             </Link>
             <Link href="#">
               <span className="block px-3 py-2 rounded-md text-base font-medium text-neutral-light hover:text-primary cursor-pointer">Activity</span>
