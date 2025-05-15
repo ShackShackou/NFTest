@@ -121,8 +121,28 @@ export default function NftMinter() {
       const signer = await provider.getSigner();
       const nftContract = new ethers.Contract(contractAddress, contractABI, signer);
       
-      // Mint le NFT
-      const transaction = await nftContract.mintNFT(address);
+      // Vérifier quelle fonction est disponible sur le contrat
+      let transaction;
+      try {
+        // Essayer d'abord mint()
+        if (typeof nftContract.mint === 'function') {
+          transaction = await nftContract.mint();
+        } 
+        // Sinon essayer safeMint(address) si disponible
+        else if (typeof nftContract.safeMint === 'function') {
+          transaction = await nftContract.safeMint(address);
+        }
+        // Sinon essayer mintNFT(address) si disponible
+        else if (typeof nftContract.mintNFT === 'function') {
+          transaction = await nftContract.mintNFT(address);
+        }
+        else {
+          throw new Error("Aucune fonction de mint reconnue n'est disponible sur ce contrat");
+        }
+      } catch (err) {
+        console.error("Erreur lors de la détection de la fonction mint:", err);
+        throw new Error(`Le contrat ne supporte pas le mint: ${err.message}`);
+      }
       
       // Attendre que la transaction soit minée
       toast({
@@ -132,8 +152,8 @@ export default function NftMinter() {
       
       const receipt = await transaction.wait();
       
-      // Chercher l'événement NFTMinted dans les logs
-      const mintEvent = receipt.logs
+      // Chercher l'événement Transfer dans les logs (standard ERC721)
+      const transferEvent = receipt.logs
         .map((log: any) => {
           try {
             return nftContract.interface.parseLog(log);
@@ -141,10 +161,10 @@ export default function NftMinter() {
             return null;
           }
         })
-        .filter((event: any) => event && event.name === 'NFTMinted')[0];
+        .filter((event: any) => event && event.name === 'Transfer')[0];
       
-      // Extraire le tokenId de l'événement
-      const tokenId = mintEvent ? mintEvent.args.tokenId.toString() : 'Inconnu';
+      // Extraire le tokenId de l'événement Transfer (to, from, tokenId)
+      const tokenId = transferEvent ? transferEvent.args[2].toString() : 'Inconnu';
       
       toast({
         title: 'NFT minté avec succès !',

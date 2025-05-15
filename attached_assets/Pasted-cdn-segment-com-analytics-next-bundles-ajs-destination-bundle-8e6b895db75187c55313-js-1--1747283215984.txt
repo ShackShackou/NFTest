@@ -1,0 +1,248 @@
+cdn.segment.com/analytics-next/bundles/ajs-destination.bundle.8e6b895db75187c55313.js:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+InteractiveNftCanvas:1 Refused to execute script from 'https://cdn.segment.com/analytics-next/bundles/ajs-destination.bundle.8e6b895db75187c55313.js' because its MIME type ('image/png') is not executable.Understand this error
+standalone.ts:45 [analytics.js] Failed to load Analytics.js ChunkLoadError: Loading chunk 50 failed.
+(error: https://cdn.segment.com/analytics-next/bundles/ajs-destination.bundle.8e6b895db75187c55313.js)
+    at Object.j (jsonp chunk loading:28:25)
+    at get javascript chunk filename:2:21
+    at Array.reduce (<anonymous>)
+    at s.e (ensure chunk:5:82)
+    at index.ts:138:15
+    at tslib.es6.js:103:23
+    at Object.next (tslib.es6.js:108:37)
+    at tslib.es6.js:80:8
+    at new Promise (<anonymous>)
+    at u (tslib.es6.js:72:27)
+(anonymous) @ standalone.ts:45Understand this error
+InteractiveNftCanvas:1 Access to fetch at 'https://api.segment.io/v1/m' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+api.segment.io/v1/m:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+remote-metrics.ts:53 Error sending segment performance metrics TypeError: Failed to fetch
+    at fetchCallImpl (main.js?attr=ILTdaVwUIPrvJaH4YNBecAdlB6uJdte9ai9Kav6-xwxtpTvVd30spR4hiHPtDPx5PzGKPQ5XIYGzRBlIAUfH2Qgmy0sUKUlSzMiiEfx9vcI:4407:21)
+    at fetch (main.js?attr=ILTdaVwUIPrvJaH4YNBecAdlB6uJdte9ai9Kav6-xwxtpTvVd30spR4hiHPtDPx5PzGKPQ5XIYGzRBlIAUfH2Qgmy0sUKUlSzMiiEfx9vcI:4413:60)
+    at o (sdk.min.js:1:23763)
+    at t.<anonymous> (remote-metrics.ts:138:12)
+    at tslib.es6.js:103:23
+    at Object.next (tslib.es6.js:108:37)
+    at tslib.es6.js:80:8
+    at new Promise (<anonymous>)
+    at u (tslib.es6.js:72:27)
+    at t.send (sdk.min.js:1:22021)
+a @ remote-metrics.ts:53Understand this error
+main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-OLILhTXog2S64nhI6Q/dTj9d207g7OM1OeSWQEDO1fI='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-OLILhTXog2S64nhI6Q/dTj9d207g7OM1OeSWQEDO1fI='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7ux…FTn3lVeIFInVfC…:491Understand this error
+main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-tkQt22074YUmuZlGzuwk0GqzMcmTHjtPHR/7BQCauR8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-tkQt22074YUmuZlGzuwk0GqzMcmTHjtPHR/7BQCauR8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7ux…FTn3lVeIFInVfC…:491Understand this error
+main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-iTAMFQ55v1RA/Nh6HruAL1gE5cQJpzBu+Hb1v+Pvpo8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-iTAMFQ55v1RA/Nh6HruAL1gE5cQJpzBu+Hb1v+Pvpo8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7ux…FTn3lVeIFInVfC…:491Understand this error
+main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-ONZQoKZJtTwHO/zdXKRjxFBiCjD/nUbwfjlrjUeVH2k='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7uxLIO2_gQdQ3HdFrzPE94lfrsXSJ67xPF42uGTICY4dstYcbs_2Qi8jBubrBBRRNQlKFTn3lVeIFInVfCYRivC9W3-GzLMRHgmdy9fVTv_Pa2EDMtxFqmYZFB0JBlHY5mhQ7dnzaO1udvmsEQ:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' 'sha256-0hAheEzaMe6uXIKV4EehS9pu1am1lj/KnnzrOYqckXk=' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-ONZQoKZJtTwHO/zdXKRjxFBiCjD/nUbwfjlrjUeVH2k='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=F11z7ux…FTn3lVeIFInVfC…:491Understand this error
+web-client-content-script.js:2 Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'.
+    at HTMLIFrameElement.<anonymous> (web-client-content-script.js:2:324406)Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+shared-97b5971910032…753d551ffb2556.js:1 Uncaught (in promise) FetchError: Error fetching https://r.stripe.com/b: Failed to fetch
+    at shared-97b5971910032686c9753d551ffb2556.js:1:209678Understand this error
+main.js:1 
+            
+            
+           Failed to load resource: net::ERR_BLOCKED_BY_RESPONSE.NotSameOriginAfterDefaultedToSameOriginByCoepUnderstand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+shared-97b5971910032…753d551ffb2556.js:1 Uncaught (in promise) FetchError: Error fetching https://r.stripe.com/b: Failed to fetch
+    at shared-97b5971910032686c9753d551ffb2556.js:1:209678Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+shared-97b5971910032…753d551ffb2556.js:1 Uncaught (in promise) FetchError: Error fetching https://r.stripe.com/b: Failed to fetch
+    at shared-97b5971910032686c9753d551ffb2556.js:1:209678Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-OLILhTXog2S64nhI6Q/dTj9d207g7OM1OeSWQEDO1fI='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vL…3LWV23gvhpUbU3…:491Understand this error
+main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-OLILhTXog2S64nhI6Q/dTj9d207g7OM1OeSWQEDO1fI='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-tkQt22074YUmuZlGzuwk0GqzMcmTHjtPHR/7BQCauR8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vL…3LWV23gvhpUbU3…:491Understand this error
+main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-tkQt22074YUmuZlGzuwk0GqzMcmTHjtPHR/7BQCauR8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-iTAMFQ55v1RA/Nh6HruAL1gE5cQJpzBu+Hb1v+Pvpo8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vL…3LWV23gvhpUbU3…:491Understand this error
+main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-iTAMFQ55v1RA/Nh6HruAL1gE5cQJpzBu+Hb1v+Pvpo8='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491Understand this error
+ Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-ONZQoKZJtTwHO/zdXKRjxFBiCjD/nUbwfjlrjUeVH2k='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vL…3LWV23gvhpUbU3…:491Understand this error
+main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491 Refused to apply inline style because it violates the following Content Security Policy directive: "style-src 'self' https://gc.kis.v2.scr.kaspersky-labs.com wss://gc.kis.v2.scr.kaspersky-labs.com". Either the 'unsafe-inline' keyword, a hash ('sha256-ONZQoKZJtTwHO/zdXKRjxFBiCjD/nUbwfjlrjUeVH2k='), or a nonce ('nonce-...') is required to enable inline execution.
+
+AddDocumentStyles @ main.js?attr=Gw6K_vLCrh-TLb6gplxbDJgYqZ3vDqwoc8T2vyq5VfO9pN7nfxO1sskcwBaPyqe7l4pm1oo23LWV23gvhpUbU3xoQ0ff7DUQlcrcXrtHN0yjyDi0tdnLllOSFXFsRnfM:491Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+inner.html:1 Refused to load the script 'https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=c95qOvlShrRrZrNAC-lWhdNNLRyGK4D7dUgMsIHoXy5MAzdfid33DE8njigS_8XcwzxOrnQfez-HnAMcDTs92w' because it violates the following Content Security Policy directive: "script-src https://m.stripe.network 'sha256-5DA+a07wxWmEka9IdoWjSPVHb17Cp5284/lJzfbl8KA=' 'sha256-/5Guo2nzv5n/w6ukZpOBZOtTJBJPSkJ6mhHpnBgm3Ls='". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+Understand this error
+inner.html:1 Refused to load the stylesheet 'https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9tLnN0cmlwZS5uZXR3b3JrL2lubmVyLmh0bWw' because it violates the following Content Security Policy directive: "style-src https://m.stripe.network". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
+Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+csp-report:1 
+            
+            
+           Failed to load resource: the server responded with a status of 499 ()Understand this error
+web-client-content-script.js:2 Uncaught TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'.
+    at HTMLIFrameElement.<anonymous> (web-client-content-script.js:2:324406)Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+shared-97b5971910032…753d551ffb2556.js:1 Uncaught (in promise) FetchError: Error fetching https://r.stripe.com/b: Failed to fetch
+    at shared-97b5971910032686c9753d551ffb2556.js:1:209678Understand this error
+framework-70509ecdf0e52304.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-70509ecdf0e52304.js:1Understand this error
+workspace_iframe.html:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.Understand this error
+Network.js:227 WebSocket connection to 'wss://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev/?token=O_byPJs0vdE4' failed: 
+t @ Network.js:227Understand this error
+Network.js:227 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=O_byPJs0vdE4' is invalid.
+    at new t (Network.js:227:18)
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)Understand this error
+api.web3modal.org/getAnalyticsConfig?projectId=YOUR_WALLET_CONNECT_PROJECT_ID&st=appkit&sv=html-core-1.7.3:1 
+            
+            
+           Failed to load resource: the server responded with a status of 403 ()Understand this error
+pulse.walletconnect.org/e?projectId=YOUR_WALLET_CONNECT_PROJECT_ID&st=appkit&sv=html-core-1.7.3:1 
+            
+            
+           Failed to load resource: the server responded with a status of 400 ()Understand this error
+_app-e1757f97926d111b.js:38 Invalid href 'https://4e4ba299-2d6d-403d-b2ec-b6f2c97fab66-00-xg9vqi576qnn.picard.replit.dev//mint' passed to next/router in page: '/replEnvironmentDesktop'. Repeated forward-slashes (//) or backslashes \ are not valid in the href.
+(anonymous) @ _app-e1757f97926d111b.js:38Understand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+InteractiveNftCanvas:1 Access to XMLHttpRequest at 'https://events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820' from origin 'https://replit.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+events.launchdarkly.com/events/bulk/62b35a865152ab14c5942820:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+js.stripe.com/v3/controller-with-preconnect-e94cecf48d2f70df939adbbb1ae958ec.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=962e5217-6c7f-4b55-99a3-9acd2ed7547c&firstStripeInstanceCreatedLatency=11&controllerCount=1&isCheckout=false&stripeJsLoadTime=1747282810324&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=36e19a68-94c6-48f5-a337-8f292ca0a634f9baa1&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40shackou%2FInteractiveNftCanvas&controllerId=__privateStripeController4351:1 Access to fetch at 'https://r.stripe.com/b' from origin 'https://js.stripe.com' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+r.stripe.com/b:1 
+            
+            
+           Failed to load resource: net::ERR_FAILEDUnderstand this error
+shared-97b5971910032…753d551ffb2556.js:1 Uncaught (in promise) FetchError: Error fetching https://r.stripe.com/b: Failed to fetch
+    at shared-97b5971910032686c9753d551ffb2556.js:1:209678Understand this error
+inner.html:1 Refused to load the stylesheet 'https://gc.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9tLnN0cmlwZS5uZXR3b3JrL2lubmVyLmh0bWw' because it violates the following Content Security Policy directive: "style-src https://m.stripe.network". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
