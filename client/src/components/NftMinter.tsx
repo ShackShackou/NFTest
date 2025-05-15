@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,41 @@ export default function NftMinter() {
   
   // État pour stocker l'adresse du contrat
   const [contractAddress, setContractAddress] = useState<string>(defaultContractAddress);
+  
+  // État pour suivre si MetaMask est réellement détecté
+  const [isMetaMaskDetected, setIsMetaMaskDetected] = useState<boolean>(false);
+  
+  // Vérifier si MetaMask est réellement détecté à l'initialisation
+  useEffect(() => {
+    const checkMetaMask = async () => {
+      try {
+        const hasMetaMask = typeof window !== 'undefined' && 
+          window.ethereum !== undefined &&
+          typeof window.ethereum.request === 'function';
+          
+        console.log("Détection de MetaMask:", hasMetaMask);
+        
+        if (hasMetaMask) {
+          // Essayer d'utiliser une méthode simple pour confirmer la connexion
+          try {
+            await window.ethereum?.request({ method: 'eth_chainId' });
+            setIsMetaMaskDetected(true);
+            console.log("MetaMask confirmé et fonctionnel");
+          } catch (err) {
+            console.error("MetaMask détecté mais API non disponible:", err);
+            setIsMetaMaskDetected(false);
+          }
+        } else {
+          setIsMetaMaskDetected(false);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de MetaMask:", error);
+        setIsMetaMaskDetected(false);
+      }
+    };
+    
+    checkMetaMask();
+  }, []);
   
   const handleSwitchToTestnet = async () => {
     try {
@@ -222,6 +257,20 @@ export default function NftMinter() {
   return (
     <div className="p-6 bg-neutral-darker rounded-lg border border-neutral-dark/80 shadow-lg">
       <h2 className="text-2xl font-pixel text-primary mb-6">NFT<span className="text-accent">Mint</span></h2>
+      
+      {/* Message d'aide pour MetaMask */}
+      {!isMetaMaskDetected && (
+        <div className="mb-4 p-3 bg-amber-900/30 border border-amber-800 rounded text-amber-200 text-sm">
+          <h3 className="font-semibold mb-1">MetaMask n'est pas détecté</h3>
+          <p className="mb-2">Voici quelques solutions :</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Assurez-vous que l'extension MetaMask est installée et activée</li>
+            <li>Essayez de rafraîchir la page</li>
+            <li>Dans Replit, cliquez sur "Open in new tab" pour ouvrir l'application dans un nouvel onglet</li>
+            <li>Vérifiez que vous n'êtes pas en mode navigation privée</li>
+          </ol>
+        </div>
+      )}
       
       {/* Statut de connexion */}
       <div className="mb-4">
