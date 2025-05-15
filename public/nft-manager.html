@@ -247,6 +247,16 @@
     
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
+        // Vérifiez que ethers a bien été chargé
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof ethers === 'undefined') {
+                console.error("Ethers.js n'a pas été chargé correctement !");
+                showMessage('mint-message', "Erreur: La bibliothèque blockchain (ethers.js) n'a pas été chargée correctement. Veuillez rafraîchir la page ou ouvrir dans un nouvel onglet.", 'error');
+            } else {
+                console.log("Ethers.js chargé avec succès, version:", ethers.version);
+            }
+        });
+        
         // Configuration
         const CONTRACT_ADDRESS = "0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037";
         const CONTRACT_ABI = [
@@ -283,55 +293,75 @@
         
         // Connexion du wallet
         document.getElementById('connect-wallet').addEventListener('click', async () => {
+            showMessage('mint-message', 'Tentative de connexion à MetaMask...', 'success');
+            
             try {
-                if (window.ethereum) {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                // Vérifier si ethers est disponible
+                if (typeof ethers === 'undefined') {
+                    throw new Error("La bibliothèque ethers.js n'est pas disponible. Veuillez rafraîchir la page.");
+                }
+
+                // Vérifier si MetaMask est installé
+                if (!window.ethereum) {
+                    throw new Error("MetaMask n'est pas installé. Veuillez l'installer pour continuer.");
+                }
+                
+                console.log("Connexion à MetaMask...");
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Demander la connexion du wallet
+                console.log("Demande d'accès au compte...");
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                console.log("Récupération du signer...");
+                signer = provider.getSigner();
+                
+                console.log("Récupération de l'adresse...");
+                walletAddress = await signer.getAddress();
+                
+                // Récupérer le réseau
+                console.log("Récupération du réseau...");
+                const network = await provider.getNetwork();
+                chainId = network.chainId;
+                console.log("Réseau détecté:", network.name, "chainId:", network.chainId);
+                
+                // Afficher les informations du wallet
+                document.getElementById('wallet-address').textContent = 
+                    `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                document.getElementById('network-name').textContent = 
+                    chainId === SEPOLIA_CHAIN_ID ? 'Sepolia' : `ChainID: ${chainId}`;
+                document.getElementById('wallet-info').classList.remove('hidden');
+                
+                // Vérifier si nous sommes sur Sepolia
+                const isSepolia = chainId === SEPOLIA_CHAIN_ID;
+                
+                // Afficher/masquer l'avertissement de réseau
+                document.getElementById('network-warning').classList.toggle('hidden', isSepolia);
+                
+                // Activer/désactiver les boutons
+                document.getElementById('mint-button').disabled = !isSepolia;
+                document.getElementById('transfer-button').disabled = !isSepolia;
+                
+                // Créer l'instance du contrat si nous sommes sur Sepolia
+                if (isSepolia) {
+                    console.log("Création de l'instance du contrat...");
+                    contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
                     
-                    // Demander la connexion du wallet
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                    signer = provider.getSigner();
-                    walletAddress = await signer.getAddress();
-                    
-                    // Récupérer le réseau
-                    const network = await provider.getNetwork();
-                    chainId = network.chainId;
-                    
-                    // Afficher les informations du wallet
-                    document.getElementById('wallet-address').textContent = 
-                        `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
-                    document.getElementById('network-name').textContent = 
-                        chainId === SEPOLIA_CHAIN_ID ? 'Sepolia' : `ChainID: ${chainId}`;
-                    document.getElementById('wallet-info').classList.remove('hidden');
-                    
-                    // Vérifier si nous sommes sur Sepolia
-                    const isSepolia = chainId === SEPOLIA_CHAIN_ID;
-                    
-                    // Afficher/masquer l'avertissement de réseau
-                    document.getElementById('network-warning').classList.toggle('hidden', isSepolia);
-                    
-                    // Activer/désactiver les boutons
-                    document.getElementById('mint-button').disabled = !isSepolia;
-                    document.getElementById('transfer-button').disabled = !isSepolia;
-                    
-                    // Créer l'instance du contrat si nous sommes sur Sepolia
-                    if (isSepolia) {
-                        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-                        
-                        // Charger les NFTs
-                        if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
-                            loadNFTs();
-                        }
+                    // Charger les NFTs
+                    if (document.querySelector('.tab-button.active').dataset.tab === 'nfts') {
+                        loadNFTs();
                     }
                     
-                    // Écouter les changements de compte
-                    window.ethereum.on('accountsChanged', handleAccountsChanged);
-                    
-                    // Écouter les changements de réseau
-                    window.ethereum.on('chainChanged', handleChainChanged);
+                    showMessage('mint-message', 'Connexion réussie à MetaMask sur le réseau Sepolia', 'success');
                 } else {
-                    showMessage('mint-message', 'MetaMask n\'est pas installé. Veuillez l\'installer pour continuer.', 'error');
+                    showMessage('mint-message', 'Attention: Veuillez vous connecter au réseau Sepolia testnet pour interagir avec ce contrat', 'error');
                 }
+                
+                // Écouter les changements de compte
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                
+                // Écouter les changements de réseau
+                window.ethereum.on('chainChanged', handleChainChanged);
             } catch (error) {
                 console.error('Erreur de connexion:', error);
                 showMessage('mint-message', `Erreur de connexion: ${error.message}`, 'error');
