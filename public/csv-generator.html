@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur CSV pour NFT.Storage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #8b5cf6;
+            margin: 0;
+        }
+        
+        .card {
+            background-color: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background-color: rgba(79, 70, 229, 0.2);
+            border-left: 4px solid #6366f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .error-box {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9ca3af;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            background-color: #374151;
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: monospace;
+            margin-bottom: 16px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #7c3aed;
+        }
+        
+        button:disabled {
+            background-color: #6b7280;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        button .icon {
+            margin-right: 8px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        a.button {
+            display: inline-block;
+            background-color: #4b5563;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #374151;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        pre {
+            background-color: #374151;
+            color: #f3f4f6;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .download-link {
+            display: inline-block;
+            background-color: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-top: 12px;
+            transition: background-color 0.3s;
+        }
+        
+        .download-link:hover {
+            background-color: #059669;
+        }
+        
+        .nav-links {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #374151;
+        }
+        
+        .nav-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Générateur CSV pour NFT.Storage</h1>
+            <a href="/admin-nft.html" class="button">Retour à l'Admin</a>
+        </div>
+        
+        <div class="card">
+            <div class="info-box">
+                <h3 style="margin-top: 0;">Pourquoi ce générateur ?</h3>
+                <p>NFT.Storage n'accepte les mises à jour de métadonnées qu'au format CSV avec un format très précis :</p>
+                <pre>tokenID,cid
+0,bafybeihe5wxegafpf5a73p3l5xxvtdupk4t6vfntyv6hfhhw6svutvh47u
+1,bafybeihcoyxrqnbbtgxu5gtvl3qpyunj3chwjynfk4e2ex6bqxbwdtfp4i</pre>
+                <p>Cet outil vous permet de générer ce CSV facilement.</p>
+            </div>
+            
+            <div id="message" style="display: none;"></div>
+            
+            <form id="csv-form">
+                <label for="nft-mappings">Configuration des NFTs (format JSON) :</label>
+                <textarea id="nft-mappings" placeholder='[
+  {
+    "tokenId": "0",
+    "cid": "bafybeihe5wxegafpf5a73p3l5xxvtdupk4t6vfntyv6hfhhw6svutvh47u"
+  },
+  {
+    "tokenId": "1",
+    "cid": "bafybeihcoyxrqnbbtgxu5gtvl3qpyunj3chwjynfk4e2ex6bqxbwdtfp4i"
+  }
+]'></textarea>
+                
+                <div class="button-group">
+                    <button type="submit" id="generate-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Générer le CSV
+                    </button>
+                    <button type="button" id="example-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Charger un exemple
+                    </button>
+                </div>
+            </form>
+            
+            <div id="result-box" class="result-box">
+                <h3>Fichier CSV généré avec succès !</h3>
+                <p>Votre fichier CSV a été généré et est prêt à être téléchargé.</p>
+                <pre id="csv-preview"></pre>
+                <a id="download-link" href="#" class="download-link" download>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; display: inline-block; vertical-align: middle;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Télécharger le fichier CSV
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Instructions pour NFT.Storage</h2>
+            <ol>
+                <li style="margin-bottom: 12px;">Générez le CSV en remplissant le formulaire ci-dessus avec vos données.</li>
+                <li style="margin-bottom: 12px;">Téléchargez le fichier CSV généré.</li>
+                <li style="margin-bottom: 12px;">Allez sur <a href="https://nft.storage" target="_blank" style="color: #8b5cf6;">https://nft.storage</a> et connectez-vous à votre compte.</li>
+                <li style="margin-bottom: 12px;">Cliquez sur l'onglet "Collections" puis sur "Create Collection Update".</li>
+                <li style="margin-bottom: 12px;">Entrez l'adresse de votre contrat NFT (ex: 0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037).</li>
+                <li style="margin-bottom: 12px;">Uploadez le fichier CSV que vous venez de télécharger.</li>
+                <li>Cliquez sur "Create Update" pour finaliser la mise à jour de vos métadonnées.</li>
+            </ol>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/admin-nft.html">← Retour à l'Admin NFT</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const csvForm = document.getElementById('csv-form');
+            const nftMappingsTextarea = document.getElementById('nft-mappings');
+            const generateButton = document.getElementById('generate-button');
+            const exampleButton = document.getElementById('example-button');
+            const resultBox = document.getElementById('result-box');
+            const csvPreview = document.getElementById('csv-preview');
+            const downloadLink = document.getElementById('download-link');
+            const messageBox = document.getElementById('message');
+            
+            // Charger un exemple
+            exampleButton.addEventListener('click', function() {
+                const exampleData = [
+                    {
+                        tokenId: "0",
+                        cid: "bafybeieogzmtappuygfufsl3vfzr725lq7o5duz5qule6r3ohjod4jhcw4"
+                    },
+                    {
+                        tokenId: "1",
+                        cid: "bafybeiglxwpzf4j2rgweozsxvgr6ou7t7a7s3cu5o3w7lz6tfkvevrrz6a"
+                    }
+                ];
+                
+                nftMappingsTextarea.value = JSON.stringify(exampleData, null, 2);
+            });
+            
+            // Soumission du formulaire
+            csvForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Masquer les résultats précédents
+                resultBox.style.display = 'none';
+                
+                try {
+                    // Valider le JSON
+                    const nftMappings = JSON.parse(nftMappingsTextarea.value);
+                    
+                    if (!Array.isArray(nftMappings) || nftMappings.length === 0) {
+                        throw new Error('Le format doit être un tableau JSON contenant au moins un élément');
+                    }
+                    
+                    // Vérifier que chaque élément a les propriétés requises
+                    for (const mapping of nftMappings) {
+                        if (!mapping.tokenId || !mapping.cid) {
+                            throw new Error('Chaque élément doit avoir les propriétés "tokenId" et "cid"');
+                        }
+                        
+                        // Nettoyer les CIDs qui ont le préfixe ipfs://
+                        if (mapping.cid.startsWith('ipfs://')) {
+                            mapping.cid = mapping.cid.replace('ipfs://', '');
+                        }
+                    }
+                    
+                    // Désactiver le bouton pendant la génération
+                    generateButton.disabled = true;
+                    generateButton.textContent = 'Génération en cours...';
+                    
+                    // Appeler l'API pour générer le CSV
+                    const response = await fetch('/api/nft/generate-csv', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ mappings: nftMappings })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.error) {
+                        throw new Error(result.error);
+                    }
+                    
+                    // Afficher l'aperçu
+                    let csvContent = 'tokenID,cid\n';
+                    for (const mapping of nftMappings) {
+                        const cid = mapping.cid.replace('ipfs://', '');
+                        csvContent += `${mapping.tokenId},${cid}\n`;
+                    }
+                    
+                    csvPreview.textContent = csvContent;
+                    
+                    // Configurer le lien de téléchargement
+                    downloadLink.href = result.csvUrl;
+                    downloadLink.setAttribute('download', result.csvPath.split('/').pop());
+                    
+                    // Afficher la boîte de résultat
+                    resultBox.style.display = 'block';
+                    
+                    // Afficher un message de succès
+                    messageBox.className = 'success-box';
+                    messageBox.innerHTML = '<strong>Succès!</strong> Le fichier CSV a été généré avec succès.';
+                    messageBox.style.display = 'block';
+                    
+                    // Faire défiler jusqu'au résultat
+                    resultBox.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    
+                    // Afficher un message d'erreur
+                    messageBox.className = 'error-box';
+                    messageBox.innerHTML = `<strong>Erreur:</strong> ${error.message}`;
+                    messageBox.style.display = 'block';
+                } finally {
+                    // Réactiver le bouton
+                    generateButton.disabled = false;
+                    generateButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Générer le CSV';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

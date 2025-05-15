@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer } from 'ws';
 import { uploadFileToIPFS, uploadMetadataToIPFS, ipfsToHttpUrl } from './ipfs-direct-service';
+import { generateNFTStorageCSV } from './csv-generator';
 import fs from 'fs-extra';
 import path from 'path';
 import multer from 'multer';
@@ -120,6 +121,37 @@ function broadcastEvent(event: WebSocketEvent) {
 import { registerNFTRoutes } from './nft-routes';
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Route pour générer un fichier CSV compatible avec NFT.Storage
+  app.post('/api/nft/generate-csv', async (req: Request, res: Response) => {
+    try {
+      const { mappings } = req.body;
+      
+      if (!mappings || !Array.isArray(mappings) || mappings.length === 0) {
+        return res.status(400).json({ 
+          error: "Un tableau de mappings (tokenId, cid) est requis" 
+        });
+      }
+      
+      // Générer le fichier CSV
+      const csvPath = await generateNFTStorageCSV(mappings);
+      
+      // Renvoyer l'URL du fichier CSV
+      const baseUrl = getBaseUrl(req);
+      const csvUrl = `${baseUrl}${csvPath}`;
+      
+      res.json({
+        success: true,
+        message: "Fichier CSV généré avec succès",
+        csvUrl,
+        csvPath
+      });
+    } catch (error) {
+      console.error('Erreur lors de la génération du CSV:', error);
+      res.status(500).json({
+        error: `Erreur lors de la génération du CSV: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      });
+    }
+  });
   // Enregistrer les routes d'upload
   uploadService.registerRoutes(app);
   
