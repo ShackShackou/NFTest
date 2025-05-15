@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-import darthBaterGif from '@assets/13_DARTHBATER.gif';
+import originalStudioImg from '/images/original-studio-1.jpg';
 import { cn } from '@/lib/utils';
 import { NftShop, ShopItem } from './NftShop';
 import { useToast } from '@/hooks/use-toast';
