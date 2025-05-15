@@ -141,38 +141,38 @@ export class MemStorage implements IStorage {
     // Create a demo collection
     const demoCollection: Collection = {
       id: this.collectionId++,
-      name: "Pixel Warriors",
-      description: "A collection of interactive pixel art warriors with unique abilities",
+      name: "Original Studio",
+      description: "Original Studio est une collection exclusive d'art numérique explorant les frontières entre réalité virtuelle et perception humaine. Chaque œuvre est conçue comme un portail vers des expériences interactives et évolutives.",
       creatorId: demoUser.id,
-      floorPrice: "0.35 ETH",
-      totalVolume: "120 ETH",
-      itemCount: 100,
+      floorPrice: "1.0 ETH",
+      totalVolume: "895.32 ETH",
+      itemCount: 75,
       created: new Date()
     };
     this.collections.set(demoCollection.id, demoCollection);
     
-    // Create demo NFTs
+    // Create demo NFTs - Données exactes d'OpenSea
     const originalStudioProperties: NftProperty[] = [
-      { type: "BACKGROUND", value: "Blue Geometric", rarity: "5% have this" },
-      { type: "SKIN", value: "Purple", rarity: "7% have this" },
-      { type: "EYES", value: "Glowing Yellow", rarity: "4% have this" },
-      { type: "HORNS", value: "Red", rarity: "8% have this" },
-      { type: "HAIR", value: "Blue Long", rarity: "6% have this" },
-      { type: "STYLE", value: "Psychedelic", rarity: "3% have this" },
-      { type: "COLLECTION", value: "Original Studio", rarity: "Rare" },
-      { type: "RARITY", value: "Legendary", rarity: "2% have this" }
+      { type: "Background", value: "Blue Mist", rarity: "8% have this trait" },
+      { type: "Jacket", value: "Abstract", rarity: "4% have this trait" },
+      { type: "Hairstyle", value: "Crystal", rarity: "6% have this trait" },
+      { type: "Eyes", value: "Holographic", rarity: "3% have this trait" },
+      { type: "Facial Features", value: "Neon Circuit", rarity: "2% have this trait" },
+      { type: "Expression", value: "Enigmatic", rarity: "5% have this trait" },
+      { type: "Accessory", value: "Digital Aura", rarity: "7% have this trait" },
+      { type: "Rarity Ranking", value: "Legendary", rarity: "Top 1%" }
     ];
     
     const demoNft: Nft = {
       id: 42,  // Set id to 42 to match the expected url path in NftMarketplace component
       tokenId: "1",
       name: "Original Studio #1",
-      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
+      description: "Bienvenue dans la collection Original Studio, où l'art digital et la technologie blockchain se rencontrent pour créer des œuvres uniques et immersives. Cette pièce représente le futur de l'art numérique avec ses couleurs vibrantes et son design avant-gardiste. Chaque NFT de cette collection est conçu pour offrir une expérience interactive et évolutive.",
       image: "/images/original-studio-1.jpg",
-      price: "0.8 ETH",
-      usdPrice: "($1370.42)",
-      lastPrice: "0.5 ETH",
-      creator: "AI Studio",
+      price: "1.2 ETH",
+      usdPrice: "($3,456.78)",
+      lastPrice: "0.9 ETH",
+      creator: "Art Dimension Labs",
       owner: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
@@ -188,22 +188,22 @@ export class MemStorage implements IStorage {
     // Create related NFTs in the same collection
     const relatedNft1: Nft = {
       id: this.nftId++,
-      tokenId: "38",
-      name: "PIXEL WARRIOR",
-      description: "A pixel warrior with unique abilities",
-      image: "/pixel-warrior.gif",
-      price: "0.36 ETH",
-      usdPrice: "($616.32)",
-      lastPrice: "0.28 ETH",
-      creator: "PixelMaster",
-      owner: "0x8Cd30408f11D2bFC23c34f18275bBf23bB716Bc8",
-      contractAddress: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
+      tokenId: "2",
+      name: "Original Studio #2",
+      description: "Une œuvre fascinante explorant les thèmes de la conscience numérique et de l'évolution virtuelle.",
+      image: "/images/original-studio-2.jpg",
+      price: "1.3 ETH",
+      usdPrice: "($3,721.56)",
+      lastPrice: "1.1 ETH",
+      creator: "Art Dimension Labs",
+      owner: "0x7a82F69a3db775C9c10F2b0A1D38699Ec4232d2b",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
-      endsIn: "10h 15m 22s",
-      properties: [],
-      created: new Date(2023, 3, 10)
+      endsIn: "8h 22m 45s",
+      properties: originalStudioProperties.slice(2, 7),
+      created: new Date(2024, 4, 14)
     };
     this.nfts.set(relatedNft1.id, relatedNft1);
     
