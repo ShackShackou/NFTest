@@ -116,6 +116,52 @@ function broadcastEvent(event: WebSocketEvent) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configuration de Multer pour l'upload de fichiers
+  const multerStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const uploadDir = path.join(process.cwd(), 'temp');
+      fs.ensureDirSync(uploadDir);
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+  });
+  
+  const upload = multer({ storage: multerStorage });
+  
+  // API pour uploader un fichier direct sur IPFS
+  app.post('/api/ipfs/upload-file', upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "Aucun fichier téléchargé" });
+      }
+      
+      const filePath = req.file.path;
+      console.log(`📤 Fichier téléchargé: ${filePath}`);
+      
+      // Uploader sur IPFS
+      const ipfsUrl = await uploadFileToIPFS(filePath);
+      const httpUrl = ipfsToHttpUrl(ipfsUrl);
+      
+      // Nettoyer le fichier temporaire
+      await fs.remove(filePath);
+      
+      res.json({
+        success: true,
+        ipfsUrl,
+        httpUrl,
+        fileName: req.file.originalname
+      });
+    } catch (error) {
+      console.error("❌ Erreur d'upload direct sur IPFS:", error);
+      res.status(500).json({ 
+        error: "Erreur lors de l'upload sur IPFS", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
   // Initialiser les métadonnées
   initializeMetadata();
   
