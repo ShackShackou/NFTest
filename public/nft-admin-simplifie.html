@@ -194,62 +194,73 @@
         </div>
         
         <div class="tabs">
-            <div class="tab active" data-panel="nft-interactif">NFT Interactif CSV</div>
-            <div class="tab" data-panel="mint">Mint NFT</div>
+            <div class="tab active" data-panel="ipfs">IPFS</div>
             <div class="tab" data-panel="metadata">Métadonnées</div>
-            <div class="tab" data-panel="ipfs">IPFS</div>
+            <div class="tab" data-panel="nft-interactif">NFT Interactif CSV</div>
+            <div class="tab" data-panel="mint">Mint NFT</div>
         </div>
         
-        <!-- Panel NFT Interactif CSV -->
-        <div class="panel active" id="nft-interactif-panel">
+        <!-- Panel IPFS -->
+        <div class="panel active" id="ipfs-panel">
             <div class="card">
-                <h2 style="color: #8b5cf6; margin-top: 0;">Générateur CSV pour NFT.Storage</h2>
+                <h2 style="color: #8b5cf6; margin-top: 0;">Upload de fichiers sur IPFS</h2>
                 
                 <div class="alert alert-info">
-                    <h3 style="margin-top: 0;">Solution simplifiée</h3>
-                    <p>Cette page génère un fichier CSV compatible avec NFT.Storage qui pointe vers votre NFT interactif hébergé sur Replit.</p>
+                    <h3 style="margin-top: 0;">Étape 1: Upload de vos assets</h3>
+                    <p>Uploadez ici tous les fichiers nécessaires à votre NFT interactif (images, HTML, CSS, JS, etc.)</p>
                     
                     <div class="flow">
-                        <div class="flow-step">HTML interactif sur Replit</div>
+                        <div class="flow-step">Upload des fichiers</div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-step">Métadonnées JSON</div>
+                        <div class="flow-step">Hébergement sur Replit</div>
                         <div class="flow-arrow">→</div>
-                        <div class="flow-step">CSV pour NFT.Storage</div>
+                        <div class="flow-step">URLs accessibles au public</div>
                     </div>
                 </div>
                 
-                <div id="csv-message" class="hidden"></div>
+                <div id="ipfs-message" class="hidden"></div>
                 
-                <form id="csv-form">
+                <form id="ipfs-form" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="token-count">Nombre de tokens NFT:</label>
-                        <input type="number" id="token-count" class="form-input" min="1" max="10" value="1">
+                        <label>Fichier à uploader</label>
+                        <input type="file" id="ipfs-file" class="form-input">
                     </div>
                     
-                    <div class="form-group">
-                        <h3>Aperçu des métadonnées</h3>
-                        <pre>{
-  "name": "S.H.A.C.K.E.R. #0",
-  "description": "Une créature démoniaque aux yeux jaunes flamboyants avec mini-jeu intégré.",
-  "image": "https://votre-app.replit.app/nft-package/shacker01.jpg",
-  "animation_url": "https://votre-app.replit.app/nft-package/index.html",
-  "attributes": [
-    {
-      "trait_type": "Type",
-      "value": "Demon"
-    },
-    {
-      "trait_type": "Rarity",
-      "value": "Legendary"
-    }
-  ]
-}</pre>
-                    </div>
-                    
-                    <button type="submit" id="generate-csv-button" class="button block">
-                        Générer CSV pour NFT.Storage
-                    </button>
+                    <button type="submit" class="button block">Uploader le fichier</button>
                 </form>
+                
+                <div id="ipfs-result" class="hidden space-y-4" style="margin-top: 20px;">
+                    <h3>Fichier uploadé avec succès!</h3>
+                    <div class="form-group">
+                        <label>URL du fichier:</label>
+                        <input type="text" id="ipfs-url" class="form-input" readonly>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 30px;">
+                    <h3>Fichiers déjà uploadés</h3>
+                    <div class="alert alert-info">
+                        Ces fichiers sont hébergés directement sur votre Replit et sont accessibles publiquement.
+                    </div>
+                    <div class="grid" style="margin-top: 10px;">
+                        <div class="card" style="padding: 10px; background-color: #2d3748;">
+                            <img src="/nft-package/shacker01.jpg" style="width: 100%; height: 120px; object-fit: cover; border-radius: 4px;">
+                            <p style="margin-top: 5px; font-size: 0.9em;">shacker01.jpg</p>
+                            <p style="font-size: 0.8em; font-family: monospace; color: #9ca3af; word-break: break-all;">
+                                /nft-package/shacker01.jpg
+                            </p>
+                        </div>
+                        <div class="card" style="padding: 10px; background-color: #2d3748;">
+                            <div style="width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; background-color: #1a202c; border-radius: 4px;">
+                                <span style="color: #9ca3af;">HTML</span>
+                            </div>
+                            <p style="margin-top: 5px; font-size: 0.9em;">index.html</p>
+                            <p style="font-size: 0.8em; font-family: monospace; color: #9ca3af; word-break: break-all;">
+                                /nft-package/index.html
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div id="csv-result" class="hidden space-y-4" style="margin-top: 20px;">
                     <h3>Fichier CSV généré avec succès!</h3>
@@ -303,50 +314,166 @@
         <!-- Panel Métadonnées -->
         <div class="panel" id="metadata-panel">
             <div class="card">
-                <h2 style="color: #8b5cf6; margin-top: 0;">Mettre à jour les métadonnées</h2>
+                <h2 style="color: #8b5cf6; margin-top: 0;">Étape 2: Créer les métadonnées</h2>
+                
+                <div class="alert alert-info">
+                    <h3 style="margin-top: 0;">Configuration des métadonnées NFT</h3>
+                    <p>Créez ici les métadonnées pour votre NFT interactif en utilisant les URLs des fichiers que vous avez uploadés à l'étape 1.</p>
+                </div>
                 
                 <div id="metadata-message" class="hidden"></div>
                 
                 <form id="metadata-form">
                     <div class="form-group">
                         <label>ID du token</label>
-                        <input type="number" id="metadata-token-id" class="form-input" placeholder="0" min="0">
+                        <input type="number" id="metadata-token-id" class="form-input" value="0" min="0">
                     </div>
                     
                     <div class="form-group">
                         <label>Nom</label>
-                        <input type="text" id="metadata-name" class="form-input" placeholder="S.H.A.C.K.E.R. #01">
+                        <input type="text" id="metadata-name" class="form-input" value="S.H.A.C.K.E.R. #01">
                     </div>
                     
                     <div class="form-group">
                         <label>Description</label>
-                        <textarea id="metadata-description" class="form-textarea" placeholder="Description du NFT..."></textarea>
+                        <textarea id="metadata-description" class="form-textarea">Une créature démoniaque aux yeux jaunes flamboyants. NFT interactif avec mini-jeu intégré.</textarea>
                     </div>
                     
                     <div class="form-group">
                         <label>URL de l'image</label>
-                        <input type="text" id="metadata-image" class="form-input" placeholder="https://...">
+                        <div class="flex" style="gap: 10px;">
+                            <input type="text" id="metadata-image" class="form-input" value="/nft-package/shacker01.jpg" style="flex-grow: 1;">
+                            <button type="button" class="button secondary" style="white-space: nowrap;">Sélectionner</button>
+                        </div>
+                        <p style="font-size: 0.8em; color: #9ca3af; margin-top: 5px;">Utiliser l'URL d'un fichier uploadé dans l'étape 1</p>
                     </div>
                     
                     <div class="form-group">
                         <label>URL de l'animation (HTML interactif)</label>
-                        <input type="text" id="metadata-animation" class="form-input" placeholder="https://...">
+                        <div class="flex" style="gap: 10px;">
+                            <input type="text" id="metadata-animation" class="form-input" value="/nft-package/index.html" style="flex-grow: 1;">
+                            <button type="button" class="button secondary" style="white-space: nowrap;">Sélectionner</button>
+                        </div>
+                        <p style="font-size: 0.8em; color: #9ca3af; margin-top: 5px;">Page HTML interactive principale</p>
                     </div>
                     
                     <div class="form-group">
                         <label>Attributs (format JSON)</label>
-                        <textarea id="metadata-attributes" class="form-textarea" placeholder='[{"trait_type": "Type", "value": "Demon"}, ...]'></textarea>
+                        <textarea id="metadata-attributes" class="form-textarea">[
+  {
+    "trait_type": "Type",
+    "value": "Demon"
+  },
+  {
+    "trait_type": "Rarity",
+    "value": "Legendary"
+  },
+  {
+    "trait_type": "Eyes",
+    "value": "Yellow Flames"
+  }
+]</textarea>
                     </div>
                     
-                    <button type="submit" class="button block">Mettre à jour les métadonnées</button>
+                    <button type="submit" class="button block">Enregistrer les métadonnées</button>
                 </form>
+                
+                <div style="margin-top: 30px;">
+                    <h3>Aperçu des métadonnées</h3>
+                    <pre style="background-color: #1a202c; padding: 15px; border-radius: 4px; margin-top: 10px;">{
+  "name": "S.H.A.C.K.E.R. #01",
+  "description": "Une créature démoniaque aux yeux jaunes flamboyants. NFT interactif avec mini-jeu intégré.",
+  "image": "https://votre-app.replit.app/nft-package/shacker01.jpg",
+  "animation_url": "https://votre-app.replit.app/nft-package/index.html",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Demon"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Eyes",
+      "value": "Yellow Flames"
+    }
+  ]
+}</pre>
+                </div>
             </div>
         </div>
         
-        <!-- Panel IPFS -->
-        <div class="panel" id="ipfs-panel">
+        <!-- Panel NFT Interactif CSV -->
+        <div class="panel" id="nft-interactif-panel">
             <div class="card">
-                <h2 style="color: #8b5cf6; margin-top: 0;">Upload de fichiers sur IPFS</h2>
+                <h2 style="color: #8b5cf6; margin-top: 0;">Étape 3: Générer le CSV pour NFT.Storage</h2>
+                
+                <div class="alert alert-info">
+                    <h3 style="margin-top: 0;">Génération du fichier CSV</h3>
+                    <p>Cette étape génère un fichier CSV compatible avec NFT.Storage qui pointe vers les métadonnées de votre NFT interactif créées à l'étape 2.</p>
+                    
+                    <div class="flow">
+                        <div class="flow-step">Fichier CSV</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Upload sur NFT.Storage</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">NFT mis à jour</div>
+                    </div>
+                </div>
+                
+                <div id="csv-message" class="hidden"></div>
+                
+                <form id="csv-form">
+                    <div class="form-group">
+                        <label for="token-count">Nombre de tokens NFT à générer:</label>
+                        <input type="number" id="token-count" class="form-input" min="1" max="10" value="1">
+                    </div>
+                    
+                    <button type="submit" id="generate-csv-button" class="button block">
+                        Générer CSV pour NFT.Storage
+                    </button>
+                </form>
+                
+                <div id="csv-result" class="hidden space-y-4" style="margin-top: 20px;">
+                    <h3>Fichier CSV généré avec succès!</h3>
+                    <pre id="csv-preview">tokenID,cid
+0,https://votre-app.replit.app/api/nft/0/metadata</pre>
+                    <a id="csv-download" href="#" class="button block" style="background-color: #10b981;">
+                        Télécharger le fichier CSV
+                    </a>
+                    
+                    <div class="alert alert-info" style="margin-top: 20px;">
+                        <h4 style="margin-top: 0;">Étapes finales:</h4>
+                        <ol style="padding-left: 20px;">
+                            <li>Téléchargez le fichier CSV généré ci-dessus</li>
+                            <li>Allez sur <a href="https://nft.storage" target="_blank" style="color: #60a5fa;">NFT.Storage</a></li>
+                            <li>Dans la section "Upload", entrez l'adresse de votre contrat NFT: <code>0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037</code></li>
+                            <li>Uploadez le fichier CSV que vous venez de télécharger</li>
+                            <li>Cliquez sur "Upload" pour finaliser la mise à jour de vos NFTs</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        <!-- Panel IPFS -->
+        <div class="panel active" id="ipfs-panel">
+            <div class="card">
+                <h2 style="color: #8b5cf6; margin-top: 0;">Étape 1: Upload de vos fichiers</h2>
+                
+                <div class="alert alert-info">
+                    <h3 style="margin-top: 0;">Upload de vos assets</h3>
+                    <p>Uploadez ici tous les fichiers nécessaires à votre NFT interactif (images, HTML, CSS, JS, etc.)</p>
+                    
+                    <div class="flow">
+                        <div class="flow-step">Upload des fichiers</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Hébergement sur Replit</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">URLs accessibles au public</div>
+                    </div>
+                </div>
                 
                 <div id="ipfs-message" class="hidden"></div>
                 
@@ -356,18 +483,14 @@
                         <input type="file" id="ipfs-file" class="form-input">
                     </div>
                     
-                    <button type="submit" class="button block">Uploader sur IPFS</button>
+                    <button type="submit" class="button block">Uploader le fichier</button>
                 </form>
                 
                 <div id="ipfs-result" class="hidden space-y-4" style="margin-top: 20px;">
                     <h3>Fichier uploadé avec succès!</h3>
                     <div class="form-group">
-                        <label>URL IPFS:</label>
+                        <label>URL du fichier:</label>
                         <input type="text" id="ipfs-url" class="form-input" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label>URL HTTP Gateway:</label>
-                        <input type="text" id="ipfs-http-url" class="form-input" readonly>
                     </div>
                 </div>
             </div>
