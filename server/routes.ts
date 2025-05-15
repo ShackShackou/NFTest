@@ -38,7 +38,7 @@ function initializeMetadata() {
     nftMetadataStore.set(1, {
       name: "S.H.A.C.K.E.R. #01",
       description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
-      image: "https://raw-nfts.replit.app/images/shacker01.jpg", // URL absolue pour OpenSea
+      image: "https://i.ibb.co/D1QyqcG/shacker01.jpg", // URL d'une image hébergée sur un service public
       animation_url: "https://raw-nfts.replit.app/",  // URL du mini-jeu
       attributes: [
         { trait_type: "Gender", value: "Male" },
