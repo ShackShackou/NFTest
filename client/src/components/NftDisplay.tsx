@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { Spinner } from '@/components/ui/spinner';
-import originalStudioImg from '/images/original-studio-1.jpg';
 import { cn } from '@/lib/utils';
 import { NftShop, ShopItem } from './NftShop';
 import { useToast } from '@/hooks/use-toast';
@@ -1802,14 +1801,13 @@ export function NftDisplay({ className }: NftDisplayProps) {
         </div>
       )}
       
-      {/* NFT Gif animé */}
+      {/* NFT Image (Original Studio #1) */}
       <img 
         ref={gifRef}
-        src={darthBaterGif} 
-        alt="NFT Animation" 
+        src="/images/original-studio-1.jpg" 
+        alt="Original Studio #1" 
         className="w-full h-full object-cover"
         style={{
-          animation: `pulse ${3/animationSpeed}s infinite alternate`,
           filter: isFrozen ? "grayscale(100%)" : "none",
           opacity: isPaused ? 0.7 : 1
         }}

@@ -22,10 +22,10 @@ export default function NftMarketplace() {
   return (
     <>
       <Helmet>
-        <title>DARTHBATER #42 | PIXELNFT Marketplace</title>
-        <meta name="description" content="Interactive pixel art NFT from the Pixel Warriors collection. Hover to pause animation, click to advance frames. Unique on-chain properties." />
-        <meta property="og:title" content="DARTHBATER #42 | PIXELNFT Marketplace" />
-        <meta property="og:description" content="Interactive pixel art NFT from the Pixel Warriors collection with special features and rarity traits." />
+        <title>Original Studio #1 | PIXELNFT Marketplace</title>
+        <meta name="description" content="Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement." />
+        <meta property="og:title" content="Original Studio #1 | PIXELNFT Marketplace" />
+        <meta property="og:description" content="Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement." />
         <meta property="og:type" content="website" />
       </Helmet>
 
