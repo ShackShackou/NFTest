@@ -1,11 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes, getBaseUrl } from "./routes";
+import { registerRoutes } from "./routes";
 import { registerIPFSRoutes } from "./ipfs-routes";
 import { registerStaticRoutes } from "./static-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import { fileURLToPath } from 'url';
-import { generateNFTStorageCSV } from "./csv-generator";
 
 // Obtenir l'équivalent de __dirname pour les modules ES
 const __filename = fileURLToPath(import.meta.url);
@@ -17,8 +16,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Servir les fichiers statiques depuis le dossier public
 app.use(express.static(path.join(__dirname, "../public")));
-
-// Nous utilisons maintenant un fichier index.html statique dans le dossier public
 
 app.use((req, res, next) => {
   const start = Date.now();

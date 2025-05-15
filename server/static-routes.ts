@@ -9,8 +9,6 @@ export function registerStaticRoutes(app: Express) {
   // Servir les fichiers statiques du dossier public
   app.use(express.static(path.join(process.cwd(), 'public')));
   
-  // Note: la route racine est maintenant gérée dans server/index.ts
-  
   // Route spéciale pour servir les métadonnées NFT
   app.get('/api/nft/:tokenId/metadata', async (req, res) => {
     const tokenId = req.params.tokenId;
