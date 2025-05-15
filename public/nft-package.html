@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Package NFT Interactif - S.H.A.C.K.E.R. #01</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .button-primary {
+            background-color: #8b5cf6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button-primary:hover {
+            background-color: #7c3aed;
+        }
+        .button-secondary {
+            background-color: #4b5563;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button-secondary:hover {
+            background-color: #374151;
+        }
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            color: #d1fae5;
+        }
+        .alert-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            color: #fee2e2;
+        }
+        pre {
+            background-color: #374151;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            overflow-x: auto;
+            color: #e5e7eb;
+            margin-bottom: 1rem;
+        }
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="card w-full max-w-4xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-xl font-bold text-purple-400">Package NFT Interactif S.H.A.C.K.E.R. #01</h1>
+                <a href="/admin-nft.html" class="text-sm text-gray-400 hover:text-white">Retour à l'Admin</a>
+            </div>
+
+            <div id="alert" class="p-4 mb-4 rounded-md hidden"></div>
+
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold text-gray-300 mb-4">Préparation du NFT interactif pour IPFS</h2>
+                
+                <div class="mb-4">
+                    <p class="text-gray-400 mb-2">Votre NFT interactif comprend plusieurs fichiers:</p>
+                    <ul class="list-disc pl-6 mb-4 text-gray-400">
+                        <li>index.html - Le code HTML principal du NFT interactif</li>
+                        <li>shacker01.jpg - L'image de fond</li>
+                        <li>character.png - Le personnage interactif</li>
+                    </ul>
+                    
+                    <p class="text-gray-400 mb-4">Pour télécharger et utiliser ce package:</p>
+                    
+                    <ol class="list-decimal pl-6 mb-4 text-gray-400">
+                        <li class="mb-2">Téléchargez chaque fichier individuellement avec les liens ci-dessous</li>
+                        <li class="mb-2">Créez un dossier sur votre ordinateur nommé "shacker-nft"</li>
+                        <li class="mb-2">Placez tous les fichiers téléchargés dans ce dossier</li>
+                        <li class="mb-2">Vous pouvez maintenant tester localement en ouvrant index.html dans votre navigateur</li>
+                        <li>Pour le déployer sur IPFS, vous aurez besoin d'uploader l'ensemble du dossier</li>
+                    </ol>
+                </div>
+                
+                <div class="bg-gray-800 p-4 rounded-md mb-6">
+                    <h3 class="text-md font-semibold text-purple-400 mb-2">Fichiers du package</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 border border-gray-700 rounded-md">
+                            <h4 class="text-gray-300 font-medium mb-2">index.html</h4>
+                            <p class="text-gray-400 text-sm mb-3">Le fichier HTML principal contenant le code interactif</p>
+                            <a href="/nft-package/index.html" download class="button-primary inline-block text-center">Télécharger HTML</a>
+                        </div>
+                        
+                        <div class="p-3 border border-gray-700 rounded-md">
+                            <h4 class="text-gray-300 font-medium mb-2">shacker01.jpg</h4>
+                            <p class="text-gray-400 text-sm mb-3">L'image de fond principale du NFT</p>
+                            <a href="/nft-package/shacker01.jpg" download class="button-primary inline-block text-center">Télécharger Image</a>
+                        </div>
+                        
+                        <div class="p-3 border border-gray-700 rounded-md">
+                            <h4 class="text-gray-300 font-medium mb-2">character.png</h4>
+                            <p class="text-gray-400 text-sm mb-3">Le personnage interactif cliquable</p>
+                            <a href="/nft-package/character.png" download class="button-primary inline-block text-center">Télécharger Personnage</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 class="text-lg font-semibold text-gray-300 mb-4">Instructions pour uploader sur IPFS</h2>
+                
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-2">Pour uploader ce package sur IPFS, vous avez plusieurs options:</p>
+                    
+                    <div class="bg-gray-800 p-4 rounded-md mb-4">
+                        <h3 class="text-md font-semibold text-purple-400 mb-2">Option 1: NFT.Storage (Recommandée)</h3>
+                        <ol class="list-decimal pl-6 mb-4 text-gray-400">
+                            <li class="mb-2">Allez sur <a href="https://nft.storage" target="_blank" class="text-blue-400 hover:underline">https://nft.storage</a></li>
+                            <li class="mb-2">Créez un compte ou connectez-vous</li>
+                            <li class="mb-2">Cliquez sur "Upload"</li>
+                            <li class="mb-2">Sélectionnez le dossier entier "shacker-nft" contenant tous les fichiers</li>
+                            <li>Une fois l'upload terminé, vous recevrez un CID IPFS que vous pourrez utiliser pour votre NFT</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 rounded-md mb-4">
+                        <h3 class="text-md font-semibold text-purple-400 mb-2">Option 2: Pinata</h3>
+                        <ol class="list-decimal pl-6 mb-4 text-gray-400">
+                            <li class="mb-2">Allez sur <a href="https://pinata.cloud" target="_blank" class="text-blue-400 hover:underline">https://pinata.cloud</a></li>
+                            <li class="mb-2">Créez un compte ou connectez-vous</li>
+                            <li class="mb-2">Cliquez sur "Upload" puis "Folder"</li>
+                            <li class="mb-2">Sélectionnez le dossier "shacker-nft" contenant tous les fichiers</li>
+                            <li>Vous recevrez un CID IPFS pour l'ensemble du dossier</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <h2 class="text-lg font-semibold text-gray-300 mb-4">Intégration dans les métadonnées NFT</h2>
+                
+                <div class="mb-6">
+                    <p class="text-gray-400 mb-4">Une fois que vous avez obtenu le CID IPFS, vous devez l'utiliser dans vos métadonnées NFT comme suit:</p>
+                    
+                    <pre><code>{
+  "name": "S.H.A.C.K.E.R. #01",
+  "description": "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
+  "image": "ipfs://VOTRE_CID_ICI/shacker01.jpg",
+  "animation_url": "ipfs://VOTRE_CID_ICI/index.html",
+  "attributes": [
+    {
+      "trait_type": "Gender",
+      "value": "Male"
+    }
+  ]
+}</code></pre>
+                    
+                    <p class="text-gray-400 mb-2">Notes importantes:</p>
+                    <ul class="list-disc pl-6 mb-4 text-gray-400">
+                        <li class="mb-2">Remplacez "VOTRE_CID_ICI" par le CID que vous avez obtenu lors de l'upload</li>
+                        <li class="mb-2">Le champ "animation_url" permet aux plateformes comme OpenSea d'afficher votre NFT interactif</li>
+                        <li>Le champ "image" sera utilisé comme image par défaut</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

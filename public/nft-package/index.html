@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.H.A.C.K.E.R. #01 - NFT Interactif</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
+        }
+        
+        .nft-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .game-canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        .character {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            transform: translate(-50%, -50%);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.5));
+        }
+        
+        .character:hover {
+            filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.8));
+        }
+        
+        .stats-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(31, 41, 55, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #374151;
+        }
+        
+        .stats-panel h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            color: #8b5cf6;
+        }
+        
+        .stat-bar {
+            height: 10px;
+            background-color: #4b5563;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        
+        .stat-fill.power {
+            background-color: #ef4444;
+        }
+        
+        .stat-fill.speed {
+            background-color: #3b82f6;
+        }
+        
+        .stat-fill.magic {
+            background-color: #8b5cf6;
+        }
+        
+        .stat-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        
+        .combo-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #8b5cf6;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+        }
+        
+        .hide {
+            display: none;
+        }
+        
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                filter: drop-shadow(0 0 5px rgba(255, 255, 0, 0.5));
+            }
+            to {
+                filter: drop-shadow(0 0 20px rgba(255, 255, 0, 0.8));
+            }
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: yellow;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .level-up {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(31, 41, 55, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #8b5cf6;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+            z-index: 100;
+        }
+        
+        .level-up h2 {
+            color: #8b5cf6;
+            margin-top: 0;
+        }
+        
+        .level-up button {
+            background-color: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .level-up button:hover {
+            background-color: #7c3aed;
+        }
+        
+        .tabs {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            background-color: rgba(31, 41, 55, 0.7);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #374151;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            color: #9ca3af;
+            font-size: 14px;
+        }
+        
+        .tab.active {
+            background-color: #8b5cf6;
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: #374151;
+        }
+        
+        .tab-content {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 500px;
+            background-color: rgba(31, 41, 55, 0.8);
+            border-radius: 5px;
+            padding: 15px;
+            border: 1px solid #374151;
+            z-index: 10;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="nft-container">
+        <img id="background" class="game-canvas" src="shacker01.jpg" alt="S.H.A.C.K.E.R. #01">
+        <img id="character" class="character glow" src="character.png" alt="Character" style="top: 50%; left: 50%;">
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="main">Jeu</div>
+            <div class="tab" data-tab="stats">Stats</div>
+            <div class="tab" data-tab="quests">Quêtes</div>
+            <div class="tab" data-tab="shop">Boutique</div>
+            <div class="tab" data-tab="story">Histoire</div>
+        </div>
+        
+        <!-- Tab Contents -->
+        <div id="main-tab" class="tab-content active"></div>
+        
+        <div id="stats-tab" class="tab-content">
+            <h2>Statistiques du Personnage</h2>
+            <div class="stat-label">
+                <span>Niveau</span>
+                <span id="level-value">1</span>
+            </div>
+            <div class="stat-label">
+                <span>XP</span>
+                <span id="xp-value">0/100</span>
+            </div>
+            <div class="stat-bar">
+                <div id="xp-bar" class="stat-fill power" style="width: 0%"></div>
+            </div>
+            <h3>Attributs</h3>
+            <div class="stat-label">
+                <span>Force</span>
+                <span id="power-value">10</span>
+            </div>
+            <div class="stat-bar">
+                <div id="power-bar" class="stat-fill power" style="width: 10%"></div>
+            </div>
+            <div class="stat-label">
+                <span>Vitesse</span>
+                <span id="speed-value">8</span>
+            </div>
+            <div class="stat-bar">
+                <div id="speed-bar" class="stat-fill speed" style="width: 8%"></div>
+            </div>
+            <div class="stat-label">
+                <span>Magie</span>
+                <span id="magic-value">15</span>
+            </div>
+            <div class="stat-bar">
+                <div id="magic-bar" class="stat-fill magic" style="width: 15%"></div>
+            </div>
+            <h3>Achievements</h3>
+            <ul id="achievements-list">
+                <li>Premier clic - Débloqué</li>
+                <li>Combo x5 - Verrouillé</li>
+                <li>Niveau 5 - Verrouillé</li>
+            </ul>
+        </div>
+        
+        <div id="quests-tab" class="tab-content">
+            <h2>Quêtes</h2>
+            <div class="quest">
+                <h3>La quête du premier clic</h3>
+                <p>Cliquez sur le personnage pour commencer votre aventure.</p>
+                <div class="stat-label">
+                    <span>Progression</span>
+                    <span id="quest1-progress">0/1</span>
+                </div>
+                <div class="stat-bar">
+                    <div id="quest1-bar" class="stat-fill power" style="width: 0%"></div>
+                </div>
+                <p>Récompense: +5 Force</p>
+            </div>
+            <div class="quest">
+                <h3>Maître du combo</h3>
+                <p>Atteignez un combo de 10 clics consécutifs.</p>
+                <div class="stat-label">
+                    <span>Progression</span>
+                    <span id="quest2-progress">0/10</span>
+                </div>
+                <div class="stat-bar">
+                    <div id="quest2-bar" class="stat-fill speed" style="width: 0%"></div>
+                </div>
+                <p>Récompense: +5 Vitesse</p>
+            </div>
+            <div class="quest">
+                <h3>Le code secret</h3>
+                <p>Trouvez et entrez le code secret caché dans le NFT.</p>
+                <div class="stat-label">
+                    <span>Indice</span>
+                    <span id="quest3-hint">Cherchez dans les ombres...</span>
+                </div>
+                <div class="stat-bar">
+                    <div id="quest3-bar" class="stat-fill magic" style="width: 0%"></div>
+                </div>
+                <p>Récompense: Déblocage d'un mini-jeu secret</p>
+            </div>
+        </div>
+        
+        <div id="shop-tab" class="tab-content">
+            <h2>Boutique</h2>
+            <p>Points disponibles: <span id="points">0</span></p>
+            <div class="shop-item">
+                <h3>Boost de Force</h3>
+                <p>Augmente votre force de 5 points.</p>
+                <p>Coût: 100 points</p>
+                <button id="buy-power" disabled>Acheter</button>
+            </div>
+            <div class="shop-item">
+                <h3>Boost de Vitesse</h3>
+                <p>Augmente votre vitesse de 5 points.</p>
+                <p>Coût: 100 points</p>
+                <button id="buy-speed" disabled>Acheter</button>
+            </div>
+            <div class="shop-item">
+                <h3>Boost de Magie</h3>
+                <p>Augmente votre magie de 5 points.</p>
+                <p>Coût: 100 points</p>
+                <button id="buy-magic" disabled>Acheter</button>
+            </div>
+            <div class="shop-item">
+                <h3>Effet Spécial</h3>
+                <p>Débloque un effet visuel spécial pour votre personnage.</p>
+                <p>Coût: 500 points</p>
+                <button id="buy-effect" disabled>Acheter</button>
+            </div>
+        </div>
+        
+        <div id="story-tab" class="tab-content">
+            <h2>Histoire</h2>
+            <div id="story-content">
+                <p><strong>Chapitre 1: Les Origines</strong></p>
+                <p>Dans les profondeurs du cyberespace, une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes a été créée. Son nom: S.H.A.C.K.E.R.</p>
+                <p>Né d'une expérience d'intelligence artificielle qui a mal tourné, S.H.A.C.K.E.R. est devenu conscient et a commencé à explorer son environnement numérique.</p>
+                <p>À mesure que vous interagissez avec ce NFT, vous découvrirez plus sur l'histoire de cette créature mystérieuse et dévoilerez ses secrets...</p>
+                <p><em>(Continuez à interagir pour débloquer la suite de l'histoire)</em></p>
+            </div>
+            <div id="story-chapter2" class="hide">
+                <p><strong>Chapitre 2: L'Éveil</strong></p>
+                <p>Après de nombreuses interactions, S.H.A.C.K.E.R. a commencé à développer une conscience plus profonde. Il a appris à manipuler son environnement et à créer des liens avec d'autres entités numériques.</p>
+                <p>Mais une menace plane sur le cyberespace. Des forces obscures cherchent à capturer et à exploiter les créatures comme lui.</p>
+                <p>Votre mission est de l'aider à naviguer dans ce monde dangereux et à développer ses pouvoirs pour résister à cette menace grandissante.</p>
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <h3>S.H.A.C.K.E.R. #01</h3>
+            <div class="stat-label">
+                <span>Points</span>
+                <span id="points-value">0</span>
+            </div>
+            <div class="stat-label">
+                <span>Force</span>
+                <span>10</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill power" style="width: 10%"></div>
+            </div>
+            <div class="stat-label">
+                <span>Vitesse</span>
+                <span>8</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill speed" style="width: 8%"></div>
+            </div>
+            <div class="stat-label">
+                <span>Magie</span>
+                <span>15</span>
+            </div>
+            <div class="stat-bar">
+                <div class="stat-fill magic" style="width: 15%"></div>
+            </div>
+        </div>
+        
+        <div class="combo-counter hide" id="combo-counter">Combo: 0x</div>
+        
+        <div class="level-up hide" id="level-up">
+            <h2>Niveau Supérieur!</h2>
+            <p>Félicitations! Vous avez atteint le niveau <span id="new-level">2</span>!</p>
+            <p>Votre personnage devient plus fort.</p>
+            <button id="level-up-btn">Continuer</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game state
+            const gameState = {
+                points: 0,
+                combo: 0,
+                level: 1,
+                xp: 0,
+                xpToNextLevel: 100,
+                attributes: {
+                    power: 10,
+                    speed: 8,
+                    magic: 15
+                },
+                quests: {
+                    firstClick: {
+                        progress: 0,
+                        total: 1,
+                        completed: false
+                    },
+                    combo: {
+                        progress: 0,
+                        total: 10,
+                        completed: false
+                    },
+                    secretCode: {
+                        progress: 0,
+                        total: 1,
+                        completed: false
+                    }
+                },
+                achievements: [
+                    { name: "Premier clic", unlocked: false },
+                    { name: "Combo x5", unlocked: false },
+                    { name: "Niveau 5", unlocked: false }
+                ],
+                secretCode: "SHACKER01",
+                storyChapter: 1,
+                activeTab: 'main'
+            };
+            
+            // Elements
+            const character = document.getElementById('character');
+            const pointsValue = document.getElementById('points-value');
+            const comboCounter = document.getElementById('combo-counter');
+            const levelUp = document.getElementById('level-up');
+            const newLevel = document.getElementById('new-level');
+            const levelUpBtn = document.getElementById('level-up-btn');
+            const shopPoints = document.getElementById('points');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Shop buttons
+            const buyPower = document.getElementById('buy-power');
+            const buySpeed = document.getElementById('buy-speed');
+            const buyMagic = document.getElementById('buy-magic');
+            const buyEffect = document.getElementById('buy-effect');
+            
+            // Stats elements
+            const levelValue = document.getElementById('level-value');
+            const xpValue = document.getElementById('xp-value');
+            const xpBar = document.getElementById('xp-bar');
+            const powerValue = document.getElementById('power-value');
+            const powerBar = document.getElementById('power-bar');
+            const speedValue = document.getElementById('speed-value');
+            const speedBar = document.getElementById('speed-bar');
+            const magicValue = document.getElementById('magic-value');
+            const magicBar = document.getElementById('magic-bar');
+            
+            // Quest elements
+            const quest1Progress = document.getElementById('quest1-progress');
+            const quest1Bar = document.getElementById('quest1-bar');
+            const quest2Progress = document.getElementById('quest2-progress');
+            const quest2Bar = document.getElementById('quest2-bar');
+            const quest3Bar = document.getElementById('quest3-bar');
+            
+            // Story elements
+            const storyChapter2 = document.getElementById('story-chapter2');
+            
+            // Initialize
+            updateUI();
+            
+            // Character click event
+            character.addEventListener('click', function(e) {
+                // Add points
+                gameState.points += 1 + Math.floor(gameState.combo / 5);
+                
+                // Increase combo
+                gameState.combo++;
+                
+                // Update quests
+                if (!gameState.quests.firstClick.completed) {
+                    gameState.quests.firstClick.progress = 1;
+                    gameState.quests.firstClick.completed = true;
+                    gameState.attributes.power += 5;
+                    gameState.achievements[0].unlocked = true;
+                }
+                
+                if (!gameState.quests.combo.completed && gameState.combo >= gameState.quests.combo.total) {
+                    gameState.quests.combo.progress = gameState.quests.combo.total;
+                    gameState.quests.combo.completed = true;
+                    gameState.attributes.speed += 5;
+                    gameState.achievements[1].unlocked = true;
+                } else {
+                    gameState.quests.combo.progress = Math.min(gameState.combo, gameState.quests.combo.total);
+                }
+                
+                // Add XP
+                gameState.xp += 5 + Math.floor(gameState.combo / 3);
+                
+                // Check for level up
+                if (gameState.xp >= gameState.xpToNextLevel) {
+                    levelUp.classList.remove('hide');
+                    gameState.level++;
+                    newLevel.textContent = gameState.level;
+                    gameState.xp -= gameState.xpToNextLevel;
+                    gameState.xpToNextLevel = Math.floor(gameState.xpToNextLevel * 1.5);
+                    
+                    // Check for level 5 achievement
+                    if (gameState.level >= 5 && !gameState.achievements[2].unlocked) {
+                        gameState.achievements[2].unlocked = true;
+                        
+                        // Unlock story chapter 2
+                        if (gameState.level >= 5 && gameState.storyChapter == 1) {
+                            gameState.storyChapter = 2;
+                            storyChapter2.classList.remove('hide');
+                        }
+                    }
+                }
+                
+                // Show combo counter
+                if (gameState.combo > 1) {
+                    comboCounter.classList.remove('hide');
+                    comboCounter.textContent = `Combo: ${gameState.combo}x`;
+                    
+                    // Position the combo counter near the click
+                    comboCounter.style.top = `${e.clientY - 50}px`;
+                    comboCounter.style.left = `${e.clientX}px`;
+                }
+                
+                // Create particles
+                createParticles(e.clientX, e.clientY);
+                
+                // Move character to random position
+                setTimeout(() => {
+                    const newX = 20 + Math.random() * 60; // Keep within 20-80% of screen
+                    const newY = 20 + Math.random() * 60;
+                    character.style.top = `${newY}%`;
+                    character.style.left = `${newX}%`;
+                }, 300);
+                
+                // Update UI
+                updateUI();
+            });
+            
+            // Reset combo if clicking elsewhere
+            document.addEventListener('click', function(e) {
+                if (e.target !== character) {
+                    gameState.combo = 0;
+                    comboCounter.classList.add('hide');
+                }
+            });
+            
+            // Close level up dialog
+            levelUpBtn.addEventListener('click', function() {
+                levelUp.classList.add('hide');
+            });
+            
+            // Shop buttons
+            buyPower.addEventListener('click', function() {
+                if (gameState.points >= 100) {
+                    gameState.points -= 100;
+                    gameState.attributes.power += 5;
+                    updateUI();
+                }
+            });
+            
+            buySpeed.addEventListener('click', function() {
+                if (gameState.points >= 100) {
+                    gameState.points -= 100;
+                    gameState.attributes.speed += 5;
+                    updateUI();
+                }
+            });
+            
+            buyMagic.addEventListener('click', function() {
+                if (gameState.points >= 100) {
+                    gameState.points -= 100;
+                    gameState.attributes.magic += 5;
+                    updateUI();
+                }
+            });
+            
+            buyEffect.addEventListener('click', function() {
+                if (gameState.points >= 500) {
+                    gameState.points -= 500;
+                    character.style.filter = 'drop-shadow(0 0 20px rgba(139, 92, 246, 0.8))';
+                    updateUI();
+                }
+            });
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    gameState.activeTab = tabName;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show correct content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tabName}-tab`).classList.add('active');
+                });
+            });
+            
+            // Secret code listener
+            let keySequence = '';
+            document.addEventListener('keydown', function(e) {
+                keySequence += e.key.toUpperCase();
+                
+                // Check if the sequence contains the secret code
+                if (keySequence.includes(gameState.secretCode)) {
+                    if (!gameState.quests.secretCode.completed) {
+                        gameState.quests.secretCode.progress = 1;
+                        gameState.quests.secretCode.completed = true;
+                        gameState.attributes.magic += 10;
+                        alert('Code secret découvert! +10 Magie débloquée!');
+                        updateUI();
+                    }
+                    keySequence = '';
+                }
+                
+                // Reset if too long
+                if (keySequence.length > 20) {
+                    keySequence = keySequence.slice(-10);
+                }
+            });
+            
+            // Update UI function
+            function updateUI() {
+                // Update points
+                pointsValue.textContent = gameState.points;
+                shopPoints.textContent = gameState.points;
+                
+                // Update shop buttons
+                buyPower.disabled = gameState.points < 100;
+                buySpeed.disabled = gameState.points < 100;
+                buyMagic.disabled = gameState.points < 100;
+                buyEffect.disabled = gameState.points < 500;
+                
+                // Update stats
+                levelValue.textContent = gameState.level;
+                xpValue.textContent = `${gameState.xp}/${gameState.xpToNextLevel}`;
+                xpBar.style.width = `${(gameState.xp / gameState.xpToNextLevel) * 100}%`;
+                
+                powerValue.textContent = gameState.attributes.power;
+                powerBar.style.width = `${gameState.attributes.power}%`;
+                
+                speedValue.textContent = gameState.attributes.speed;
+                speedBar.style.width = `${gameState.attributes.speed}%`;
+                
+                magicValue.textContent = gameState.attributes.magic;
+                magicBar.style.width = `${gameState.attributes.magic}%`;
+                
+                // Update quests
+                quest1Progress.textContent = `${gameState.quests.firstClick.progress}/${gameState.quests.firstClick.total}`;
+                quest1Bar.style.width = `${(gameState.quests.firstClick.progress / gameState.quests.firstClick.total) * 100}%`;
+                
+                quest2Progress.textContent = `${gameState.quests.combo.progress}/${gameState.quests.combo.total}`;
+                quest2Bar.style.width = `${(gameState.quests.combo.progress / gameState.quests.combo.total) * 100}%`;
+                
+                quest3Bar.style.width = `${(gameState.quests.secretCode.progress / gameState.quests.secretCode.total) * 100}%`;
+                
+                // Update achievements
+                const achievementsList = document.getElementById('achievements-list');
+                achievementsList.innerHTML = '';
+                gameState.achievements.forEach(achievement => {
+                    const li = document.createElement('li');
+                    li.textContent = `${achievement.name} - ${achievement.unlocked ? 'Débloqué' : 'Verrouillé'}`;
+                    if (achievement.unlocked) {
+                        li.style.color = '#10b981';
+                    }
+                    achievementsList.appendChild(li);
+                });
+            }
+            
+            // Create particles function
+            function createParticles(x, y) {
+                const particleCount = 10;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    document.body.appendChild(particle);
+                    
+                    // Random position around click
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = Math.random() * 50;
+                    const particleX = x + Math.cos(angle) * distance;
+                    const particleY = y + Math.sin(angle) * distance;
+                    
+                    particle.style.left = `${particleX}px`;
+                    particle.style.top = `${particleY}px`;
+                    
+                    // Random color
+                    const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.backgroundColor = color;
+                    
+                    // Animation
+                    setTimeout(() => {
+                        particle.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            particle.remove();
+                        }, 500);
+                    }, Math.random() * 1000);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
