@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.H.A.C.K.E.R. #01 NFT</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .pixelated {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .nft-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .property-tag {
+            background-color: #374151;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .property-tag span {
+            color: #9ca3af;
+            margin-right: 0.25rem;
+        }
+        
+        /* Game styling */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            user-select: none;
+        }
+        .game-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .game-effect {
+            position: absolute;
+            font-weight: bold;
+            transition: all 0.5s ease-out;
+        }
+        .game-stats {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 4px;
+            z-index: 20;
+            font-size: 14px;
+        }
+        .click-counter {
+            font-size: 16px;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .combo-display {
+            font-size: 14px;
+            color: #f59e0b;
+        }
+        .game-points {
+            font-size: 14px;
+            color: #a855f7;
+        }
+        
+        /* Animation classes */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        @keyframes scaleUp {
+            from { transform: scale(1); opacity: 0.8; }
+            to { transform: scale(3); opacity: 0; }
+        }
+        .fade-out {
+            animation: fadeOut 1.5s forwards;
+        }
+        .scale-up {
+            animation: scaleUp 0.8s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <div class="nft-container">
+            <h1 class="text-3xl font-bold mb-6 text-center">S.H.A.C.K.E.R. #01</h1>
+            
+            <div class="card">
+                <div class="relative game-area" id="game-area">
+                    <img 
+                        id="nft-image"
+                        src="images/shacker01.jpg" 
+                        alt="S.H.A.C.K.E.R. #01" 
+                        class="w-full h-full object-cover pixelated absolute z-0"
+                        onerror="this.onerror=null; this.src='images/shacker01.jpg';"
+                    >
+                    
+                    <!-- Game overlay pour les effets -->
+                    <div class="game-overlay" id="effects-container"></div>
+                    
+                    <!-- Stats du jeu -->
+                    <div class="game-stats">
+                        <div class="click-counter">Clics: <span id="click-count">0</span></div>
+                        <div class="combo-display">Combo: <span id="combo-display">x1</span></div>
+                        <div class="game-points">Points: <span id="points-display">0</span></div>
+                    </div>
+                </div>
+                
+                <div class="p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-bold">Démon aux yeux flamboyants</h2>
+                        <div class="text-sm bg-indigo-900 text-indigo-300 px-2 py-1 rounded">Rareté: #86</div>
+                    </div>
+                    
+                    <p class="text-gray-300 mb-4">Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.</p>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold mb-2">Propriétés</h3>
+                        <div>
+                            <div class="property-tag"><span>Gender:</span> Male</div>
+                            <div class="property-tag"><span>Type:</span> Demon</div>
+                            <div class="property-tag"><span>Eyes:</span> Yellow Flames</div>
+                            <div class="property-tag"><span>Accessory:</span> Piercings</div>
+                            <div class="property-tag"><span>Accessory:</span> Small Horns</div>
+                            <div class="property-tag"><span>Damages:</span> Bloody Nose</div>
+                            <div class="property-tag"><span>Collection:</span> Shackers OGs</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Détails</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Token ID:</div>
+                            <div>1</div>
+                            
+                            <div class="text-gray-400">Contract:</div>
+                            <div class="break-all">0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f</div>
+                            
+                            <div class="text-gray-400">Standard:</div>
+                            <div>ERC-721</div>
+                            
+                            <div class="text-gray-400">Blockchain:</div>
+                            <div>Ethereum</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center text-gray-500 text-sm">
+                <p class="mb-2">Cette page est une version interactive du NFT S.H.A.C.K.E.R. #01</p>
+                <p>Cliquez sur l'image pour découvrir des effets interactifs!</p>
+            </div>
+            
+            <div class="mt-4 text-center text-xs text-gray-600">
+                <p>S.H.A.C.K.E.R. #01 - Contrat: 0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f - Token ID: 1</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables du jeu
+        let clickCount = 0;
+        let points = 0;
+        let combo = 1;
+        let lastClickTime = 0;
+        let comboTimer = null;
+        
+        // Référence aux éléments DOM
+        const gameArea = document.getElementById('game-area');
+        const effectsContainer = document.getElementById('effects-container');
+        const clickCountDisplay = document.getElementById('click-count');
+        const comboDisplay = document.getElementById('combo-display');
+        const pointsDisplay = document.getElementById('points-display');
+        
+        // Fonction pour générer une couleur aléatoire
+        function getRandomColor() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffffff'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Gestion des clics sur l'image
+        gameArea.addEventListener('click', function(event) {
+            // Incrémenter le compteur de clics
+            clickCount++;
+            clickCountDisplay.textContent = clickCount;
+            
+            // Calculer les coordonnées relatives du clic
+            const rect = gameArea.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+            
+            // Gestion du système de combo
+            const now = Date.now();
+            const timeDiff = now - lastClickTime;
+            lastClickTime = now;
+            
+            // Réinitialiser le timer de combo
+            if (comboTimer) clearTimeout(comboTimer);
+            
+            // Augmenter le combo si les clics sont rapides
+            if (timeDiff < 500 && timeDiff > 0) {
+                combo = Math.min(combo + 1, 10);
+            } else {
+                combo = 1;
+            }
+            
+            // Afficher le combo
+            comboDisplay.textContent = `x${combo}`;
+            
+            // Mettre en place un timer pour réinitialiser le combo
+            comboTimer = setTimeout(() => {
+                combo = 1;
+                comboDisplay.textContent = `x${combo}`;
+            }, 2000);
+            
+            // Calculer les points gagnés
+            const pointsGained = 10 * combo;
+            points += pointsGained;
+            pointsDisplay.textContent = points;
+            
+            // Créer l'effet de points
+            createTextEffect(`+${pointsGained}`, x, y, '#00ff00');
+            
+            // Créer un effet de shockwave si le combo est élevé
+            if (combo > 3) {
+                createShockwaveEffect(x, y);
+            }
+            
+            // Créer des effets de particules
+            const particleCount = Math.min(Math.floor(combo / 2) + 2, 10);
+            for (let i = 0; i < particleCount; i++) {
+                createParticleEffect(
+                    x + (Math.random() * 10 - 5), 
+                    y + (Math.random() * 10 - 5), 
+                    getRandomColor()
+                );
+            }
+            
+            // Afficher le combo si > 1
+            if (combo > 1) {
+                createTextEffect(`Combo x${combo}!`, x + 10, y + 10, '#ffff00', 1.5);
+            }
+        });
+        
+        // Fonction pour créer un effet de texte
+        function createTextEffect(text, x, y, color, scale = 1) {
+            const effect = document.createElement('div');
+            effect.className = 'game-effect fade-out';
+            effect.textContent = text;
+            effect.style.left = `${x}%`;
+            effect.style.top = `${y}%`;
+            effect.style.color = color;
+            effect.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            effectsContainer.appendChild(effect);
+            
+            // Supprimer l'effet après l'animation
+            setTimeout(() => {
+                effect.remove();
+            }, 1500);
+        }
+        
+        // Fonction pour créer un effet de particule
+        function createParticleEffect(x, y, color) {
+            const particle = document.createElement('div');
+            particle.className = 'game-effect fade-out';
+            particle.textContent = '*';
+            particle.style.left = `${x}%`;
+            particle.style.top = `${y}%`;
+            particle.style.color = color;
+            particle.style.fontSize = `${10 + Math.random() * 10}px`;
+            particle.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
+            effectsContainer.appendChild(particle);
+            
+            // Supprimer la particule après l'animation
+            setTimeout(() => {
+                particle.remove();
+            }, 1500);
+        }
+        
+        // Fonction pour créer un effet d'onde de choc
+        function createShockwaveEffect(x, y) {
+            const shockwave = document.createElement('div');
+            shockwave.className = 'game-effect scale-up';
+            shockwave.style.left = `${x}%`;
+            shockwave.style.top = `${y}%`;
+            shockwave.style.width = '30px';
+            shockwave.style.height = '30px';
+            shockwave.style.borderRadius = '50%';
+            shockwave.style.border = '2px solid white';
+            shockwave.style.background = 'rgba(255, 255, 255, 0.2)';
+            effectsContainer.appendChild(shockwave);
+            
+            // Supprimer l'onde de choc après l'animation
+            setTimeout(() => {
+                shockwave.remove();
+            }, 800);
+        }
+        
+        // Afficher un message de bienvenue
+        setTimeout(() => {
+            createTextEffect('Cliquez sur l\'image!', 50, 50, '#ffffff', 1.5);
+        }, 1000);
+    </script>
+</body>
+</html>
