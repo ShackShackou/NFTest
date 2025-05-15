@@ -3,15 +3,14 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
  * @title DarthBaterNFT
  * @dev Un contrat NFT pour la collection DARTHBATER avec des métadonnées externes
  */
 contract DarthBaterNFT is ERC721URIStorage, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    // Compteur de tokens
+    uint256 private _nextTokenId;
     
     // Base URI pour les métadonnées
     string private _baseTokenURI;
@@ -30,15 +29,22 @@ contract DarthBaterNFT is ERC721URIStorage, Ownable {
      * @return Le nouveau tokenId
      */
     function mintNFT(address to) public returns (uint256) {
-        _tokenIds.increment();
-        uint256 newTokenId = _tokenIds.current();
+        uint256 tokenId = _nextTokenId++;
         
-        _mint(to, newTokenId);
-        _setTokenURI(newTokenId, string(abi.encodePacked(_baseTokenURI, "/", Strings.toString(newTokenId))));
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, string.concat(_baseTokenURI, "/", _toString(tokenId)));
         
-        emit NFTMinted(to, newTokenId);
+        emit NFTMinted(to, tokenId);
         
-        return newTokenId;
+        return tokenId;
+    }
+    
+    /**
+     * @dev Fonction publique pour minter un NFT sans spécifier d'adresse (utilise msg.sender)
+     * @return Le nouveau tokenId
+     */
+    function mint() public returns (uint256) {
+        return mintNFT(msg.sender);
     }
     
     /**
@@ -54,5 +60,32 @@ contract DarthBaterNFT is ERC721URIStorage, Ownable {
      */
     function _baseURI() internal view override returns (string memory) {
         return _baseTokenURI;
+    }
+    
+    /**
+     * @dev Convertit un uint256 en string
+     */
+    function _toString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        
+        uint256 temp = value;
+        uint256 digits;
+        
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        
+        bytes memory buffer = new bytes(digits);
+        
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        
+        return string(buffer);
     }
 }
