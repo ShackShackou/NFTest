@@ -1,4 +1,4 @@
-import { createConfig } from 'wagmi';
+import { createConfig, http } from 'wagmi';
 import { sepolia, mainnet, goerli } from 'wagmi/chains';
 
 // Définir les chaînes supportées
@@ -8,6 +8,11 @@ export { sepolia, mainnet, goerli };
 // Créer une configuration simple pour wagmi
 export const config = createConfig({
   chains: [sepolia, mainnet, goerli],
+  transports: {
+    [sepolia.id]: http(),
+    [mainnet.id]: http(),
+    [goerli.id]: http()
+  }
 });
 
 // Fonction utilitaire pour vérifier si un réseau est supporté

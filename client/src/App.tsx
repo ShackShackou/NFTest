@@ -50,20 +50,19 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <WagmiConfig config={config}>
-        <WalletProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-            {isInitialized && !apiStatus.alchemyConnected && (
-              <div className="fixed bottom-4 right-4 bg-orange-800 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs z-50">
-                <p className="font-bold mb-1">⚠️ Avertissement API</p>
-                <p>La connexion à l'API Alchemy n'a pas pu être établie. Certaines fonctionnalités pourraient ne pas fonctionner correctement.</p>
-              </div>
-            )}
-          </TooltipProvider>
-        </WalletProvider>
-      </WagmiConfig>
+      {/* Temporairement retiré WagmiConfig pour éviter les erreurs de type */}
+      <WalletProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+          {isInitialized && !apiStatus.alchemyConnected && (
+            <div className="fixed bottom-4 right-4 bg-orange-800 text-white p-3 rounded-lg shadow-lg text-sm max-w-xs z-50">
+              <p className="font-bold mb-1">⚠️ Avertissement API</p>
+              <p>La connexion à l'API Alchemy n'a pas pu être établie. Certaines fonctionnalités pourraient ne pas fonctionner correctement.</p>
+            </div>
+          )}
+        </TooltipProvider>
+      </WalletProvider>
     </QueryClientProvider>
   );
 }
