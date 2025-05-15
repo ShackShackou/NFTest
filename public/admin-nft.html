@@ -287,8 +287,18 @@
         </div>
     </div>
     
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
+        // Vérifiez que ethers a bien été chargé
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof ethers === 'undefined') {
+                console.error("Ethers.js n'a pas été chargé correctement !");
+                showMessage('mint-message', "Erreur: La bibliothèque blockchain (ethers.js) n'a pas été chargée correctement. Veuillez rafraîchir la page ou ouvrir dans un nouvel onglet.", 'error');
+            } else {
+                console.log("Ethers.js chargé avec succès, version:", ethers.version);
+            }
+        });
+
         // Configuration
         const contractAddress = "0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037";
         const contractABI = [
@@ -314,33 +324,64 @@
             });
         });
         
+        // Fonction pour afficher un message
+        function showMessage(elementId, message, type) {
+            const messageElement = document.getElementById(elementId);
+            if (!messageElement) {
+                console.error(`Élément #${elementId} introuvable!`);
+                return;
+            }
+            messageElement.textContent = message;
+            messageElement.classList.remove('hidden', 'alert-success', 'alert-error');
+            messageElement.classList.add(`alert-${type}`);
+        }
+
         // Connexion du wallet
         document.getElementById('connect-wallet').addEventListener('click', async () => {
+            showMessage('mint-message', 'Tentative de connexion à MetaMask...', 'success');
+            
             try {
-                if (window.ethereum) {
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    
-                    // Demander la connexion du wallet
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    
-                    signer = provider.getSigner();
-                    walletAddress = await signer.getAddress();
-                    
-                    // Afficher l'adresse du wallet
-                    document.getElementById('wallet-address').textContent = 
-                        `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
-                    document.getElementById('wallet-info').classList.remove('hidden');
-                    
-                    // Créer l'instance du contrat
-                    contract = new ethers.Contract(contractAddress, contractABI, signer);
-                    
-                    // Vérifier le réseau
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 11155111) { // Sepolia
-                        showMessage('metadata-message', 'Veuillez vous connecter au réseau Sepolia testnet', 'error');
-                    }
+                // Vérifier si ethers est disponible
+                if (typeof ethers === 'undefined') {
+                    throw new Error("La bibliothèque ethers.js n'est pas disponible. Veuillez rafraîchir la page.");
+                }
+
+                // Vérifier si MetaMask est installé
+                if (!window.ethereum) {
+                    throw new Error("MetaMask n'est pas installé. Veuillez l'installer pour continuer.");
+                }
+                
+                console.log("Connexion à MetaMask...");
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Demander la connexion du wallet
+                console.log("Demande d'accès au compte...");
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                console.log("Récupération du signer...");
+                signer = provider.getSigner();
+                
+                console.log("Récupération de l'adresse...");
+                walletAddress = await signer.getAddress();
+                
+                // Afficher l'adresse du wallet
+                document.getElementById('wallet-address').textContent = 
+                    `${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`;
+                document.getElementById('wallet-info').classList.remove('hidden');
+                
+                // Créer l'instance du contrat
+                console.log("Création de l'instance du contrat...");
+                contract = new ethers.Contract(contractAddress, contractABI, signer);
+                
+                // Vérifier le réseau
+                console.log("Vérification du réseau...");
+                const network = await provider.getNetwork();
+                console.log("Réseau détecté:", network.name, "chainId:", network.chainId);
+                
+                if (network.chainId !== 11155111) { // Sepolia
+                    showMessage('mint-message', 'Attention: Veuillez vous connecter au réseau Sepolia testnet pour interagir avec ce contrat', 'error');
                 } else {
-                    showMessage('mint-message', 'MetaMask n\'est pas installé. Veuillez l\'installer pour continuer.', 'error');
+                    showMessage('mint-message', 'Connexion réussie à MetaMask sur le réseau Sepolia', 'success');
                 }
             } catch (error) {
                 console.error('Erreur de connexion:', error);
