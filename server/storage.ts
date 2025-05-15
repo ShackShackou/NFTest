@@ -151,7 +151,7 @@ export class MemStorage implements IStorage {
     };
     this.collections.set(demoCollection.id, demoCollection);
     
-    // Create demo NFTs - Données exactes d'OpenSea
+    // Create demo NFTs - Données exactes de l'image fournie
     const originalStudioProperties: NftProperty[] = [
       { type: "Background", value: "Blue Mist", rarity: "8% have this trait" },
       { type: "Jacket", value: "Abstract", rarity: "4% have this trait" },
@@ -167,14 +167,14 @@ export class MemStorage implements IStorage {
       id: 42,  // Set id to 42 to match the expected url path in NftMarketplace component
       tokenId: "1",
       name: "Original Studio #1",
-      description: "Bienvenue dans la collection Original Studio, où l'art digital et la technologie blockchain se rencontrent pour créer des œuvres uniques et immersives. Cette pièce représente le futur de l'art numérique avec ses couleurs vibrantes et son design avant-gardiste. Chaque NFT de cette collection est conçu pour offrir une expérience interactive et évolutive.",
+      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
       image: "/images/original-studio-1.jpg",
       price: "1.2 ETH",
       usdPrice: "($3,456.78)",
       lastPrice: "0.9 ETH",
       creator: "Art Dimension Labs",
       owner: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
-      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
+      contractAddress: "0x4d9f9cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
