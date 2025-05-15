@@ -207,6 +207,32 @@
                     <div class="mb-4">
                         <label class="block text-gray-400 mb-2">URL de l'image</label>
                         <input type="text" id="metadata-image" class="form-input" placeholder="https://...">
+                        <div class="mt-2 flex justify-between items-center">
+                            <span class="text-xs text-gray-500">Format: URL locale ou IPFS</span>
+                            <button type="button" id="upload-to-ipfs" class="bg-indigo-500 text-white text-xs py-1 px-2 rounded hover:bg-indigo-600 transition">
+                                Uploader sur IPFS
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="ipfs-info" class="mb-4 p-3 bg-gray-800 rounded border border-indigo-400 hidden">
+                        <h3 class="text-sm font-semibold text-indigo-400 mb-2">Information IPFS</h3>
+                        <div class="grid grid-cols-4 gap-2 text-xs">
+                            <div class="text-gray-400">Image URL:</div>
+                            <div class="col-span-3 break-all font-mono text-green-400" id="ipfs-image-url"></div>
+                            
+                            <div class="text-gray-400">HTTP Gateway:</div>
+                            <div class="col-span-3 break-all">
+                                <a id="ipfs-http-url" href="#" target="_blank" class="text-blue-400 hover:underline font-mono"></a>
+                            </div>
+                            
+                            <div class="text-gray-400">Metadata URL:</div>
+                            <div class="col-span-3 break-all font-mono text-green-400" id="ipfs-metadata-url"></div>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-400">
+                            <p>✅ Stockage permanent et immuable</p>
+                            <p>✅ Compatible avec OpenSea et autres marketplaces</p>
+                        </div>
                     </div>
                     
                     <div class="mb-4">

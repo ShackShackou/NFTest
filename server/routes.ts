@@ -343,6 +343,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API pour uploader l'image d'un NFT sur IPFS
+  app.post("/api/ipfs/upload-nft-image", async (req: Request, res: Response) => {
+    try {
+      const { tokenId } = req.body;
+      
+      if (!tokenId && tokenId !== 0) {
+        return res.status(400).json({ error: "Token ID requis" });
+      }
+      
+      // Vérifier que le NFT existe
+      if (!nftMetadataStore.has(Number(tokenId))) {
+        return res.status(404).json({ error: "NFT non trouvé" });
+      }
+      
+      // Récupérer les métadonnées actuelles
+      const metadata = nftMetadataStore.get(Number(tokenId));
+      if (!metadata) {
+        return res.status(404).json({ error: "Métadonnées non trouvées" });
+      }
+      
+      // Récupérer le chemin local de l'image
+      let imagePath = metadata.image;
+      if (imagePath.startsWith('/')) {
+        // Convertir le chemin relatif en chemin absolu du système de fichiers
+        imagePath = path.join(process.cwd(), 'public', imagePath);
+      } else if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+        // Si c'est une URL externe, extraire le chemin de fichier
+        const urlParts = new URL(imagePath);
+        imagePath = path.join(process.cwd(), 'public', urlParts.pathname);
+      }
+      
+      console.log(`🖼️ Uploading image from ${imagePath} to IPFS...`);
+      
+      // Vérifier si le fichier existe
+      if (!await fs.pathExists(imagePath)) {
+        return res.status(404).json({ error: `Image non trouvée: ${imagePath}` });
+      }
+      
+      // Uploader l'image sur IPFS
+      const ipfsImageUrl = await uploadFileToIPFS(imagePath);
+      
+      // Mettre à jour les métadonnées avec l'URL IPFS
+      const updatedMetadata = {
+        ...metadata,
+        image: ipfsImageUrl,
+        lastUpdated: new Date()
+      };
+      
+      // Sauvegarder les métadonnées mises à jour
+      nftMetadataStore.set(Number(tokenId), updatedMetadata);
+      
+      // Uploader les métadonnées complètes sur IPFS (optionnel)
+      const ipfsMetadataUrl = await uploadMetadataToIPFS(updatedMetadata);
+      
+      // Diffuser la mise à jour à tous les clients connectés
+      broadcastEvent({
+        type: 'metadata_update',
+        tokenId: Number(tokenId),
+        data: updatedMetadata,
+        timestamp: Date.now()
+      });
+      
+      res.json({ 
+        success: true, 
+        metadata: updatedMetadata,
+        ipfsImageUrl,
+        ipfsMetadataUrl,
+        httpImageUrl: ipfsToHttpUrl(ipfsImageUrl),
+        httpMetadataUrl: ipfsToHttpUrl(ipfsMetadataUrl)
+      });
+    } catch (error) {
+      console.error("Erreur d'upload sur IPFS:", error);
+      res.status(500).json({ error: "Erreur lors de l'upload sur IPFS", details: error instanceof Error ? error.message : String(error) });
+    }
+  });
+
   // Créer le serveur HTTP
   const httpServer = createServer(app);
 
