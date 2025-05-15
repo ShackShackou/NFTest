@@ -1,10 +1,11 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes, getBaseUrl } from "./routes";
 import { registerIPFSRoutes } from "./ipfs-routes";
 import { registerStaticRoutes } from "./static-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import { fileURLToPath } from 'url';
+import { generateNFTStorageCSV } from "./csv-generator";
 
 // Obtenir l'équivalent de __dirname pour les modules ES
 const __filename = fileURLToPath(import.meta.url);

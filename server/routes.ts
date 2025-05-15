@@ -38,7 +38,7 @@ const nftMetadataStore = new Map<number, NftMetadata>();
 const connectedClients = new Map<string, any>();
 
 // Fonction pour obtenir l'URL de base du serveur
-function getBaseUrl(req: Request): string {
+export function getBaseUrl(req: Request): string {
   const protocol = req.headers['x-forwarded-proto'] || req.protocol;
   const host = req.headers['x-forwarded-host'] || req.headers.host;
   return `${protocol}://${host}`;
