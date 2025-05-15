@@ -18,6 +18,8 @@ app.use(express.urlencoded({ extended: false }));
 // Servir les fichiers statiques depuis le dossier public
 app.use(express.static(path.join(__dirname, "../public")));
 
+// Nous utilisons maintenant un fichier index.html statique dans le dossier public
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
