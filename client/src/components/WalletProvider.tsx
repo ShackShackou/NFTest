@@ -2,6 +2,21 @@ import { ReactNode, createContext, useContext, useState, useEffect } from 'react
 import { useToast } from '@/hooks/use-toast';
 import { ethers } from 'ethers';
 
+// Interface de base pour l'objet ethereum de MetaMask
+interface Ethereum {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: any[] }) => Promise<any>;
+  on: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener: (event: string, handler: (...args: any[]) => void) => void;
+}
+
+// Déclarer ethereum comme une propriété de window
+declare global {
+  interface Window {
+    ethereum?: Ethereum;
+  }
+}
+
 // Constantes pour les network IDs
 const SEPOLIA_CHAIN_ID = 11155111;
 
@@ -37,8 +52,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const checkIfMetaMaskIsAvailable = (): boolean => {
     try {
       return typeof window !== 'undefined' && 
-             window.ethereum !== undefined && 
-             !!window.ethereum.isMetaMask;
+             typeof window.ethereum !== 'undefined' &&
+             typeof window.ethereum.request === 'function';
     } catch (error) {
       console.error("Erreur lors de la vérification de MetaMask:", error);
       return false;
@@ -148,20 +163,44 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       return;
     }
     
+    const ethereum = window.ethereum;
+    if (!ethereum) {
+      toast({
+        title: 'MetaMask non accessible',
+        description: 'MetaMask est installé mais n\'est pas accessible. Essayez de rafraîchir la page ou de redémarrer votre navigateur.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     
     try {
       // Demander à l'utilisateur de se connecter
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
+      await ethereum.request({ method: 'eth_requestAccounts' });
       await updateAccountInfo();
+      
+      // Si nous arrivons ici, c'est que la connexion a réussi
+      toast({
+        title: 'Connexion réussie',
+        description: 'Vous êtes maintenant connecté avec votre portefeuille MetaMask.',
+      });
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError(err instanceof Error ? err : new Error(err?.message || 'Erreur inconnue'));
       
+      // Formater le message d'erreur pour l'utilisateur
+      let errorMessage = err?.message || 'Impossible de se connecter à MetaMask';
+      
+      // Si l'utilisateur a rejeté la requête
+      if (errorMessage.includes('User rejected')) {
+        errorMessage = 'La connexion a été rejetée dans MetaMask.';
+      }
+      
       toast({
         title: 'Erreur de connexion',
-        description: err.message || 'Impossible de se connecter à MetaMask',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
