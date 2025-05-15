@@ -6,7 +6,7 @@ module.exports = {
       chainId: 31337,
     },
     sepolia: {
-      url: "https://ethereum-sepolia.publicnode.com",
+      url: process.env.SEPOLIA_RPC_URL || "https://ethereum-sepolia.publicnode.com",
       accounts: [process.env.PRIVATE_KEY || "0x0000000000000000000000000000000000000000000000000000000000000001"],
     },
   },
