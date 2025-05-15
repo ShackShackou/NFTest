@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { formatEthPrice, shortenAddress } from '@/lib/utils';
 import { useWallet } from '@/components/WalletProvider';
 import { ethers } from 'ethers';
-import { contractABI, contractAddress as defaultContractAddress } from '@/lib/contractConfig';
+import { contractABI, contractAddress as defaultContractAddress, getContractConfig } from '@/lib/contractConfig';
 
 export default function NftMinter() {
   const { toast } = useToast();

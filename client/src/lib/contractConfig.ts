@@ -1,7 +1,14 @@
 // Configuration du contrat NFT déployé sur Sepolia testnet
-// Adresse du contrat NFT DARTHBATER sur Sepolia
-// Adresse d'un contrat ERC721 standard déjà déployé sur Sepolia
-export const contractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+// Adresse du contrat NFT DARTHBATER sur différents réseaux
+
+// Adresse du contrat déployé en local (réseau Hardhat)
+const HARDHAT_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+// Adresse du contrat déployé sur Sepolia testnet (à mettre à jour après déploiement réel)
+const SEPOLIA_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+// Adresse par défaut du contrat (utilisée si chainId n'est pas reconnu)
+export const contractAddress = SEPOLIA_CONTRACT_ADDRESS;
 
 // ABI du contrat (interface pour interagir avec le contrat)
 export const contractABI = [
@@ -42,22 +49,22 @@ export const getContractConfig = (chainId?: number) => {
   // Si on est sur le réseau de test Sepolia (chaînId 11155111)
   if (chainId === 11155111) {
     return {
-      contractAddress,
+      contractAddress: SEPOLIA_CONTRACT_ADDRESS,
       contractABI,
     };
   }
   
-  // Si on est sur d'autres réseaux de test comme Goerli (chaînId 5)
-  if (chainId === 5) {
+  // Si on est sur le réseau Hardhat local (chaînId 31337)
+  if (chainId === 31337) {
     return {
-      contractAddress: "0x0000000000000000000000000000000000000000", // À remplacer si disponible sur Goerli
+      contractAddress: HARDHAT_CONTRACT_ADDRESS,
       contractABI,
     };
   }
   
   // Par défaut, retourner la configuration de Sepolia
   return {
-    contractAddress,
+    contractAddress: SEPOLIA_CONTRACT_ADDRESS,
     contractABI,
   };
 };
