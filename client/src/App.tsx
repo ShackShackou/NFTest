@@ -8,6 +8,7 @@ import NftMarketplace from "@/pages/NftMarketplace";
 import NftMintPage from "@/pages/NftMintPage";
 import NftManager from "@/pages/NftManager";
 import AdminPage from "@/pages/AdminPage";
+import { AnimationEditorPage } from "@/pages/AnimationEditorPage";
 import NotFound from "@/pages/not-found";
 import { WalletProvider } from "@/components/WalletProvider";
 import { WagmiConfig } from "wagmi";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/mint" component={NftMintPage} />
       <Route path="/manager" component={NftManager} />
       <Route path="/admin" component={AdminPage} />
+      <Route path="/animation-editor" component={AnimationEditorPage} />
       <Route component={NotFound} />
     </Switch>
   );
