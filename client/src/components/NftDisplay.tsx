@@ -877,6 +877,22 @@ export function NftDisplay({ className }: NftDisplayProps) {
           ...prev,
           maxCombo: newCombo
         }));
+        
+        // Déclencher les animations personnalisées liées au nouveau record de combo
+        if (animationContainerRef.current) {
+          animationInstances.forEach(instanceId => {
+            triggerAnimation(
+              instanceId, 
+              'condition', 
+              animationContainerRef.current as HTMLElement,
+              {
+                score: points,
+                level: gameStats.level,
+                combo: newCombo
+              }
+            );
+          });
+        }
       }
       
       newCombo = 1;
@@ -1014,6 +1030,22 @@ export function NftDisplay({ className }: NftDisplayProps) {
           `Vous avez atteint le niveau ${newLevel}!`,
           "success"
         );
+        
+        // Déclencher les animations personnalisées liées au niveau
+        if (animationContainerRef.current) {
+          animationInstances.forEach(instanceId => {
+            triggerAnimation(
+              instanceId, 
+              'condition', 
+              animationContainerRef.current as HTMLElement,
+              {
+                score: points,
+                level: newLevel,
+                combo: currentCombo
+              }
+            );
+          });
+        }
         
         // Débloquer des mini-jeux en fonction du niveau
         if (newLevel === 3 && !miniGames.unlocked.memory) {
