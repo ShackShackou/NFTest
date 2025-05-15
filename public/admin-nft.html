@@ -320,10 +320,229 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Onglet IPFS Direct -->
+        <div class="tab-content" id="ipfs-tab">
+            <div class="card p-6">
+                <h2 class="text-xl font-semibold mb-4 text-purple-400">Upload Direct sur IPFS</h2>
+                
+                <div id="ipfs-direct-message" class="hidden alert"></div>
+                
+                <div class="bg-indigo-900 bg-opacity-30 p-4 rounded-md mb-6 border border-indigo-700">
+                    <div class="flex items-center mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-indigo-400">Upload Direct sur NFT.Storage</h3>
+                    </div>
+                    <p class="text-gray-300 mb-2">Cette fonctionnalité vous permet d'uploader directement vos fichiers sur IPFS via NFT.Storage - pour un stockage permanent et décentralisé.</p>
+                    <p class="text-gray-400 text-sm mb-4">Les fichiers uploadés sur IPFS sont accessibles via leur CID unique et peuvent être utilisés dans vos métadonnées NFT.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <!-- Upload d'image -->
+                    <div class="p-4 border border-gray-700 rounded-md">
+                        <h3 class="text-lg font-semibold text-purple-400 mb-3">Upload d'Image</h3>
+                        <p class="text-gray-400 mb-4">Uploadez une image pour votre NFT</p>
+                        
+                        <form id="ipfs-image-form" class="mb-4">
+                            <div class="mb-4">
+                                <label class="block text-gray-400 mb-2">Sélectionnez une image</label>
+                                <input type="file" id="ipfs-image-file" class="form-input" accept="image/*">
+                            </div>
+                            
+                            <button type="submit" class="button-primary w-full flex justify-center items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                Uploader sur IPFS
+                            </button>
+                        </form>
+                        
+                        <div id="ipfs-image-result" class="hidden p-3 bg-gray-800 rounded border border-green-600">
+                            <h4 class="text-sm font-semibold text-green-400 mb-2">Image uploadée avec succès!</h4>
+                            <div class="mb-2">
+                                <label class="block text-xs text-gray-400 mb-1">URL IPFS:</label>
+                                <input type="text" id="ipfs-image-url-result" class="form-input text-xs font-mono bg-gray-900" readonly>
+                            </div>
+                            <div class="mb-2">
+                                <label class="block text-xs text-gray-400 mb-1">URL HTTP Gateway:</label>
+                                <input type="text" id="ipfs-image-http-result" class="form-input text-xs font-mono bg-gray-900" readonly>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <a id="ipfs-image-preview-link" href="#" target="_blank" class="text-xs text-blue-400 hover:underline">Prévisualiser l'image</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Upload HTML interactif -->
+                    <div class="p-4 border border-gray-700 rounded-md">
+                        <h3 class="text-lg font-semibold text-purple-400 mb-3">Upload HTML Interactif</h3>
+                        <p class="text-gray-400 mb-4">Uploadez un fichier HTML interactif pour votre NFT</p>
+                        
+                        <form id="ipfs-html-form" class="mb-4">
+                            <div class="mb-4">
+                                <label class="block text-gray-400 mb-2">Sélectionnez un fichier HTML</label>
+                                <input type="file" id="ipfs-html-file" class="form-input" accept=".html,.htm">
+                            </div>
+                            
+                            <button type="submit" class="button-primary w-full flex justify-center items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                </svg>
+                                Uploader sur IPFS
+                            </button>
+                        </form>
+                        
+                        <div id="ipfs-html-result" class="hidden p-3 bg-gray-800 rounded border border-green-600">
+                            <h4 class="text-sm font-semibold text-green-400 mb-2">HTML uploadé avec succès!</h4>
+                            <div class="mb-2">
+                                <label class="block text-xs text-gray-400 mb-1">URL IPFS:</label>
+                                <input type="text" id="ipfs-html-url-result" class="form-input text-xs font-mono bg-gray-900" readonly>
+                            </div>
+                            <div class="mb-2">
+                                <label class="block text-xs text-gray-400 mb-1">URL HTTP Gateway:</label>
+                                <input type="text" id="ipfs-html-http-result" class="form-input text-xs font-mono bg-gray-900" readonly>
+                            </div>
+                            <div class="mt-2 text-center">
+                                <a id="ipfs-html-preview-link" href="#" target="_blank" class="text-xs text-blue-400 hover:underline">Voir la page HTML</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Instructions métadonnées NFT -->
+                <div class="p-4 border border-gray-700 rounded-md mb-6">
+                    <h3 class="text-lg font-semibold text-purple-400 mb-3">Utilisation dans les métadonnées NFT</h3>
+                    <p class="text-gray-400 mb-4">Une fois vos fichiers uploadés, intégrez-les dans vos métadonnées NFT en utilisant les URLs IPFS générées:</p>
+                    
+                    <pre class="bg-gray-900 p-3 rounded text-xs overflow-x-auto mb-3">
+{
+  "name": "S.H.A.C.K.E.R. #01",
+  "description": "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes.",
+  "image": "<span class="text-green-400">ipfs://bafkreiaylxpfsgvouqwwqopxvfrqe7qasdyunbgprqp2jkrz37gssstpry</span>",
+  "animation_url": "<span class="text-green-400">ipfs://bafkreidivzimqfqtoqxkrpge6bjyhlvxqs3rjv5yze7uus7unnbgpyzpce</span>",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Demon"
+    }
+  ]
+}
+</pre>
+                    <p class="text-gray-400 text-sm">
+                        <strong class="text-white">Note:</strong> L'URL <code class="bg-gray-800 px-1 rounded">animation_url</code> permet à OpenSea et autres marketplaces d'afficher votre HTML interactif à la place de l'image statique.
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
+        // Fonctions d'upload IPFS
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion du formulaire d'upload d'image
+            const ipfsImageForm = document.getElementById('ipfs-image-form');
+            if (ipfsImageForm) {
+                ipfsImageForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const fileInput = document.getElementById('ipfs-image-file');
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        showMessage('ipfs-direct-message', 'Veuillez sélectionner une image à uploader', 'error');
+                        return;
+                    }
+                    
+                    const file = fileInput.files[0];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    try {
+                        showMessage('ipfs-direct-message', 'Upload en cours... Veuillez patienter, cela peut prendre jusqu\'à 30 secondes.', 'info');
+                        
+                        const response = await fetch('/api/ipfs/direct-upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.error) {
+                            showMessage('ipfs-direct-message', `Erreur: ${result.error}`, 'error');
+                            return;
+                        }
+                        
+                        // Afficher les résultats
+                        document.getElementById('ipfs-image-url-result').value = result.ipfsUrl;
+                        document.getElementById('ipfs-image-http-result').value = result.httpUrl;
+                        
+                        // Configurer le lien de prévisualisation
+                        const previewLink = document.getElementById('ipfs-image-preview-link');
+                        previewLink.href = result.httpUrl;
+                        
+                        // Afficher le bloc de résultat
+                        document.getElementById('ipfs-image-result').classList.remove('hidden');
+                        
+                        showMessage('ipfs-direct-message', `Image "${result.originalName}" uploadée avec succès sur IPFS!`, 'success');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'upload:', error);
+                        showMessage('ipfs-direct-message', `Erreur lors de l'upload: ${error.message}`, 'error');
+                    }
+                });
+            }
+            
+            // Gestion du formulaire d'upload HTML
+            const ipfsHtmlForm = document.getElementById('ipfs-html-form');
+            if (ipfsHtmlForm) {
+                ipfsHtmlForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const fileInput = document.getElementById('ipfs-html-file');
+                    if (!fileInput.files || fileInput.files.length === 0) {
+                        showMessage('ipfs-direct-message', 'Veuillez sélectionner un fichier HTML à uploader', 'error');
+                        return;
+                    }
+                    
+                    const file = fileInput.files[0];
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    try {
+                        showMessage('ipfs-direct-message', 'Upload en cours... Veuillez patienter, cela peut prendre jusqu\'à 30 secondes.', 'info');
+                        
+                        const response = await fetch('/api/ipfs/direct-upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.error) {
+                            showMessage('ipfs-direct-message', `Erreur: ${result.error}`, 'error');
+                            return;
+                        }
+                        
+                        // Afficher les résultats
+                        document.getElementById('ipfs-html-url-result').value = result.ipfsUrl;
+                        document.getElementById('ipfs-html-http-result').value = result.httpUrl;
+                        
+                        // Configurer le lien de prévisualisation
+                        const previewLink = document.getElementById('ipfs-html-preview-link');
+                        previewLink.href = result.httpUrl;
+                        
+                        // Afficher le bloc de résultat
+                        document.getElementById('ipfs-html-result').classList.remove('hidden');
+                        
+                        showMessage('ipfs-direct-message', `Fichier HTML "${result.originalName}" uploadé avec succès sur IPFS!`, 'success');
+                    } catch (error) {
+                        console.error('Erreur lors de l\'upload:', error);
+                        showMessage('ipfs-direct-message', `Erreur lors de l'upload: ${error.message}`, 'error');
+                    }
+                });
+            }
+        });
+        
         // Vérifiez que ethers a bien été chargé
         window.addEventListener('DOMContentLoaded', () => {
             if (typeof ethers === 'undefined') {
