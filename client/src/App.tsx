@@ -9,16 +9,19 @@ import NftMintPage from "@/pages/NftMintPage";
 import NftManager from "@/pages/NftManager";
 import AdminPage from "@/pages/AdminPage";
 import { AnimationEditorPage } from "@/pages/AnimationEditorPage";
+import NftSimpleView from "@/pages/NftSimpleView";
 import NotFound from "@/pages/not-found";
 import { WalletProvider } from "@/components/WalletProvider";
 import { WagmiConfig } from "wagmi";
 import { config } from "@/lib/walletConfig";
 import { initEnvironment } from "@/lib/initEnvironment";
+import { nftWebSocket } from "@/lib/nftWebsocket";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={NftMarketplace} />
+      <Route path="/" component={NftSimpleView} />
+      <Route path="/original" component={NftMarketplace} />
       <Route path="/collections/pixel" component={NftMarketplace} />
       <Route path="/mint" component={NftMintPage} />
       <Route path="/manager" component={NftManager} />
@@ -38,8 +41,11 @@ function App() {
   useEffect(() => {
     const initialize = async () => {
       try {
+        // Initialiser l'environnement (sans WebSocket pour l'instant)
         const status = await initEnvironment();
         setApiStatus(status);
+        
+        console.log("Initialisation sans WebSocket pour résoudre les problèmes de connexion");
       } catch (error) {
         console.error("Erreur d'initialisation:", error);
       } finally {

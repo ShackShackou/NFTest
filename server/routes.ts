@@ -35,19 +35,19 @@ const connectedClients = new Map<string, any>();
 function initializeMetadata() {
   if (!nftMetadataStore.has(42)) {
     nftMetadataStore.set(42, {
-      name: "Original Studio #1",
-      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
-      image: "https://nft-darthbater.replit.app/images/original-studio-1.jpg",
+      name: "S.H.A.C.K.E.R. #01",
+      description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.",
+      image: "/images/shacker01.jpg", // Image locale mise à jour
       animation_url: "https://nft-darthbater.replit.app/interactive/42",
       attributes: [
-        { trait_type: "Background", value: "Blue Geometric" },
-        { trait_type: "Skin", value: "Purple" },
-        { trait_type: "Eyes", value: "Glowing Yellow" },
-        { trait_type: "Horns", value: "Red" },
-        { trait_type: "Hair", value: "Blue Long" },
-        { trait_type: "Style", value: "Psychedelic" },
-        { trait_type: "Collection", value: "Original Studio" },
-        { trait_type: "Rarity", value: "Legendary" }
+        { trait_type: "Gender", value: "Male" },
+        { trait_type: "Type", value: "Demon" },
+        { trait_type: "Eyes", value: "Yellow Flames" },
+        { trait_type: "Accessory", value: "Piercings" },
+        { trait_type: "Accessory", value: "Small Horns" },
+        { trait_type: "Damages", value: "Bloody Nose" },
+        { trait_type: "Collection", value: "Shackers OGs" },
+        { trait_type: "Rarity", value: "#86" }
       ],
       lastUpdated: new Date()
     });
@@ -66,6 +66,19 @@ function broadcastEvent(event: WebSocketEvent) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialiser les métadonnées
   initializeMetadata();
+  
+  // API pour les variables d'environnement (sécurisée)
+  app.get("/api/env", (req: Request, res: Response) => {
+    try {
+      // Renvoyer uniquement les clés d'API nécessaires
+      res.json({
+        ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY
+      });
+    } catch (error) {
+      console.error("Erreur lors de la récupération des variables d'environnement:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
   
   // API Routes
   
@@ -272,8 +285,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Créer le serveur HTTP
   const httpServer = createServer(app);
 
-  // Configurer le WebSocket Server
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  // Configurer le WebSocket Server avec CORS activé
+  const wss = new WebSocketServer({ 
+    server: httpServer, 
+    path: '/ws',
+    // Permettre toutes les connexions
+    verifyClient: () => true 
+  });
 
   wss.on('connection', (ws) => {
     const clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;

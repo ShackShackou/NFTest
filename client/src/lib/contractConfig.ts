@@ -4,8 +4,11 @@
 // Adresse du contrat déployé en local (réseau Hardhat)
 const HARDHAT_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-// Adresse du contrat déployé sur Sepolia testnet
-const SEPOLIA_CONTRACT_ADDRESS = "0x5FbDB8231567afecb367f032d93F642f64180aa3";
+// Adresse du contrat déployé sur Sepolia testnet (mise à jour avec l'adresse exacte du contrat)
+const SEPOLIA_CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+// Utilisation de l'API MetaMask pour une meilleure connectivité
+export const METAMASK_API_KEY = process.env.METAMASK_API_KEY;
 
 // Adresse par défaut du contrat (utilisée si chainId n'est pas reconnu)
 export const contractAddress = SEPOLIA_CONTRACT_ADDRESS;

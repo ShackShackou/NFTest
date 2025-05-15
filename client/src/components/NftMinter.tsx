@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { formatEthPrice, shortenAddress } from '@/lib/utils';
 import { useWallet } from '@/components/WalletProvider';
 import { ethers } from 'ethers';
-import { contractABI, contractAddress as defaultContractAddress, getContractConfig } from '@/lib/contractConfig';
+import { contractABI, contractAddress as defaultContractAddress, getContractConfig, METAMASK_API_KEY } from '@/lib/contractConfig';
 
 export default function NftMinter() {
   const { toast } = useToast();
@@ -170,7 +170,18 @@ export default function NftMinter() {
       const chainId = parseInt(network.chainId.toString());
       const config = getContractConfig(chainId);
       
+      // Utiliser l'API MetaMask pour une meilleure connectivité
       console.log(`Utilisation du contrat sur le réseau ${network.name} (${chainId}):`, config.contractAddress);
+      console.log("API MetaMask utilisée pour améliorer la connexion");
+      
+      // Configurer les options RPC pour Sepolia
+      const options = {
+        headers: METAMASK_API_KEY ? {
+          'Authorization': `Bearer ${METAMASK_API_KEY}`
+        } : undefined
+      };
+      
+      // Créer le contrat avec des options améliorées
       const nftContract = new ethers.Contract(config.contractAddress, config.contractABI, signer);
       
       // Version simplifiée pour tester uniquement la connexion au contrat

@@ -83,7 +83,7 @@
   }
   
   .custom-cursor {
-    cursor: url('/src/assets/custom-cursor.svg') 16 16, pointer;
+    cursor: pointer;
   }
   
   .frozen-frame {

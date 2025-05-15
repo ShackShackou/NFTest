@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.H.A.C.K.E.R. #01 NFT - Alchemy</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/alchemy-sdk@2.10.1/dist/alchemy-sdk.min.js"></script>
+    <style>
+        body {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .pixelated {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        .nft-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .property-tag {
+            background-color: #374151;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .property-tag span {
+            color: #9ca3af;
+            margin-right: 0.25rem;
+        }
+        .log {
+            background-color: #374151;
+            color: #e5e7eb;
+            font-family: monospace;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+        .log-entry.error {
+            color: #f87171;
+        }
+        .log-entry.success {
+            color: #6ee7b7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <div class="nft-container">
+            <h1 class="text-3xl font-bold mb-2 text-center">S.H.A.C.K.E.R. #01</h1>
+            <p class="text-center text-indigo-400 mb-6">Chargement via Alchemy API</p>
+            
+            <div id="loading" class="flex justify-center items-center py-8">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+            </div>
+            
+            <div id="nft-card" class="card hidden">
+                <div class="relative aspect-square w-full">
+                    <img 
+                        id="nft-image"
+                        src="/images/shacker01.jpg" 
+                        alt="S.H.A.C.K.E.R. #01" 
+                        class="w-full h-full object-cover pixelated"
+                        onerror="this.onerror=null; this.src='images/shacker01.jpg';"
+                    >
+                </div>
+                
+                <div class="p-4">
+                    <p id="nft-description" class="text-gray-300 mb-4">Chargement de la description...</p>
+                    
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold mb-2">Propriétés</h3>
+                        <div id="nft-properties">
+                            <div class="animate-pulse bg-gray-700 h-6 w-20 inline-block rounded m-1"></div>
+                            <div class="animate-pulse bg-gray-700 h-6 w-24 inline-block rounded m-1"></div>
+                            <div class="animate-pulse bg-gray-700 h-6 w-16 inline-block rounded m-1"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Détails</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="text-gray-400">Token ID:</div>
+                            <div id="token-id">...</div>
+                            
+                            <div class="text-gray-400">Contract:</div>
+                            <div id="contract-address" class="break-all">...</div>
+                            
+                            <div class="text-gray-400">Standard:</div>
+                            <div id="token-standard">...</div>
+                            
+                            <div class="text-gray-400">Blockchain:</div>
+                            <div id="blockchain">Ethereum</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="error-message" class="bg-red-900/50 p-4 rounded-lg mt-4 hidden">
+                <h3 class="font-bold text-lg mb-2">Erreur de chargement</h3>
+                <p id="error-text"></p>
+            </div>
+            
+            <div class="log" id="log-container">
+                <div class="log-entry">Initialisation de l'API Alchemy...</div>
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <a href="/" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded mr-4">
+                    Application complète
+                </a>
+                <a href="/shacker.html" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded mr-4">
+                    Version statique
+                </a>
+                <a href="/diagnostic.html" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+                    Diagnostic
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonction utilitaire pour ajouter des logs
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Fonction de chargement des détails du NFT depuis Alchemy
+        async function loadNFTDetails() {
+            try {
+                // Obtenir les variables d'environnement côté serveur
+                const envResponse = await fetch('/api/env');
+                if (!envResponse.ok) {
+                    throw new Error(`Erreur lors de la récupération des variables d'environnement: ${envResponse.status}`);
+                }
+                
+                const envData = await envResponse.json();
+                const alchemyApiKey = envData.ALCHEMY_API_KEY;
+                
+                if (!alchemyApiKey) {
+                    throw new Error('Clé API Alchemy non disponible');
+                }
+                
+                log(`Clé API Alchemy disponible`, 'success');
+                
+                // Configurations Alchemy
+                const contractAddress = "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f";
+                const tokenId = "1";
+                
+                // Paramètres de la requête
+                const baseURL = "https://eth-mainnet.g.alchemy.com/nft/v2/";
+                const url = `${baseURL}${alchemyApiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}&refreshCache=false`;
+                
+                log(`Chargement des métadonnées pour le NFT ${contractAddress}:${tokenId}...`);
+                
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                log(`Métadonnées NFT chargées avec succès`, 'success');
+                console.log('Données NFT:', data);
+                
+                // Afficher les détails du NFT
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('nft-card').classList.remove('hidden');
+                
+                // Informations de base
+                document.getElementById('token-id').textContent = data.id?.tokenId || tokenId;
+                document.getElementById('contract-address').textContent = data.contract?.address || contractAddress;
+                document.getElementById('token-standard').textContent = data.id?.tokenMetadata?.tokenType || 'ERC-721';
+                
+                // Description et image
+                if (data.description) {
+                    document.getElementById('nft-description').textContent = data.description;
+                }
+                
+                if (data.media && data.media[0]?.gateway) {
+                    const imageUrl = data.media[0].gateway;
+                    document.getElementById('nft-image').src = imageUrl;
+                    log(`Image chargée: ${imageUrl}`, 'success');
+                }
+                
+                // Propriétés/Attributs
+                const propertiesContainer = document.getElementById('nft-properties');
+                propertiesContainer.innerHTML = '';
+                
+                if (data.metadata?.attributes && Array.isArray(data.metadata.attributes)) {
+                    data.metadata.attributes.forEach(attr => {
+                        const propertyTag = document.createElement('div');
+                        propertyTag.className = 'property-tag';
+                        
+                        const labelSpan = document.createElement('span');
+                        labelSpan.textContent = `${attr.trait_type || 'Attribut'}:`;
+                        
+                        propertyTag.appendChild(labelSpan);
+                        propertyTag.appendChild(document.createTextNode(` ${attr.value}`));
+                        
+                        propertiesContainer.appendChild(propertyTag);
+                    });
+                } else {
+                    propertiesContainer.textContent = 'Aucune propriété disponible';
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                log(`Erreur: ${error.message}`, 'error');
+                
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('error-text').textContent = error.message;
+                
+                // Afficher la version de secours
+                document.getElementById('nft-card').classList.remove('hidden');
+            }
+        }
+
+        // Charger les détails du NFT au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page chargée, démarrage du chargement du NFT...');
+            loadNFTDetails();
+        });
+    </script>
+</body>
+</html>

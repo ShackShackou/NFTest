@@ -1804,12 +1804,24 @@ export function NftDisplay({ className }: NftDisplayProps) {
       {/* NFT Image (S.H.A.C.K.E.R. #01) */}
       <img 
         ref={gifRef}
-        src="/images/shacker-01.jpg" 
+        src="/images/shacker01.jpg" 
         alt="S.H.A.C.K.E.R. #01" 
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover pixelated"
         style={{
           filter: isFrozen ? "grayscale(100%)" : "none",
           opacity: isPaused ? 0.7 : 1
+        }}
+        onError={(e) => {
+          console.error("Erreur de chargement de l'image:", e);
+          // Essayer plusieurs chemins de fallback
+          if (e.currentTarget.src.includes('shacker-01')) {
+            e.currentTarget.src = "/images/shacker01.jpg";
+          } else if (e.currentTarget.src.includes('shacker01')) {
+            e.currentTarget.src = "images/shacker01.jpg";
+          } else {
+            // Dernier recours
+            e.currentTarget.src = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23333333' width='100' height='100'/%3E%3Ctext fill='%23ffffff' font-family='Arial' font-size='12' x='50' y='50' text-anchor='middle'%3ES.H.A.C.K.E.R. #01%3C/text%3E%3C/svg%3E";
+          }
         }}
       />
       

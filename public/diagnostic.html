@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic S.H.A.C.K.E.R. #01</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #111;
+            color: #eee;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .nft-display {
+            margin: 20px 0;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        .log {
+            background-color: #222;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow: auto;
+        }
+        h1, h2 {
+            color: #00aaff;
+        }
+        .status {
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .success {
+            background-color: rgba(0, 128, 0, 0.2);
+            color: #4caf50;
+        }
+        .error {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #ff5252;
+        }
+        .button {
+            background-color: #2c2c2c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 10px;
+        }
+        .button:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>S.H.A.C.K.E.R. #01 - Page de Diagnostic</h1>
+        <div class="status" id="server-status">Vérification de la connexion au serveur...</div>
+        
+        <h2>Image NFT</h2>
+        <div class="nft-display">
+            <img src="/images/shacker01.jpg" alt="S.H.A.C.K.E.R. #01" id="nft-image" onerror="handleImageError()">
+        </div>
+        <div id="image-status" class="status">Vérification de l'image...</div>
+        
+        <h2>Tests alternatifs</h2>
+        <button class="button" onclick="testAlternateImagePath()">Tester chemin alternatif</button>
+        <button class="button" onclick="testAPI()">Tester API</button>
+        <button class="button" onclick="testWebSocket()">Tester WebSocket</button>
+        
+        <h2>Logs</h2>
+        <div class="log" id="log-output"></div>
+    </div>
+
+    <script>
+        const logElement = document.getElementById('log-output');
+        const imageElement = document.getElementById('nft-image');
+        const serverStatusElement = document.getElementById('server-status');
+        const imageStatusElement = document.getElementById('image-status');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.textContent = `[${timestamp}] ${message}`;
+            line.style.color = type === 'error' ? '#ff5252' : type === 'success' ? '#4caf50' : '#fff';
+            logElement.appendChild(line);
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function handleImageError() {
+            imageStatusElement.textContent = "❌ Erreur: Impossible de charger l'image";
+            imageStatusElement.className = "status error";
+            log("Erreur de chargement de l'image: /images/shacker01.jpg", 'error');
+            
+            // Essayer un chemin alternatif
+            imageElement.src = "images/shacker01.jpg";
+            log("Tentative avec chemin alternatif: images/shacker01.jpg");
+        }
+        
+        function testAlternateImagePath() {
+            const paths = [
+                "images/shacker01.jpg",
+                "/images/shacker01.jpg",
+                "images/shacker-01.jpg",
+                "/images/shacker-01.jpg"
+            ];
+            
+            log("Test de chemins d'image alternatifs...");
+            
+            paths.forEach(path => {
+                const img = new Image();
+                img.onload = function() {
+                    log(`✅ Chemin valide: ${path}`, 'success');
+                };
+                img.onerror = function() {
+                    log(`❌ Chemin invalide: ${path}`, 'error');
+                };
+                img.src = path;
+            });
+        }
+        
+        function testAPI() {
+            log("Test de l'API...");
+            fetch('/api/nfts/42')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Statut HTTP: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    log(`✅ API /api/nfts/42 fonctionne!`, 'success');
+                    log(`NFT: ${data.name} - Image: ${data.image}`);
+                })
+                .catch(error => {
+                    log(`❌ Erreur API: ${error.message}`, 'error');
+                });
+        }
+        
+        function testWebSocket() {
+            log("Test de connexion WebSocket...");
+            
+            try {
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}/ws`;
+                
+                log(`Tentative de connexion à ${wsUrl}...`);
+                const ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    log("✅ WebSocket connecté!", 'success');
+                };
+                
+                ws.onmessage = function(event) {
+                    log(`Message reçu: ${event.data}`, 'success');
+                };
+                
+                ws.onerror = function(error) {
+                    log(`❌ Erreur WebSocket: ${error}`, 'error');
+                };
+                
+                ws.onclose = function() {
+                    log("WebSocket déconnecté");
+                };
+            } catch (error) {
+                log(`❌ Exception WebSocket: ${error.message}`, 'error');
+            }
+        }
+        
+        // Vérification du serveur
+        fetch('/api/nfts/42')
+            .then(response => {
+                if (response.ok) {
+                    serverStatusElement.textContent = "✅ Connexion au serveur établie";
+                    serverStatusElement.className = "status success";
+                    return response.json();
+                } else {
+                    throw new Error(`Statut HTTP: ${response.status}`);
+                }
+            })
+            .then(data => {
+                log(`API connectée, NFT: ${data.name}`);
+            })
+            .catch(error => {
+                serverStatusElement.textContent = `❌ Erreur de connexion au serveur: ${error.message}`;
+                serverStatusElement.className = "status error";
+                log(`Erreur serveur: ${error.message}`, 'error');
+            });
+        
+        // Vérification de l'image
+        imageElement.onload = function() {
+            imageStatusElement.textContent = "✅ Image chargée avec succès";
+            imageStatusElement.className = "status success";
+            log("Image chargée: " + imageElement.src, 'success');
+        };
+        
+        // Loguer l'URL de base
+        log(`URL de base: ${window.location.href}`);
+        log(`Chemins d'images relatifs seront résolus par rapport à cette URL`);
+    </script>
+</body>
+</html>
