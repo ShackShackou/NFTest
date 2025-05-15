@@ -487,6 +487,64 @@
             }
         });
         
+        // Upload de l'image sur IPFS
+        document.getElementById('upload-to-ipfs').addEventListener('click', async () => {
+            try {
+                // Vérifier que le token ID est valide
+                const tokenId = document.getElementById('metadata-token-id').value;
+                if (!tokenId && tokenId !== "0") {
+                    showMessage('metadata-message', 'Veuillez spécifier un ID de token valide', 'error');
+                    return;
+                }
+                
+                // Afficher un message de chargement
+                showMessage('metadata-message', 'Upload vers IPFS en cours... (cela peut prendre jusqu\'à 30 secondes)', 'success');
+                
+                // Envoyer la requête d'upload
+                const response = await fetch('/api/ipfs/upload-nft-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        tokenId: parseInt(tokenId),
+                        ownerAddress: walletAddress || "0x97004E87AeEe1C25814Ec736FcbB21AdCc010F52" // Simplification pour la démo
+                    }),
+                });
+                
+                // Analyser la réponse
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || 'Erreur lors de l\'upload');
+                }
+                
+                // Afficher les informations IPFS
+                document.getElementById('ipfs-image-url').textContent = result.ipfsImageUrl;
+                document.getElementById('ipfs-metadata-url').textContent = result.ipfsMetadataUrl;
+                
+                const httpUrlElement = document.getElementById('ipfs-http-url');
+                httpUrlElement.textContent = result.httpImageUrl;
+                httpUrlElement.href = result.httpImageUrl;
+                
+                // Mettre à jour le champ d'URL de l'image
+                document.getElementById('metadata-image').value = result.ipfsImageUrl;
+                
+                // Afficher le conteneur d'informations IPFS
+                document.getElementById('ipfs-info').classList.remove('hidden');
+                
+                // Afficher un message de succès
+                showMessage('metadata-message', 'Image uploadée avec succès sur IPFS 🚀', 'success');
+                
+                // Activer le bouton de mise à jour
+                document.getElementById('update-metadata').disabled = false;
+                
+            } catch (error) {
+                console.error('Erreur d\'upload IPFS:', error);
+                showMessage('metadata-message', `Erreur lors de l'upload sur IPFS: ${error.message}`, 'error');
+            }
+        });
+        
         // Traitement du formulaire de métadonnées
         document.getElementById('metadata-form').addEventListener('submit', async (e) => {
             e.preventDefault();
