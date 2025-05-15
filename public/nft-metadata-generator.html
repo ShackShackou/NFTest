@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Métadonnées NFT pour NFT.Storage</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #8b5cf6;
+            margin: 0;
+        }
+        
+        .card {
+            background-color: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background-color: rgba(79, 70, 229, 0.2);
+            border-left: 4px solid #6366f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .error-box {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .success-box {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9ca3af;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            background-color: #374151;
+            color: #f3f4f6;
+            border: 1px solid #4b5563;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+        
+        button {
+            background-color: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #7c3aed;
+        }
+        
+        button:disabled {
+            background-color: #6b7280;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        button .icon {
+            margin-right: 8px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        a.button {
+            display: inline-block;
+            background-color: #4b5563;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #374151;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        pre {
+            background-color: #374151;
+            color: #f3f4f6;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .download-link {
+            display: inline-block;
+            background-color: #10b981;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            font-size: 16px;
+            margin-top: 12px;
+            transition: background-color 0.3s;
+        }
+        
+        .download-link:hover {
+            background-color: #059669;
+        }
+        
+        .nav-links {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #374151;
+        }
+        
+        .nav-links a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #f3f4f6;
+        }
+        
+        .flow {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .flow-step {
+            background-color: #374151;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .flow-arrow {
+            margin: 0 10px;
+            color: #6b7280;
+            font-weight: bold;
+        }
+        
+        .metadata-preview {
+            margin-bottom: 20px;
+        }
+        
+        .metadata-preview h3 {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Générateur de Métadonnées NFT</h1>
+            <a href="/admin-nft.html" class="button">Retour à l'Admin</a>
+        </div>
+        
+        <div class="card">
+            <div class="info-box">
+                <h3 style="margin-top: 0;">Solution pour NFT interactif</h3>
+                <p>Cette page génère automatiquement:</p>
+                <ol>
+                    <li>Des métadonnées NFT qui pointent vers votre HTML interactif et images</li>
+                    <li>Un fichier CSV compatible avec NFT.Storage</li>
+                </ol>
+                <p>Vous pouvez télécharger ce CSV et l'uploader directement sur NFT.Storage pour mettre à jour vos NFTs.</p>
+                
+                <div class="flow">
+                    <div class="flow-step">HTML interactif hébergé sur Replit</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">Métadonnées pointant vers l'HTML</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">CSV pour NFT.Storage</div>
+                </div>
+            </div>
+            
+            <div id="message" style="display: none;"></div>
+            
+            <form id="metadata-form">
+                <label for="token-count">Nombre de tokens NFT à générer:</label>
+                <input type="number" id="token-count" min="1" max="10" value="1">
+                
+                <div class="metadata-preview">
+                    <h3>Aperçu des métadonnées</h3>
+                    <pre>{
+  "name": "S.H.A.C.K.E.R. #0",
+  "description": "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
+  "image": "http://localhost:5000/nft-package/shacker01.jpg",
+  "animation_url": "http://localhost:5000/nft-package/index.html",
+  "attributes": [
+    {
+      "trait_type": "Type",
+      "value": "Demon"
+    },
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    }
+  ]
+}</pre>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" id="generate-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Générer CSV pour NFT.Storage
+                    </button>
+                </div>
+            </form>
+            
+            <div id="result-box" class="result-box">
+                <h3>Fichier CSV généré avec succès!</h3>
+                <p>Votre fichier CSV a été généré et est prêt à être téléchargé.</p>
+                <pre id="csv-preview">tokenID,cid
+0,http://localhost:5000/api/nft/0/metadata</pre>
+                <a id="download-link" href="#" class="download-link" download>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; display: inline-block; vertical-align: middle;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Télécharger le fichier CSV
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Instructions pour NFT.Storage</h2>
+            <ol>
+                <li style="margin-bottom: 12px;">Générez le CSV en remplissant le formulaire ci-dessus.</li>
+                <li style="margin-bottom: 12px;">Téléchargez le fichier CSV généré.</li>
+                <li style="margin-bottom: 12px;">Allez sur <a href="https://nft.storage" target="_blank" style="color: #8b5cf6;">https://nft.storage</a> et connectez-vous à votre compte.</li>
+                <li style="margin-bottom: 12px;">Cliquez sur "Upload" (la page où c'est marqué "Click or drag CSV here to upload").</li>
+                <li style="margin-bottom: 12px;">Entrez l'adresse de votre contrat NFT (ex: 0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037).</li>
+                <li style="margin-bottom: 12px;">Uploadez le fichier CSV que vous venez de télécharger.</li>
+                <li>Cliquez sur "Upload" pour finaliser la mise à jour de vos métadonnées.</li>
+            </ol>
+            
+            <div class="info-box">
+                <h3 style="margin-top: 0;">Important:</h3>
+                <p>Pour que cela fonctionne, votre application Replit doit être déployée et accessible depuis Internet. Les URLs dans le CSV pointent vers votre application.</p>
+                <p>Si vous utilisez un déploiement local, les URLs ne seront pas accessibles depuis NFT.Storage ou OpenSea.</p>
+            </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/admin-nft.html">← Retour à l'Admin NFT</a>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const metadataForm = document.getElementById('metadata-form');
+            const tokenCountInput = document.getElementById('token-count');
+            const generateButton = document.getElementById('generate-button');
+            const resultBox = document.getElementById('result-box');
+            const csvPreview = document.getElementById('csv-preview');
+            const downloadLink = document.getElementById('download-link');
+            const messageBox = document.getElementById('message');
+            
+            metadataForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Masquer les résultats précédents
+                resultBox.style.display = 'none';
+                
+                try {
+                    const tokenCount = parseInt(tokenCountInput.value);
+                    
+                    if (isNaN(tokenCount) || tokenCount < 1) {
+                        throw new Error('Le nombre de tokens doit être un nombre positif');
+                    }
+                    
+                    // Désactiver le bouton pendant la génération
+                    generateButton.disabled = true;
+                    generateButton.textContent = 'Génération en cours...';
+                    
+                    // Appeler l'API pour générer le CSV
+                    const response = await fetch(`/api/nft/create-metadata-csv?tokens=${tokenCount}`, {
+                        method: 'GET'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.error) {
+                        throw new Error(result.error);
+                    }
+                    
+                    // Afficher l'aperçu
+                    let csvContent = 'tokenID,cid\n';
+                    for (const mapping of result.mappings) {
+                        csvContent += `${mapping.tokenId},${mapping.cid}\n`;
+                    }
+                    
+                    csvPreview.textContent = csvContent;
+                    
+                    // Configurer le lien de téléchargement
+                    downloadLink.href = result.csvUrl;
+                    downloadLink.setAttribute('download', result.csvPath.split('/').pop());
+                    
+                    // Afficher la boîte de résultat
+                    resultBox.style.display = 'block';
+                    
+                    // Afficher un message de succès
+                    messageBox.className = 'success-box';
+                    messageBox.innerHTML = `<strong>Succès!</strong> Le fichier CSV pour ${tokenCount} token(s) a été généré avec succès.`;
+                    messageBox.style.display = 'block';
+                    
+                    // Faire défiler jusqu'au résultat
+                    resultBox.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    
+                    // Afficher un message d'erreur
+                    messageBox.className = 'error-box';
+                    messageBox.innerHTML = `<strong>Erreur:</strong> ${error.message}`;
+                    messageBox.style.display = 'block';
+                } finally {
+                    // Réactiver le bouton
+                    generateButton.disabled = false;
+                    generateButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Générer CSV pour NFT.Storage';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
