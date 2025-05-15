@@ -4,6 +4,12 @@ import darthBaterGif from '@assets/13_DARTHBATER.gif';
 import { cn } from '@/lib/utils';
 import { NftShop, ShopItem } from './NftShop';
 import { useToast } from '@/hooks/use-toast';
+import { 
+  AnimationEffect, 
+  loadAnimationsFromStorage,
+  registerAnimation,
+  triggerAnimation
+} from '@/lib/animationService';
 
 // Types pour les effets visuels de game feel
 interface GameEffect {
@@ -404,6 +410,11 @@ export function NftDisplay({ className }: NftDisplayProps) {
   const glassesRef = useRef<HTMLImageElement>(null);
   const backgroundRef = useRef<HTMLImageElement>(null);
   const effectRef = useRef<HTMLImageElement>(null);
+  const animationContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Animation personnalisée
+  const [customAnimations, setCustomAnimations] = useState<AnimationEffect[]>([]);
+  const [animationInstances, setAnimationInstances] = useState<string[]>([]);
   
   // Items du shop
   const [shopItems, setShopItems] = useState<ShopItem[]>([
@@ -543,6 +554,36 @@ export function NftDisplay({ className }: NftDisplayProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Charger les animations personnalisées
+  useEffect(() => {
+    // Charger les animations depuis le stockage local
+    const animations = loadAnimationsFromStorage();
+    if (animations && animations.length > 0) {
+      setCustomAnimations(animations);
+      
+      // Enregistrer chaque animation active dans le DOM
+      const instances = animations
+        .filter(anim => anim.active)
+        .map(anim => registerAnimation(anim));
+      
+      setAnimationInstances(instances);
+    }
+    
+    // Nettoyer les animations à la destruction du composant
+    return () => {
+      animationInstances.forEach(instance => {
+        try {
+          const styleElement = document.getElementById(`anim_style_${instance}`);
+          if (styleElement) {
+            document.head.removeChild(styleElement);
+          }
+        } catch (error) {
+          console.error("Erreur lors du nettoyage des animations:", error);
+        }
+      });
+    };
+  }, []);
+  
   // Animation des particules d'arrière-plan
   useEffect(() => {
     if (isPaused || isFrozen) return;
