@@ -1,49 +1,67 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
- 
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+// Fonction pour combiner les classes CSS avec tailwind-merge
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-// Format price to currency format
-export function formatPrice(price: number, currency = 'USD'): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-  }).format(price);
-}
-
-// Format Ethereum price
-export function formatEthPrice(eth: number): string {
-  return `${eth.toFixed(2)} ETH`;
-}
-
-// Convert seconds to human-readable time
-export function formatTimeRemaining(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-  
-  return `${hours}h ${minutes}m ${secs.toString().padStart(2, '0')}s`;
-}
-
-// Truncate text with ellipsis
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return `${text.slice(0, maxLength)}...`;
-}
-
-// Format date to readable format
-export function formatDate(date: Date | string): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
-}
-
-// Get shortened wallet address
+// Fonction pour raccourcir une adresse Ethereum
 export function shortenAddress(address: string): string {
+  if (!address || address.length < 10) return address;
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+// Fonction pour formater un montant avec 2 décimales
+export function formatAmount(amount: number): string {
+  return amount.toFixed(2);
+}
+
+// Fonction pour convertir une date en format lisible
+export function formatDate(date: Date): string {
+  return date.toLocaleString();
+}
+
+// Fonction pour formater un timestamp Unix en date
+export function formatUnixTimestamp(timestamp: number): string {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleString();
+}
+
+// Fonction pour formater un prix ETH
+export function formatEthPrice(priceWei: string | number): string {
+  const price = typeof priceWei === 'string' ? parseFloat(priceWei) : priceWei;
+  const ethPrice = price / 1e18; // Convertir Wei en ETH
+  
+  if (ethPrice < 0.0001) {
+    return '< 0.0001 ETH';
+  }
+  
+  return `${ethPrice.toFixed(4)} ETH`;
+}
+
+// Fonctions pour interactions avec l'API
+export async function apiRequest<T>(
+  url: string, 
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
+  body?: any
+): Promise<T> {
+  const options: RequestInit = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.statusText}`);
+  }
+
+  return response.json();
 }

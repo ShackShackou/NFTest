@@ -54,22 +54,28 @@ export default function NftMinter() {
       // Si le réseau n'est pas configuré, proposer de l'ajouter
       if (err.code === 4902) {
         try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: '0xaa36a7',
-                chainName: 'Sepolia Test Network',
-                nativeCurrency: {
-                  name: 'ETH',
-                  symbol: 'ETH',
-                  decimals: 18,
+          // Vérifier que window.ethereum existe
+          const ethereum = window.ethereum;
+          if (ethereum && ethereum.request) {
+            await ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0xaa36a7',
+                  chainName: 'Sepolia Test Network',
+                  nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18,
+                  },
+                  rpcUrls: ['https://sepolia.infura.io/v3/'],
+                  blockExplorerUrls: ['https://sepolia.etherscan.io'],
                 },
-                rpcUrls: ['https://sepolia.infura.io/v3/'],
-                blockExplorerUrls: ['https://sepolia.etherscan.io'],
-              },
-            ],
-          });
+              ],
+            });
+          } else {
+            setError('MetaMask n\'est pas disponible ou n\'est pas correctement initialisé');
+          }
         } catch (addError: any) {
           setError(addError.message || 'Impossible d\'ajouter le réseau Sepolia');
         }

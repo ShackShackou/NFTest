@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { WebSocketServer } from 'ws';
 
 // Type pour les métadonnées du NFT
 interface NftMetadata {
@@ -16,8 +17,19 @@ interface NftMetadata {
   updateFrequency?: number;
 }
 
+// Type pour les événements WebSocket
+interface WebSocketEvent {
+  type: 'metadata_update' | 'live_event' | 'notification';
+  tokenId: number;
+  data: any;
+  timestamp: number;
+}
+
 // Stockage en mémoire des métadonnées personnalisées
 const nftMetadataStore = new Map<number, NftMetadata>();
+
+// Stockage des clients WebSocket connectés
+const connectedClients = new Map<string, any>();
 
 // Fonction d'initialisation des métadonnées pour le NFT #42
 function initializeMetadata() {
@@ -35,6 +47,15 @@ function initializeMetadata() {
       lastUpdated: new Date()
     });
   }
+}
+
+// Fonction pour envoyer un événement à tous les clients connectés
+function broadcastEvent(event: WebSocketEvent) {
+  connectedClients.forEach((client, clientId) => {
+    if (client.readyState === 1) { // 1 = WebSocket.OPEN
+      client.send(JSON.stringify(event));
+    }
+  });
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -192,6 +213,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       nftMetadataStore.set(id, updatedMetadata);
       
+      // Diffuser la mise à jour à tous les clients connectés
+      broadcastEvent({
+        type: 'metadata_update',
+        tokenId: id,
+        data: updatedMetadata,
+        timestamp: Date.now()
+      });
+      
       res.json({ success: true, metadata: updatedMetadata });
     } catch (error) {
       console.error("Error updating metadata:", error);
@@ -199,7 +228,81 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint pour envoyer un événement en direct à un NFT spécifique
+  app.post("/api/events/:id", (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid ID" });
+      }
+
+      // Vérifier que le NFT existe
+      if (!nftMetadataStore.has(id)) {
+        return res.status(404).json({ error: "NFT not found" });
+      }
+
+      // Valider le propriétaire via l'adresse (simplifié pour la démo)
+      const ownerAddress = "0x97004E87AeEe1C25814Ec736FcbB21AdCc010F52".toLowerCase();
+      const requestAddress = (req.body.ownerAddress || "").toLowerCase();
+      
+      if (requestAddress !== ownerAddress) {
+        return res.status(403).json({ error: "Not authorized" });
+      }
+
+      // Diffuser l'événement en direct à tous les clients connectés
+      broadcastEvent({
+        type: 'live_event',
+        tokenId: id,
+        data: req.body.eventData,
+        timestamp: Date.now()
+      });
+      
+      res.json({ success: true, message: "Live event sent successfully" });
+    } catch (error) {
+      console.error("Error sending live event:", error);
+      res.status(500).json({ message: "Failed to send live event" });
+    }
+  });
+
+  // Créer le serveur HTTP
   const httpServer = createServer(app);
+
+  // Configurer le WebSocket Server
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+
+  wss.on('connection', (ws) => {
+    const clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Enregistrer le client
+    connectedClients.set(clientId, ws);
+    
+    console.log(`WebSocket client connected: ${clientId}`);
+    
+    // Envoyer un message de bienvenue
+    ws.send(JSON.stringify({
+      type: 'notification',
+      message: 'Connected to DarthBater NFT live updates',
+      timestamp: Date.now()
+    }));
+    
+    // Gérer les messages entrants
+    ws.on('message', (message) => {
+      try {
+        const parsedMessage = JSON.parse(message.toString());
+        console.log(`Received message from ${clientId}:`, parsedMessage);
+        
+        // Gérer les différents types de messages ici si nécessaire
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    });
+    
+    // Gérer la déconnexion
+    ws.on('close', () => {
+      connectedClients.delete(clientId);
+      console.log(`WebSocket client disconnected: ${clientId}`);
+    });
+  });
 
   return httpServer;
 }

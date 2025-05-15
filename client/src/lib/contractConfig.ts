@@ -1,12 +1,8 @@
+// Configuration pour le contrat NFT
+export const contractAddress = "0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656";
 export const contractABI = [
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "baseURI",
-        "type": "string"
-      }
-    ],
+    "inputs": [],
     "stateMutability": "nonpayable",
     "type": "constructor"
   },
@@ -58,25 +54,6 @@ export const contractABI = [
       }
     ],
     "name": "ApprovalForAll",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "NFTMinted",
     "type": "event"
   },
   {
@@ -204,21 +181,9 @@ export const contractABI = [
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      }
-    ],
-    "name": "mintNFT",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [],
+    "name": "mint",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -346,19 +311,6 @@ export const contractABI = [
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "newBaseURI",
-        "type": "string"
-      }
-    ],
-    "name": "setBaseURI",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -444,6 +396,3 @@ export const contractABI = [
     "type": "function"
   }
 ];
-
-// Remplacez cette adresse par celle de votre contrat déployé
-export const contractAddress = "0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656";
