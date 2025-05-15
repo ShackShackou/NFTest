@@ -8,13 +8,8 @@ interface Ethereum {
   request: (args: { method: string; params?: any[] }) => Promise<any>;
   on: (event: string, handler: (...args: any[]) => void) => void;
   removeListener: (event: string, handler: (...args: any[]) => void) => void;
-}
-
-// Déclarer ethereum comme une propriété de window
-declare global {
-  interface Window {
-    ethereum?: Ethereum;
-  }
+  selectedAddress?: string;
+  chainId?: string;
 }
 
 // Constantes pour les network IDs
@@ -31,6 +26,13 @@ interface WalletContextType {
   connectWallet: () => void;
   disconnectWallet: () => void;
   isSepoliaNetwork: boolean;
+}
+
+// Déclarer ethereum comme une propriété de window
+declare global {
+  interface Window {
+    ethereum?: Ethereum;
+  }
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);

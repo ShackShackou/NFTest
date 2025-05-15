@@ -1,6 +1,6 @@
 // Configuration du contrat NFT déployé sur Sepolia testnet
 // Adresse du contrat NFT DARTHBATER sur Sepolia
-export const contractAddress = "0x8B848F654c30e99bc2e4A1559b4Dc1a"; // Remplacez par l'adresse réelle de votre contrat sur Sepolia
+export const contractAddress = "0xBB848F654c30e99bc2e4A1559b4Dc1a"; // Adresse du contrat NFT sur Sepolia (selon l'erreur)
 
 // ABI du contrat (interface pour interagir avec le contrat)
 export const contractABI = [
