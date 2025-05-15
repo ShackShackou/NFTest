@@ -101,7 +101,24 @@ async function uploadToNFTStorage(filePath: string): Promise<string> {
     const content = await fs.readFile(filePath);
     const fileName = path.basename(filePath);
     
-    formData.append('file', new Blob([content]), fileName);
+    // En Node.js, nous ne pouvons pas utiliser Blob directement de cette façon
+    // Utilisons Buffer pour créer un "Blob-like" object adapté au FormData de node-fetch
+    const blob = {
+      name: fileName,
+      type: 'application/octet-stream',
+      [Symbol.toStringTag]: 'Blob',
+      arrayBuffer: async () => content.buffer,
+      size: content.length,
+      slice: () => {
+        throw new Error('Not implemented');
+      },
+      stream: () => {
+        throw new Error('Not implemented');
+      },
+      text: async () => content.toString('utf-8'),
+    };
+    
+    formData.append('file', blob as any, fileName);
     
     const response = await fetch('https://api.nft.storage/upload', {
       method: 'POST',
@@ -137,11 +154,46 @@ export async function uploadFileToIPFS(filePath: string): Promise<string> {
       return filePath;
     }
     
-    // Normaliser le chemin pour les URL relatives
+    // Pour les URLs externes, télécharger d'abord le fichier
     let normalizedPath = filePath;
-    if (filePath.startsWith('/')) {
+    let tempFilePath = null;
+    
+    if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
+      try {
+        console.log(`🌐 Téléchargement du fichier depuis URL: ${filePath}`);
+        
+        // Créer un dossier temporaire
+        const tempDir = path.join(process.cwd(), 'temp');
+        await fs.ensureDir(tempDir);
+        
+        // Utiliser fetch pour télécharger le fichier
+        const response = await fetch(filePath);
+        
+        if (!response.ok) {
+          throw new Error(`Impossible de télécharger le fichier: ${response.status} ${response.statusText}`);
+        }
+        
+        // Lire le contenu comme un tableau d'octets
+        const fileBuffer = await response.arrayBuffer();
+        
+        // Générer un nom de fichier unique
+        const extension = path.extname(filePath) || '.jpg'; // Par défaut .jpg si pas d'extension
+        tempFilePath = path.join(tempDir, `temp_${Date.now()}${extension}`);
+        
+        // Écrire dans un fichier temporaire
+        await fs.writeFile(tempFilePath, Buffer.from(fileBuffer));
+        
+        console.log(`✅ Fichier téléchargé et sauvegardé temporairement: ${tempFilePath}`);
+        normalizedPath = tempFilePath;
+      } catch (downloadError) {
+        console.error('❌ Erreur lors du téléchargement du fichier:', downloadError);
+        throw downloadError;
+      }
+    } 
+    // Pour les chemins locaux
+    else if (filePath.startsWith('/')) {
       normalizedPath = path.join(process.cwd(), 'public', filePath.substring(1));
-    } else if (!filePath.startsWith('/') && !filePath.includes('://') && !path.isAbsolute(filePath)) {
+    } else if (!filePath.startsWith('/') && !path.isAbsolute(filePath)) {
       normalizedPath = path.join(process.cwd(), 'public', filePath);
     }
     
@@ -174,14 +226,12 @@ export async function uploadFileToIPFS(filePath: string): Promise<string> {
       }
     }
     
-    // Si aucun service n'a fonctionné, fallback vers stockage local
-    console.warn("⚠️ Tous les services IPFS ont échoué, stockage local utilisé comme fallback");
-    const { filePath: localFilePath, urlPath } = generateLocalFilePath(normalizedPath);
-    await fs.ensureDir(path.dirname(localFilePath));
-    await fs.copyFile(normalizedPath, localFilePath);
-    console.log(`✅ Fichier sauvegardé localement: ${urlPath}`);
-    
-    return urlPath;
+    // L'utilisateur veut spécifiquement un stockage IPFS, pas de fallback local
+    if (lastError) {
+      throw new Error(`Erreur lors de l'upload IPFS: Tous les services IPFS ont échoué. Dernière erreur: ${lastError.message}`);
+    } else {
+      throw new Error("Tous les services IPFS ont échoué sans donner de détails.");
+    }
   } catch (error) {
     console.error('❌ Erreur générale lors de l\'upload sur IPFS:', error);
     throw error;
