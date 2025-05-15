@@ -824,6 +824,22 @@ export function NftDisplay({ className }: NftDisplayProps) {
       totalClicks: prev.totalClicks + 1
     }));
     
+    // Déclencher les animations personnalisées liées au clic
+    if (animationContainerRef.current) {
+      animationInstances.forEach(instanceId => {
+        triggerAnimation(
+          instanceId, 
+          'click', 
+          animationContainerRef.current as HTMLElement,
+          {
+            score: points,
+            level: gameStats.level,
+            combo: currentCombo
+          }
+        );
+      });
+    }
+    
     // Logique de combo
     const now = Date.now();
     const timeDiff = now - lastClickTime;
