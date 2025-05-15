@@ -152,32 +152,35 @@ export class MemStorage implements IStorage {
     this.collections.set(demoCollection.id, demoCollection);
     
     // Create demo NFTs
-    const darthBaterProperties: NftProperty[] = [
-      { type: "CHARACTER", value: "Darth Pixel", rarity: "4% have this" },
-      { type: "WEAPON", value: "Light Saber", rarity: "12% have this" },
-      { type: "RARITY", value: "Legendary", rarity: "2% have this" },
-      { type: "BACKGROUND", value: "Teal", rarity: "8% have this" },
-      { type: "ANIMATION", value: "Interactive", rarity: "5% have this" }
+    const originalStudioProperties: NftProperty[] = [
+      { type: "BACKGROUND", value: "Blue Geometric", rarity: "5% have this" },
+      { type: "SKIN", value: "Purple", rarity: "7% have this" },
+      { type: "EYES", value: "Glowing Yellow", rarity: "4% have this" },
+      { type: "HORNS", value: "Red", rarity: "8% have this" },
+      { type: "HAIR", value: "Blue Long", rarity: "6% have this" },
+      { type: "STYLE", value: "Psychedelic", rarity: "3% have this" },
+      { type: "COLLECTION", value: "Original Studio", rarity: "Rare" },
+      { type: "RARITY", value: "Legendary", rarity: "2% have this" }
     ];
     
     const demoNft: Nft = {
       id: 42,  // Set id to 42 to match the expected url path in NftMarketplace component
-      tokenId: "42",
-      name: "DARTHBATER #42",
-      description: "Cet NFT interactif présente un personnage en pixel art avec des pouvoirs spéciaux. Le NFT répond à l'interaction de l'utilisateur - survolez pour mettre en pause l'animation, cliquez sur le personnage pour déclencher une animation spéciale (de la frame 15 à 19). Un objet de collection unique avec des propriétés rares.",
-      image: "/assets/13_DARTHBATER.gif",
-      price: "0.42 ETH",
-      usdPrice: "($720.84)",
-      lastPrice: "0.30 ETH",
-      creator: "PixelMaster",
-      owner: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
-      contractAddress: "0x7Bd29408f11D2bFC23c34f18275bBf23bB716Bc7",
+      tokenId: "1",
+      name: "Original Studio #1",
+      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
+      image: "/images/original-studio-1.jpg",
+      price: "0.8 ETH",
+      usdPrice: "($1370.42)",
+      lastPrice: "0.5 ETH",
+      creator: "AI Studio",
+      owner: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
+      contractAddress: "0x4d9f6cc9d80fdf481a5f367343fdb11b208fee1f",
       tokenStandard: "ERC-721",
       blockchain: "Ethereum",
       collectionId: demoCollection.id,
       endsIn: "12h 42m 03s",
-      properties: darthBaterProperties,
-      created: new Date(2023, 3, 13) // April 13, 2023
+      properties: originalStudioProperties,
+      created: new Date(2024, 4, 15) // May 15, 2024
     };
     this.nftId = 43; // Make sure nftId is correctly set after creating this NFT
     this.nfts.set(demoNft.id, demoNft);
