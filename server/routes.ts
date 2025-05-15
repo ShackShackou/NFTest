@@ -35,14 +35,19 @@ const connectedClients = new Map<string, any>();
 function initializeMetadata() {
   if (!nftMetadataStore.has(42)) {
     nftMetadataStore.set(42, {
-      name: "DARTHBATER #42",
-      description: "Un NFT interactif avec mini-jeu intégré",
-      image: "https://gateway.pinata.cloud/ipfs/QmYDm8Bzye4RMS5RZPwqRNz9ZRUvk2bciF7VYjwdgXCFm8",
+      name: "Original Studio #1",
+      description: "Original Studio est une collection d'art psychédélique inspirée par le surréalisme et l'imagerie cyberpunk. Chaque pièce est unique et créée numériquement.",
+      image: "https://nft-darthbater.replit.app/images/original-studio-1.jpg",
       animation_url: "https://nft-darthbater.replit.app/interactive/42",
       attributes: [
-        { trait_type: "Base", value: "Pixel" },
-        { trait_type: "Style", value: "Rétro" },
-        { trait_type: "Level", value: "1" }
+        { trait_type: "Background", value: "Blue Geometric" },
+        { trait_type: "Skin", value: "Purple" },
+        { trait_type: "Eyes", value: "Glowing Yellow" },
+        { trait_type: "Horns", value: "Red" },
+        { trait_type: "Hair", value: "Blue Long" },
+        { trait_type: "Style", value: "Psychedelic" },
+        { trait_type: "Collection", value: "Original Studio" },
+        { trait_type: "Rarity", value: "Legendary" }
       ],
       lastUpdated: new Date()
     });
