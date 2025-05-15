@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { registerIPFSRoutes } from "./ipfs-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -46,6 +47,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Enregistrer les routes IPFS
+  registerIPFSRoutes(app);
+  
+  // Enregistrer les autres routes
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
