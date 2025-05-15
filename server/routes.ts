@@ -31,14 +31,15 @@ const nftMetadataStore = new Map<number, NftMetadata>();
 // Stockage des clients WebSocket connectés
 const connectedClients = new Map<string, any>();
 
-// Fonction d'initialisation des métadonnées pour le NFT #42
+// Fonction d'initialisation des métadonnées pour les NFT
 function initializeMetadata() {
-  if (!nftMetadataStore.has(42)) {
-    nftMetadataStore.set(42, {
+  // Métadonnées pour S.H.A.C.K.E.R. #01 (ID=1 pour OpenSea)
+  if (!nftMetadataStore.has(1)) {
+    nftMetadataStore.set(1, {
       name: "S.H.A.C.K.E.R. #01",
-      description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum.",
-      image: "/images/shacker01.jpg", // Image locale mise à jour
-      animation_url: "https://nft-darthbater.replit.app/interactive/42",
+      description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
+      image: "https://raw-nfts.replit.app/images/shacker01.jpg", // URL absolue pour OpenSea
+      animation_url: "https://raw-nfts.replit.app/",  // URL du mini-jeu
       attributes: [
         { trait_type: "Gender", value: "Male" },
         { trait_type: "Type", value: "Demon" },
@@ -47,10 +48,27 @@ function initializeMetadata() {
         { trait_type: "Accessory", value: "Small Horns" },
         { trait_type: "Damages", value: "Bloody Nose" },
         { trait_type: "Collection", value: "Shackers OGs" },
-        { trait_type: "Rarity", value: "#86" }
+        { trait_type: "Rarity", value: "#86" },
+        { trait_type: "Interactive", value: "Yes" }
       ],
       lastUpdated: new Date()
     });
+  }
+  
+  // Pour compatibilité avec le code existant (ID=42)
+  if (!nftMetadataStore.has(42)) {
+    // Créer une copie avec les mêmes valeurs
+    const metadata1 = nftMetadataStore.get(1);
+    if (metadata1) {
+      nftMetadataStore.set(42, {
+        name: metadata1.name,
+        description: metadata1.description,
+        image: metadata1.image,
+        animation_url: metadata1.animation_url,
+        attributes: [...metadata1.attributes],
+        lastUpdated: new Date()
+      });
+    }
   }
 }
 

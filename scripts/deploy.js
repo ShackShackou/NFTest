@@ -4,8 +4,8 @@ const hre = require("hardhat");
 async function main() {
   console.log("Déploiement du contrat DarthBaterNFT...");
 
-  // Base URI pour les métadonnées - utilise l'URL de l'API du serveur
-  const baseURI = "http://localhost:5000/api/metadata";
+  // Base URI pour les métadonnées - utilise l'URL publique de l'API
+  const baseURI = "https://raw-nfts.replit.app/api/metadata";
 
   // Déploiement du contrat
   const DarthBaterNFT = await hre.ethers.getContractFactory("DarthBaterNFT");
