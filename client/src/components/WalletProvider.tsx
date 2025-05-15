@@ -35,15 +35,28 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   
   // Vérifier si MetaMask est disponible
   const checkIfMetaMaskIsAvailable = (): boolean => {
-    return typeof window !== 'undefined' && !!window.ethereum;
+    try {
+      return typeof window !== 'undefined' && 
+             window.ethereum !== undefined && 
+             !!window.ethereum.isMetaMask;
+    } catch (error) {
+      console.error("Erreur lors de la vérification de MetaMask:", error);
+      return false;
+    }
   };
   
   // Mettre à jour les informations du compte
   const updateAccountInfo = async () => {
     if (!checkIfMetaMaskIsAvailable()) return;
     
+    const ethereum = window.ethereum;
+    if (!ethereum) {
+      console.warn("MetaMask n'est pas accessible");
+      return;
+    }
+    
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(ethereum as any);
       
       // Obtenir l'adresse du compte
       const signer = await provider.getSigner();
@@ -72,6 +85,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       return;
     }
     
+    const ethereum = window.ethereum;
+    if (!ethereum) {
+      console.warn("MetaMask n'est pas accessible");
+      return;
+    }
+    
     const handleAccountsChanged = async (accounts: string[]) => {
       if (accounts.length === 0) {
         // Utilisateur s'est déconnecté
@@ -92,23 +111,30 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     };
     
     // Vérifier l'état initial
-    window.ethereum.request({ method: 'eth_accounts' })
-      .then(handleAccountsChanged)
-      .catch((err: any) => {
-        console.error('Erreur lors de la vérification des comptes:', err);
-      });
-    
-    // Ajouter les écouteurs d'événements
-    window.ethereum.on('accountsChanged', handleAccountsChanged);
-    window.ethereum.on('chainChanged', handleChainChanged);
-    
-    // Nettoyage lors du démontage
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-        window.ethereum.removeListener('chainChanged', handleChainChanged);
-      }
-    };
+    try {
+      ethereum.request({ method: 'eth_accounts' })
+        .then(handleAccountsChanged)
+        .catch((err: any) => {
+          console.error('Erreur lors de la vérification des comptes:', err);
+        });
+      
+      // Ajouter les écouteurs d'événements
+      ethereum.on('accountsChanged', handleAccountsChanged);
+      ethereum.on('chainChanged', handleChainChanged);
+      
+      // Nettoyage lors du démontage
+      return () => {
+        try {
+          ethereum.removeListener('accountsChanged', handleAccountsChanged);
+          ethereum.removeListener('chainChanged', handleChainChanged);
+        } catch (error) {
+          console.error("Erreur lors du nettoyage des écouteurs:", error);
+        }
+      };
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation des écouteurs MetaMask:", error);
+      return () => {};
+    }
   }, []);
   
   // Fonction pour connecter le wallet
