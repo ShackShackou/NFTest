@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur CSV pour NFT.Storage</title>
+    <style>
+        body {
+            background-color: #111827;
+            color: #f3f4f6;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #8b5cf6;
+            text-align: center;
+        }
+        .card {
+            background-color: #1f2937;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .info-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .success-box {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: none;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            color: #f3f4f6;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #8b5cf6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #7c3aed;
+        }
+        pre {
+            background-color: #374151;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .download-link {
+            display: block;
+            background-color: #10b981;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        .download-link:hover {
+            background-color: #059669;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Convertisseur CSV pour NFT.Storage</h1>
+        
+        <div class="card">
+            <div class="info-box">
+                <h3 style="margin-top: 0;">Générateur de CSV pour NFT.Storage</h3>
+                <p>Cette page génère un fichier CSV compatible avec NFT.Storage qui contient les liens vers vos métadonnées NFT.</p>
+                <p><strong>NFT.Storage accepte uniquement le format CSV</strong> pour les mises à jour de métadonnées.</p>
+            </div>
+            
+            <form id="csv-form">
+                <label for="token-count">Nombre de tokens NFT:</label>
+                <input type="number" id="token-count" min="1" max="100" value="1">
+                
+                <button type="submit">Générer le fichier CSV</button>
+            </form>
+            
+            <div id="result" class="success-box">
+                <h3 style="margin-top: 0;">Fichier CSV généré avec succès!</h3>
+                <p>Voici l'aperçu du contenu CSV:</p>
+                <pre id="csv-preview">tokenID,cid
+0,https://votre-app.replit.app/api/nft/0/metadata</pre>
+                <a id="download-link" href="#" class="download-link" download>Télécharger le fichier CSV</a>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Instructions pour NFT.Storage:</h3>
+                    <ol>
+                        <li>Téléchargez le fichier CSV généré</li>
+                        <li>Allez sur <a href="https://nft.storage" style="color: #60a5fa;" target="_blank">NFT.Storage</a></li>
+                        <li>Dans la section Upload, entrez l'adresse de votre contrat: <br><code>0xd10AC868cFC5Ab7B5d3eA041D552FB57F6a03037</code></li>
+                        <li>Uploadez ce fichier CSV</li>
+                        <li>Cliquez sur Upload pour finaliser la mise à jour</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('csv-form');
+            const result = document.getElementById('result');
+            const csvPreview = document.getElementById('csv-preview');
+            const downloadLink = document.getElementById('download-link');
+            
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const tokenCount = document.getElementById('token-count').value;
+                
+                try {
+                    // Appeler l'API pour générer le CSV
+                    const response = await fetch(`/api/nft/create-metadata-csv?tokens=${tokenCount}`, {
+                        method: 'GET'
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Afficher l'aperçu du CSV
+                    let csvContent = 'tokenID,cid\n';
+                    for (const mapping of data.mappings) {
+                        csvContent += `${mapping.tokenId},${mapping.cid}\n`;
+                    }
+                    
+                    csvPreview.textContent = csvContent;
+                    
+                    // Configurer le lien de téléchargement
+                    downloadLink.href = data.csvUrl;
+                    downloadLink.setAttribute('download', data.csvPath.split('/').pop());
+                    
+                    // Afficher le résultat
+                    result.style.display = 'block';
+                    
+                    // Faire défiler jusqu'au résultat
+                    result.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    alert(`Erreur: ${error.message}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
