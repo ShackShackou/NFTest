@@ -2,9 +2,10 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { WebSocketServer } from 'ws';
-import { uploadFileToIPFS, uploadMetadataToIPFS, ipfsToHttpUrl } from './ipfs-service';
+import { uploadFileToIPFS, uploadMetadataToIPFS, ipfsToHttpUrl } from './ipfs-direct-service';
 import fs from 'fs-extra';
 import path from 'path';
+import multer from 'multer';
 
 // Type pour les métadonnées du NFT
 interface NftMetadata {
