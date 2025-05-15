@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title DarthBaterNFT
- * @dev Un contrat NFT pour la collection DARTHBATER avec des métadonnées externes
+ * @dev Un contrat NFT pour la collection S.H.A.C.K.E.R. avec des métadonnées externes et des fonctionnalités interactives
  */
 contract DarthBaterNFT is ERC721URIStorage, Ownable {
     // Compteur de tokens
@@ -19,7 +19,7 @@ contract DarthBaterNFT is ERC721URIStorage, Ownable {
     event NFTMinted(address to, uint256 tokenId);
     
     // Constructeur
-    constructor(string memory baseURI) ERC721("DARTHBATER", "DBTR") Ownable(msg.sender) {
+    constructor(string memory baseURI) ERC721("SHACKER", "SHKR") Ownable(msg.sender) {
         _baseTokenURI = baseURI;
     }
     
