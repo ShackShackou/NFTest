@@ -6,6 +6,7 @@ import { uploadFileToIPFS, uploadMetadataToIPFS, ipfsToHttpUrl } from './ipfs-di
 import fs from 'fs-extra';
 import path from 'path';
 import multer from 'multer';
+import { uploadService } from './upload-service';
 
 // Type pour les métadonnées du NFT
 interface NftMetadata {
@@ -116,6 +117,9 @@ function broadcastEvent(event: WebSocketEvent) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Enregistrer les routes d'upload
+  uploadService.registerRoutes(app);
+  
   // Configuration de Multer pour l'upload de fichiers
   const multerStorage = multer.diskStorage({
     destination: function (req, file, cb) {

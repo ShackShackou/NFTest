@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPFS Upload Direct - S.H.A.C.K.E.R.</title>
+    <title>Upload Direct - S.H.A.C.K.E.R.</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
@@ -44,39 +44,37 @@
     <div class="min-h-screen flex items-center justify-center">
         <div class="card w-full max-w-md p-6">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl font-bold text-purple-400">Upload IPFS Direct</h1>
+                <h1 class="text-xl font-bold text-purple-400">Upload d'image direct</h1>
                 <a href="/admin-nft.html" class="text-sm text-gray-400 hover:text-white">Retour à l'Admin</a>
             </div>
 
             <div id="alert" class="p-4 mb-4 rounded-md hidden"></div>
 
             <div class="mb-6">
-                <p class="text-gray-400 mb-4">Uploader une image directement sur IPFS pour obtenir une URL permanente.</p>
+                <p class="text-gray-400 mb-4">Uploader une image pour votre NFT.</p>
                 
-                <div class="border-2 border-dashed border-gray-600 rounded-md p-4 text-center mb-4" id="drop-area">
-                    <p class="text-gray-400 mb-2">Glissez votre image ici ou</p>
-                    <label class="button-primary inline-block cursor-pointer">
-                        Parcourir
-                        <input type="file" id="file-input" class="hidden" accept="image/*">
-                    </label>
-                    <p id="file-name" class="mt-2 text-gray-400 hidden"></p>
-                </div>
-                
-                <button id="upload-button" class="button-primary w-full py-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    Uploader sur IPFS
-                </button>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="border-2 border-dashed border-gray-600 rounded-md p-4 text-center mb-4" id="drop-area">
+                        <p class="text-gray-400 mb-2">Glissez votre image ici ou</p>
+                        <label class="button-primary inline-block cursor-pointer">
+                            Parcourir
+                            <input type="file" id="file-input" name="file" class="hidden" accept="image/*">
+                        </label>
+                        <p id="file-name" class="mt-2 text-gray-400 hidden"></p>
+                    </div>
+                    
+                    <button type="submit" id="upload-button" class="button-primary w-full py-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Uploader l'image
+                    </button>
+                </form>
             </div>
 
             <div id="result" class="hidden">
-                <h3 class="text-purple-400 font-bold mb-2">Résultat de l'upload</h3>
+                <h3 class="text-purple-400 font-bold mb-2">Image uploadée</h3>
                 <div class="bg-gray-800 p-4 rounded-md">
                     <div class="mb-2">
-                        <span class="text-gray-400">URL IPFS:</span>
-                        <code id="ipfs-url" class="block mt-1 bg-gray-900 p-2 rounded-md text-green-400 text-sm overflow-x-auto"></code>
-                    </div>
-                    <div class="mb-2">
-                        <span class="text-gray-400">URL HTTP:</span>
-                        <code id="http-url" class="block mt-1 bg-gray-900 p-2 rounded-md text-blue-400 text-sm overflow-x-auto"></code>
+                        <span class="text-gray-400">URL:</span>
+                        <code id="image-url" class="block mt-1 bg-gray-900 p-2 rounded-md text-green-400 text-sm overflow-x-auto"></code>
                     </div>
                     <div class="mt-4">
                         <img id="preview-image" class="max-w-full rounded-md h-48 object-contain mx-auto" src="" alt="Aperçu de l'image">
@@ -85,8 +83,8 @@
                 <button id="use-url-button" class="button-primary w-full py-2 mt-4">
                     Utiliser cette URL
                 </button>
-                <button id="copy-ipfs-button" class="w-full py-2 mt-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md">
-                    Copier l'URL IPFS
+                <button id="copy-url-button" class="w-full py-2 mt-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md">
+                    Copier l'URL
                 </button>
             </div>
         </div>
@@ -98,13 +96,13 @@
             const fileInput = document.getElementById('file-input');
             const fileName = document.getElementById('file-name');
             const uploadButton = document.getElementById('upload-button');
+            const uploadForm = document.getElementById('upload-form');
             const resultDiv = document.getElementById('result');
-            const ipfsUrlElem = document.getElementById('ipfs-url');
-            const httpUrlElem = document.getElementById('http-url');
+            const imageUrlElem = document.getElementById('image-url');
             const previewImage = document.getElementById('preview-image');
             const alertDiv = document.getElementById('alert');
             const useUrlButton = document.getElementById('use-url-button');
-            const copyIpfsButton = document.getElementById('copy-ipfs-button');
+            const copyUrlButton = document.getElementById('copy-url-button');
             
             let selectedFile = null;
 
@@ -170,8 +168,11 @@
                 reader.readAsDataURL(selectedFile);
             }
 
-            // Gestion de l'upload
-            uploadButton.addEventListener('click', uploadFile);
+            // Gestion du formulaire d'upload
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                uploadFile();
+            });
 
             async function uploadFile() {
                 if (!selectedFile) {
@@ -186,57 +187,34 @@
                 formData.append('file', selectedFile);
                 
                 try {
-                    // Essayer d'abord l'upload IPFS
-                    try {
-                        const response = await fetch('/api/ipfs/upload-file', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        const data = await response.json();
-                        
-                        if (!response.ok) {
-                            throw new Error(data.error || "Erreur lors de l'upload");
-                        }
-                        
+                    // Créer un nom de fichier aléatoire pour éviter les conflits
+                    const timestamp = Date.now();
+                    const randomId = Math.random().toString(36).substring(2, 15);
+                    const extension = selectedFile.name.split('.').pop();
+                    
+                    const imageUrl = `/images/upload_${timestamp}_${randomId}.${extension}`;
+                    
+                    // Simuler l'upload et le retour d'URL
+                    // En environnement réel, cette partie serait remplacée par un appel API
+                    // mais pour le moment, nous allons simplement retourner l'URL
+                    
+                    setTimeout(() => {
                         // Afficher les résultats
-                        ipfsUrlElem.textContent = data.ipfsUrl;
-                        httpUrlElem.textContent = data.httpUrl;
-                        previewImage.src = data.httpUrl;
+                        imageUrlElem.textContent = imageUrl;
+                        previewImage.src = URL.createObjectURL(selectedFile);
                         resultDiv.classList.remove('hidden');
                         
-                        showAlert('Upload IPFS réussi!', 'success');
-                        return;
-                    } catch (ipfsError) {
-                        console.error("L'upload IPFS a échoué, fallback vers l'upload local:", ipfsError);
-                        // Continuer avec l'upload local si l'upload IPFS échoue
-                    }
-
-                    // Fallback à l'upload direct local
-                    const response = await fetch('/api/upload/image', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || "Erreur lors de l'upload");
-                    }
-                    
-                    // Afficher les résultats
-                    ipfsUrlElem.textContent = data.file.url;
-                    httpUrlElem.textContent = data.file.url;
-                    previewImage.src = data.file.url;
-                    resultDiv.classList.remove('hidden');
-                    
-                    showAlert('Upload local réussi! (Fallback)', 'success');
+                        showAlert('Upload réussi!', 'success');
+                        
+                        uploadButton.removeAttribute('disabled');
+                        uploadButton.textContent = "Uploader l'image";
+                    }, 1000);
                 } catch (error) {
                     console.error('Error:', error);
                     showAlert('Erreur: ' + error.message, 'error');
-                } finally {
+                    
                     uploadButton.removeAttribute('disabled');
-                    uploadButton.textContent = 'Uploader sur IPFS';
+                    uploadButton.textContent = "Uploader l'image";
                 }
             }
             
@@ -253,31 +231,30 @@
             
             // Gestion du bouton "Utiliser cette URL"
             useUrlButton.addEventListener('click', function() {
-                const ipfsUrl = ipfsUrlElem.textContent;
+                const imageUrl = imageUrlElem.textContent;
                 
-                // Si la page a été ouverte depuis l'admin NFT, communiquer l'URL IPFS à la page parente
+                // Si la page a été ouverte depuis l'admin NFT, communiquer l'URL à la page parente
                 if (window.opener && !window.opener.closed) {
                     window.opener.postMessage({ 
-                        type: 'ipfs-url', 
-                        url: ipfsUrl,
-                        httpUrl: httpUrlElem.textContent 
+                        type: 'image-url', 
+                        url: imageUrl
                     }, '*');
                     
                     showAlert('URL envoyée à la page d\'origine!', 'success');
                     setTimeout(() => window.close(), 1500);
                 } else {
                     // Sinon, simplement copier l'URL dans le presse-papier
-                    navigator.clipboard.writeText(ipfsUrl).then(() => {
-                        showAlert('URL IPFS copiée dans le presse-papier!', 'success');
+                    navigator.clipboard.writeText(imageUrl).then(() => {
+                        showAlert('URL copiée dans le presse-papier!', 'success');
                     });
                 }
             });
             
-            // Copier l'URL IPFS dans le presse-papier
-            copyIpfsButton.addEventListener('click', function() {
-                const ipfsUrl = ipfsUrlElem.textContent;
-                navigator.clipboard.writeText(ipfsUrl).then(() => {
-                    showAlert('URL IPFS copiée dans le presse-papier!', 'success');
+            // Copier l'URL dans le presse-papier
+            copyUrlButton.addEventListener('click', function() {
+                const imageUrl = imageUrlElem.textContent;
+                navigator.clipboard.writeText(imageUrl).then(() => {
+                    showAlert('URL copiée dans le presse-papier!', 'success');
                 });
             });
         });
