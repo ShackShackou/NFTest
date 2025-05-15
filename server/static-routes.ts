@@ -9,6 +9,11 @@ export function registerStaticRoutes(app: Express) {
   // Servir les fichiers statiques du dossier public
   app.use(express.static(path.join(process.cwd(), 'public')));
   
+  // Route racine qui pointe vers notre interface simplifiée
+  app.get('/', (req, res) => {
+    res.redirect('/nft-admin-simplifie.html');
+  });
+  
   // Route spéciale pour servir les métadonnées NFT
   app.get('/api/nft/:tokenId/metadata', async (req, res) => {
     const tokenId = req.params.tokenId;
