@@ -31,15 +31,23 @@ const nftMetadataStore = new Map<number, NftMetadata>();
 // Stockage des clients WebSocket connectés
 const connectedClients = new Map<string, any>();
 
+// Fonction pour obtenir l'URL de base du serveur
+function getBaseUrl(req: Request): string {
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  return `${protocol}://${host}`;
+}
+
 // Fonction d'initialisation des métadonnées pour les NFT
 function initializeMetadata() {
+
   // Métadonnées pour S.H.A.C.K.E.R. #01 (ID=0 pour le NFT déjà minté)
   if (!nftMetadataStore.has(0)) {
     nftMetadataStore.set(0, {
       name: "S.H.A.C.K.E.R. #01",
       description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
-      image: "https://raw-nfts.replit.app/images/shacker01.jpg", // URL absolue pour OpenSea
-      animation_url: "https://raw-nfts.replit.app/",  // URL du mini-jeu
+      image: "/images/shacker01.jpg", // URL relative (sera convertie en absolue)
+      animation_url: "/", // URL relative (sera convertie en absolue)
       attributes: [
         { trait_type: "Gender", value: "Male" },
         { trait_type: "Type", value: "Demon" },
@@ -60,8 +68,8 @@ function initializeMetadata() {
     nftMetadataStore.set(1, {
       name: "S.H.A.C.K.E.R. #01",
       description: "Une créature démoniaque aux yeux jaunes flamboyants et aux petites cornes. NFT rare de la collection Shackers OG sur Ethereum. NFT interactif avec mini-jeu intégré.",
-      image: "https://raw-nfts.replit.app/images/shacker01.jpg", // URL absolue pour OpenSea
-      animation_url: "https://raw-nfts.replit.app/",  // URL du mini-jeu
+      image: "/images/shacker01.jpg", // URL relative (sera convertie en absolue)
+      animation_url: "/", // URL relative (sera convertie en absolue)
       attributes: [
         { trait_type: "Gender", value: "Male" },
         { trait_type: "Type", value: "Demon" },
@@ -230,8 +238,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!metadata) {
         return res.status(404).json({ error: "Metadata not found" });
       }
+      
+      // Convertir les URL relatives en URL absolues
+      const baseUrl = getBaseUrl(req);
+      const metadataWithAbsoluteUrls = {
+        ...metadata,
+        image: metadata.image.startsWith('http') ? metadata.image : `${baseUrl}${metadata.image}`,
+        animation_url: metadata.animation_url ? 
+          (metadata.animation_url.startsWith('http') ? metadata.animation_url : `${baseUrl}${metadata.animation_url}`) 
+          : undefined
+      };
 
-      res.json(metadata);
+      res.json(metadataWithAbsoluteUrls);
     } catch (error) {
       console.error("Error fetching metadata:", error);
       res.status(500).json({ message: "Failed to fetch metadata" });
