@@ -1,104 +1,95 @@
-import { Network, Alchemy, AssetTransfersCategory } from 'alchemy-sdk';
+import { Network, Alchemy } from 'alchemy-sdk';
 
-// Vérifier si la clé API Alchemy est disponible
+// Vérifier si la clé API Alchemy est disponible depuis l'environnement Vite
 const apiKey = import.meta.env.VITE_ALCHEMY_API_KEY;
 
 // Configuration Alchemy
 const settings = {
-  apiKey: apiKey || 'demo', // Fallback to demo key (limited usage)
+  apiKey: apiKey || '', // Si pas de clé, ça échouera proprement
   network: Network.ETH_SEPOLIA,
 };
 
+// Variable pour l'instance Alchemy
 let alchemyInstance: Alchemy | null = null;
 
-// Initialiser l'instance d'Alchemy si une clé API est disponible
-try {
-  if (apiKey) {
-    alchemyInstance = new Alchemy(settings);
-    console.log('Service Alchemy initialisé avec succès');
-  } else {
-    console.warn('Pas de clé API Alchemy disponible, certaines fonctionnalités seront limitées');
+// Fonction pour obtenir l'instance Alchemy (lazy initialization)
+const getAlchemyInstance = (): Alchemy | null => {
+  if (!apiKey) {
+    console.warn("Pas de clé API Alchemy disponible");
+    return null;
   }
-} catch (error) {
-  console.error('Erreur lors de l\'initialisation du service Alchemy:', error);
-}
+  
+  if (!alchemyInstance) {
+    try {
+      alchemyInstance = new Alchemy(settings);
+      console.log("Service Alchemy initialisé");
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation d'Alchemy:", error);
+      return null;
+    }
+  }
+  
+  return alchemyInstance;
+};
 
+// Service Alchemy avec gestion des erreurs
 export const alchemyService = {
   // Vérifier si le service est prêt
-  isReady: () => !!alchemyInstance && !!apiKey,
+  isReady: (): boolean => {
+    return !!apiKey && !!getAlchemyInstance();
+  },
 
-  // Obtenir l'horodatage du bloc actuel
-  getCurrentBlockTimestamp: async () => {
-    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
-    const blockNumber = await alchemyInstance.core.getBlockNumber();
-    const block = await alchemyInstance.core.getBlock(blockNumber);
-    return block.timestamp;
+  // Obtenir l'horodatage du bloc actuel (utile pour vérifier la connexion)
+  getCurrentBlockTimestamp: async (): Promise<number> => {
+    const alchemy = getAlchemyInstance();
+    if (!alchemy) throw new Error('Service Alchemy non initialisé');
+    
+    try {
+      const blockNumber = await alchemy.core.getBlockNumber();
+      const block = await alchemy.core.getBlock(blockNumber);
+      return block.timestamp;
+    } catch (error) {
+      console.error("Erreur lors de la récupération du timestamp:", error);
+      throw error;
+    }
   },
 
   // Récupérer tous les NFTs pour une adresse
   getNftsForOwner: async (address: string) => {
-    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
+    const alchemy = getAlchemyInstance();
+    if (!alchemy) throw new Error('Service Alchemy non initialisé');
+    
     try {
-      const nfts = await alchemyInstance.nft.getNftsForOwner(address);
-      return nfts;
+      return await alchemy.nft.getNftsForOwner(address);
     } catch (error) {
-      console.error('Erreur lors de la récupération des NFTs:', error);
+      console.error("Erreur lors de la récupération des NFTs:", error);
       throw error;
     }
   },
 
   // Récupérer un NFT spécifique
   getNftMetadata: async (contractAddress: string, tokenId: string) => {
-    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
+    const alchemy = getAlchemyInstance();
+    if (!alchemy) throw new Error('Service Alchemy non initialisé');
+    
     try {
-      const nft = await alchemyInstance.nft.getNftMetadata(
-        contractAddress,
-        tokenId
-      );
-      return nft;
+      return await alchemy.nft.getNftMetadata(contractAddress, tokenId);
     } catch (error) {
-      console.error('Erreur lors de la récupération des métadonnées NFT:', error);
+      console.error("Erreur lors de la récupération des métadonnées NFT:", error);
       throw error;
     }
   },
 
   // Vérifier la propriété d'un NFT
   isNftOwner: async (address: string, contractAddress: string, tokenId: string) => {
-    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
+    const alchemy = getAlchemyInstance();
+    if (!alchemy) throw new Error('Service Alchemy non initialisé');
+    
     try {
-      const owner = await alchemyInstance.nft.getOwnersForNft(contractAddress, tokenId);
+      const owner = await alchemy.nft.getOwnersForNft(contractAddress, tokenId);
       return owner.owners.includes(address.toLowerCase());
     } catch (error) {
-      console.error('Erreur lors de la vérification de la propriété du NFT:', error);
-      throw error;
-    }
-  },
-
-  // Récupérer l'historique des transferts pour un NFT
-  getNftTransfers: async (contractAddress: string, tokenId: string) => {
-    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
-    try {
-      // Utiliser l'API d'événements pour récupérer les transferts
-      const transferEvents = await alchemyInstance.core.getLogs({
-        address: contractAddress,
-        fromBlock: "earliest",
-        toBlock: "latest",
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", // Topic de l'événement Transfer
-          null, // from (any)
-          null, // to (any)
-          null  // tokenId (any)
-        ]
-      });
-      
-      // Retourner les logs bruts
-      return transferEvents.map(event => ({
-        transactionHash: event.transactionHash,
-        blockNumber: parseInt(event.blockNumber.toString()),
-        topics: event.topics
-      }));
-    } catch (error) {
-      console.error('Erreur lors de la récupération des transferts NFT:', error);
+      console.error("Erreur lors de la vérification de la propriété du NFT:", error);
       throw error;
     }
   }
