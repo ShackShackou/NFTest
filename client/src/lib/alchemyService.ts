@@ -1,223 +1,107 @@
-// Service d'intégration Alchemy pour la gestion avancée des NFTs
+import { Network, Alchemy, AssetTransfersCategory } from 'alchemy-sdk';
 
-// Types pour les réponses de l'API Alchemy
-interface AlchemyNFT {
-  contract: {
-    address: string;
-  };
-  id: {
-    tokenId: string;
-    tokenMetadata: {
-      tokenType: string;
-    };
-  };
-  title: string;
-  description: string;
-  tokenUri: {
-    raw: string;
-    gateway: string;
-  };
-  media: {
-    raw: string;
-    gateway: string;
-  }[];
-  metadata: {
-    name: string;
-    description: string;
-    image: string;
-    attributes: {
-      trait_type: string;
-      value: string;
-    }[];
-    [key: string]: any;
-  };
-  timeLastUpdated: string;
+// Vérifier si la clé API Alchemy est disponible
+const apiKey = import.meta.env.VITE_ALCHEMY_API_KEY;
+
+// Configuration Alchemy
+const settings = {
+  apiKey: apiKey || 'demo', // Fallback to demo key (limited usage)
+  network: Network.ETH_SEPOLIA,
+};
+
+let alchemyInstance: Alchemy | null = null;
+
+// Initialiser l'instance d'Alchemy si une clé API est disponible
+try {
+  if (apiKey) {
+    alchemyInstance = new Alchemy(settings);
+    console.log('Service Alchemy initialisé avec succès');
+  } else {
+    console.warn('Pas de clé API Alchemy disponible, certaines fonctionnalités seront limitées');
+  }
+} catch (error) {
+  console.error('Erreur lors de l\'initialisation du service Alchemy:', error);
 }
 
-// Service Alchemy pour les opérations NFT
-export class AlchemyService {
-  private apiKey: string;
-  private baseUrl: string;
-  private network: 'sepolia' | 'mainnet';
+export const alchemyService = {
+  // Vérifier si le service est prêt
+  isReady: () => !!alchemyInstance && !!apiKey,
 
-  constructor(network: 'sepolia' | 'mainnet' = 'sepolia') {
-    this.apiKey = import.meta.env.VITE_ALCHEMY_API_KEY || '';
-    this.network = network;
-    this.baseUrl = network === 'mainnet' 
-      ? `https://eth-mainnet.g.alchemy.com/v2/${this.apiKey}`
-      : `https://eth-sepolia.g.alchemy.com/v2/${this.apiKey}`;
-  }
+  // Obtenir l'horodatage du bloc actuel
+  getCurrentBlockTimestamp: async () => {
+    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
+    const blockNumber = await alchemyInstance.core.getBlockNumber();
+    const block = await alchemyInstance.core.getBlock(blockNumber);
+    return block.timestamp;
+  },
 
-  // Obtenir tous les NFTs détenus par une adresse
-  async getNFTsForOwner(ownerAddress: string): Promise<AlchemyNFT[]> {
+  // Récupérer tous les NFTs pour une adresse
+  getNftsForOwner: async (address: string) => {
+    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
     try {
-      const response = await fetch(
-        `${this.baseUrl}/getNFTs?owner=${ownerAddress}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.ownedNfts || [];
+      const nfts = await alchemyInstance.nft.getNftsForOwner(address);
+      return nfts;
     } catch (error) {
-      console.error('Error fetching NFTs from Alchemy:', error);
+      console.error('Erreur lors de la récupération des NFTs:', error);
       throw error;
     }
-  }
+  },
 
-  // Obtenir un NFT spécifique par son adresse de contrat et son tokenId
-  async getNFT(contractAddress: string, tokenId: string): Promise<AlchemyNFT | null> {
+  // Récupérer un NFT spécifique
+  getNftMetadata: async (contractAddress: string, tokenId: string) => {
+    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
     try {
-      const response = await fetch(
-        `${this.baseUrl}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          }
-        }
+      const nft = await alchemyInstance.nft.getNftMetadata(
+        contractAddress,
+        tokenId
       );
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      return await response.json();
+      return nft;
     } catch (error) {
-      console.error('Error fetching NFT from Alchemy:', error);
+      console.error('Erreur lors de la récupération des métadonnées NFT:', error);
       throw error;
     }
-  }
+  },
 
-  // Obtenir tous les NFTs d'une collection spécifique détenus par une adresse
-  async getNFTsForOwnerByCollection(ownerAddress: string, contractAddress: string): Promise<AlchemyNFT[]> {
+  // Vérifier la propriété d'un NFT
+  isNftOwner: async (address: string, contractAddress: string, tokenId: string) => {
+    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
     try {
-      const response = await fetch(
-        `${this.baseUrl}/getNFTs?owner=${ownerAddress}&contractAddresses[]=${contractAddress}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.ownedNfts || [];
+      const owner = await alchemyInstance.nft.getOwnersForNft(contractAddress, tokenId);
+      return owner.owners.includes(address.toLowerCase());
     } catch (error) {
-      console.error('Error fetching collection NFTs from Alchemy:', error);
+      console.error('Erreur lors de la vérification de la propriété du NFT:', error);
       throw error;
     }
-  }
+  },
 
-  // Vérifier si une adresse possède un NFT spécifique
-  async ownsNFT(ownerAddress: string, contractAddress: string, tokenId: string): Promise<boolean> {
+  // Récupérer l'historique des transferts pour un NFT
+  getNftTransfers: async (contractAddress: string, tokenId: string) => {
+    if (!alchemyInstance) throw new Error('Service Alchemy non initialisé');
     try {
-      const nfts = await this.getNFTsForOwnerByCollection(ownerAddress, contractAddress);
-      return nfts.some(nft => nft.id.tokenId === tokenId);
-    } catch (error) {
-      console.error('Error checking NFT ownership:', error);
-      return false;
-    }
-  }
-
-  // Obtenir l'historique des transferts d'un NFT
-  async getNFTTransfers(contractAddress: string, tokenId: string): Promise<any[]> {
-    try {
-      const response = await fetch(
-        `${this.baseUrl}/getAssetTransfers?contractAddress=${contractAddress}&tokenId=${tokenId}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-          }
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.transfers || [];
-    } catch (error) {
-      console.error('Error fetching NFT transfers from Alchemy:', error);
-      throw error;
-    }
-  }
-
-  // Récupérer des données de bloc (utile pour programmer des événements)
-  async getBlock(blockNumber: string): Promise<any> {
-    try {
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'eth_getBlockByNumber',
-          params: [blockNumber, false],
-        }),
+      // Utiliser l'API d'événements pour récupérer les transferts
+      const transferEvents = await alchemyInstance.core.getLogs({
+        address: contractAddress,
+        fromBlock: "earliest",
+        toBlock: "latest",
+        topics: [
+          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", // Topic de l'événement Transfer
+          null, // from (any)
+          null, // to (any)
+          null  // tokenId (any)
+        ]
       });
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return data.result;
+      
+      // Retourner les logs bruts
+      return transferEvents.map(event => ({
+        transactionHash: event.transactionHash,
+        blockNumber: parseInt(event.blockNumber.toString()),
+        topics: event.topics
+      }));
     } catch (error) {
-      console.error('Error fetching block from Alchemy:', error);
+      console.error('Erreur lors de la récupération des transferts NFT:', error);
       throw error;
     }
   }
+};
 
-  // Récupérer le timestamp actuel de la blockchain (utile pour programmer des événements)
-  async getCurrentBlockTimestamp(): Promise<number> {
-    try {
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'eth_getBlockByNumber',
-          params: ['latest', false],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Alchemy API error: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      // Convertir le timestamp hexadécimal en nombre décimal
-      const timestamp = parseInt(data.result.timestamp, 16);
-      return timestamp;
-    } catch (error) {
-      console.error('Error fetching current block timestamp from Alchemy:', error);
-      throw error;
-    }
-  }
-}
-
-// Créer une instance du service
-export const alchemyService = new AlchemyService('sepolia');
+export default alchemyService;

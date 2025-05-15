@@ -139,9 +139,9 @@ export default function NftMinter() {
         else {
           throw new Error("Aucune fonction de mint reconnue n'est disponible sur ce contrat");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Erreur lors de la détection de la fonction mint:", err);
-        throw new Error(`Le contrat ne supporte pas le mint: ${err.message}`);
+        throw new Error(`Le contrat ne supporte pas le mint: ${err?.message || err}`);
       }
       
       // Attendre que la transaction soit minée
@@ -177,11 +177,35 @@ export default function NftMinter() {
         tokenId: tokenId,
       });
     } catch (err: any) {
-      const errorMsg = err.message || 'Une erreur s\'est produite';
+      // Formatage des messages d'erreur pour les rendre plus compréhensibles
+      let errorMsg = err.message || 'Une erreur s\'est produite';
+      let errorTitle = 'Erreur lors du mint';
+      
+      // Analyse des erreurs courantes pour des messages plus clairs
+      if (errorMsg.includes('user rejected') || errorMsg.includes('declined by user')) {
+        errorMsg = 'Vous avez rejeté la transaction dans votre portefeuille';
+        errorTitle = 'Transaction annulée';
+      } else if (errorMsg.includes('insufficient funds')) {
+        errorMsg = 'Vous n\'avez pas assez d\'ETH pour payer cette transaction et les frais de gas';
+        errorTitle = 'Fonds insuffisants';
+      } else if (errorMsg.includes('nonce')) {
+        errorMsg = 'Erreur de transaction : problème de nonce. Essayez de réinitialiser votre compte dans les paramètres de MetaMask';
+        errorTitle = 'Problème de transaction';
+      } else if (errorMsg.includes('execution reverted')) {
+        errorMsg = 'Le contrat a rejeté la transaction. Cause possible : vous avez déjà minté le maximum autorisé ou le contrat est en pause';
+        errorTitle = 'Contrat a rejeté la transaction';
+      } else if (errorMsg.includes('network changed') || errorMsg.includes('chain ID')) {
+        errorMsg = 'Le réseau a changé pendant la transaction. Vérifiez que vous êtes sur Sepolia et réessayez';
+        errorTitle = 'Changement de réseau';
+      } else if (errorMsg.toLowerCase().includes('function') || errorMsg.toLowerCase().includes('mint')) {
+        errorTitle = 'Problème de contrat';
+      }
+      
+      console.error('Détails de l\'erreur:', err);
       setError(errorMsg);
       
       toast({
-        title: 'Erreur lors du mint',
+        title: errorTitle,
         description: errorMsg.substring(0, 100) + (errorMsg.length > 100 ? '...' : ''),
         variant: 'destructive',
       });
