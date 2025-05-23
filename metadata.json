@@ -1,0 +1,13 @@
+{
+  "name": "S.H.A.C.K.E.R. #1",
+  "description": "NFT dynamique avec système de progression et événements spéciaux",
+  "image": "ipfs://bafybeihmlzy6m5sjmh3r5pvw6wh3zyix6cqui3ltx5zrzzlorswytr3zre",
+  "attributes": [
+    {"trait_type": "Niveau", "value": 1},
+    {"trait_type": "XP", "value": 0},
+    {"trait_type": "Statut", "value": "Normal"},
+    {"trait_type": "Force", "value": 5},
+    {"trait_type": "Agilité", "value": 5},
+    {"trait_type": "Intelligence", "value": 5}
+  ]
+} 
